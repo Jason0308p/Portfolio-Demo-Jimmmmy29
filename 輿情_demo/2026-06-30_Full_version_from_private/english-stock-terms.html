@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>真實英文財經報導選輯｜Real Market English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090f1c; --surface:#0f1828; --card:#162134; --card2:#1c2940; --border:#273750;
+  --accent:#e63946; --up:#ff7676; --dn:#46d98a; --neu:#60a5fa; --gold:#f59e0b;
+  --text:#e8eef6; --text2:#a3b4c9; --text3:#74879f;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter','Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.55}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(11,15,25,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 18px;height:46px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:7px}
+.nav-brand span{color:var(--accent)}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:12.5px;padding:4px 10px;border-radius:6px}
+.nav-links a:hover{background:var(--card);color:var(--text)}
+
+.hero{padding:15px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#0f172a,#1a1638)}
+.hero h1{font-size:18px;font-weight:700;color:#fff;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.hero h1 .en{font-size:11px;font-weight:500;color:var(--accent);letter-spacing:1px;text-transform:uppercase}
+.hero p{color:var(--text2);font-size:12px;margin-top:5px}
+
+.wrap{max-width:1120px;margin:0 auto;padding:14px 18px 70px}
+
+.jump{position:sticky;top:46px;z-index:90;display:flex;flex-wrap:wrap;gap:5px;padding:9px 0;background:var(--bg);border-bottom:1px solid var(--border);margin-bottom:14px}
+.jump a{padding:4px 11px;border-radius:14px;background:var(--card);border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap}
+.jump a:hover{background:rgba(230,57,70,.16);border-color:rgba(230,57,70,.55);color:#ff8a92}
+
+.note{font-size:12px;color:var(--text2);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 13px;margin-bottom:18px}
+.note b{color:var(--gold)}
+mark{background:none;font-weight:700;padding:0}
+mark.u{color:var(--up)}mark.d{color:var(--dn)}mark.n{color:#ffd27a}
+
+.sec-h{display:flex;align-items:baseline;gap:9px;margin:24px 0 11px;border-left:3px solid var(--accent);padding-left:9px}
+.sec-h h2{font-size:16px;font-weight:700;color:#fff}
+.sec-h .ctx{font-size:11.5px;color:var(--text3)}
+
+.feed{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:760px){.feed{grid-template-columns:1fr}}
+
+.card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--neu);border-radius:9px;padding:11px 14px;display:flex;flex-direction:column;transition:border-color .15s}
+.card.up{border-left-color:var(--up)}
+.card.dn{border-left-color:var(--dn)}
+.card:hover{border-top-color:#3b5378;border-right-color:#3b5378;border-bottom-color:#3b5378}
+.card .meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.src{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;color:var(--text3);font-weight:600}
+.src .out{color:#fff;background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:1px 7px;letter-spacing:.3px}
+.golink{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#0b1018;background:var(--gold);border-radius:6px;padding:3px 10px;text-decoration:none;white-space:nowrap}
+.golink:hover{background:#ffb13d}
+.headline{font-family:'Source Serif 4',Georgia,serif;font-size:16px;font-weight:600;line-height:1.34;color:#fff;text-decoration:none}
+.headline:hover{color:#cfe0f5}
+.facts{font-size:11.5px;color:var(--text3);margin-top:7px;line-height:1.55}
+.facts b{color:#cdd9e8;font-weight:600}
+.zh{font-size:12px;color:var(--text2);margin-top:6px;padding-left:9px;border-left:2px solid var(--border)}
+
+.srcs{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+@media(max-width:760px){.srcs{grid-template-columns:1fr}}
+.srcs a{display:block;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 13px;text-decoration:none}
+.srcs a:hover{border-color:#3b5378}
+.srcs .n{font-size:13px;font-weight:700;color:#fff}
+.srcs .n .lv{font-size:10px;font-weight:600;color:var(--gold);border:1px solid var(--gold);border-radius:3px;padding:0 5px;margin-left:6px}
+.srcs .d{font-size:11.5px;color:var(--text3);margin-top:2px}
+.srcs .u{font-size:11px;color:var(--neu);margin-top:3px;word-break:break-all}
+
+.foot{text-align:center;color:var(--text3);font-size:11px;margin-top:32px;padding-top:16px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="index.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>真實英文<span>報導</span></a>
+  <div class="nav-links"><a href="index.html">← 回輿情日報</a></div>
+</nav>
+
+<div class="hero">
+  <h1>真實英文財經報導選輯 <span class="en">Real Market English</span></h1>
+  <p>每則皆為 CNBC 真實報導＋原文連結，標題就是最道地的股市英文。<mark class="u">紅=漲</mark>、<mark class="d">綠=跌</mark>、<mark class="n">黃=關鍵詞</mark>（依台股慣例）</p>
+</div>
+
+<div class="wrap">
+  <div class="jump">
+    <a href="#mkt">大盤行情</a><a href="#beat">財報亮眼</a><a href="#miss">財報踩雷</a><a href="#anly">分析師評等</a><a href="#deal">併購・IPO</a><a href="#macro">總經數據</a><a href="#more">自己讀更多</a>
+  </div>
+  <div class="note">下面 20+ 則<b>全是 CNBC 真實報導</b>（標題、數據皆引自原文），非自製內容。每張卡右上角「🔗 原文」點進去就是完整英文文章；卡片左側色條：<mark class="u">紅＝上漲</mark>、<mark class="d">綠＝下跌</mark>、藍＝數據/中性。</div>
+
+  <!-- 大盤行情 -->
+  <div class="sec-h" id="mkt"><h2>① 大盤行情</h2><span class="ctx">Market recap — 收盤漲跌</span></div>
+  <div class="feed">
+    <div class="card up">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-01</span><a class="golink" href="https://www.cnbc.com/2026/06/01/stock-market-today-live-updates.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/01/stock-market-today-live-updates.html" target="_blank" rel="noopener noreferrer">Dow <mark class="u">jumps</mark> more than 200 points, S&P 500 posts first <mark class="u">close above</mark> 7,600</a>
+      <div class="zh">道瓊大漲逾 200 點，標普 500 首度收在 7,600 之上。</div>
+    </div>
+    <div class="card up">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-05-31</span><a class="golink" href="https://www.cnbc.com/2026/05/31/stock-market-today-live-updates.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/05/31/stock-market-today-live-updates.html" target="_blank" rel="noopener noreferrer">S&P 500 closes at a <mark class="u">record</mark> to kick off June trading as tech <mark class="u">rally</mark> overpowers oil spike</a>
+      <div class="zh">科技股漲勢蓋過油價飆升，標普 500 以歷史新高為 6 月開場。</div>
+    </div>
+    <div class="card dn">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-09</span><a class="golink" href="https://www.cnbc.com/2026/06/09/stock-market-today-live-updates.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/09/stock-market-today-live-updates.html" target="_blank" rel="noopener noreferrer">Dow <mark class="d">drops</mark> more than 900 points as chip <mark class="d">sell-off</mark> worsens, Trump threatens more Iran attacks</a>
+      <div class="facts"><b>Dow fell 953.33 (-1.87%)</b> to 49,918.78; <b>S&P lost 1.62%</b> to 7,266.99; <b>Nasdaq dropped 1.98%</b> to 25,169.50; WTI crude rose 2.07% to $90.03.</div>
+      <div class="zh">晶片股賣壓加劇＋川普揚言攻擊伊朗，道瓊重挫逾 900 點，油價反向走高。</div>
+    </div>
+    <div class="card dn">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-04</span><a class="golink" href="https://www.cnbc.com/2026/06/04/stock-market-today-live-updates.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/04/stock-market-today-live-updates.html" target="_blank" rel="noopener noreferrer">Nasdaq <mark class="d">falls</mark> 4% and suffers worst day since April 2025 as traders <mark class="d">flee</mark> chip stocks</a>
+      <div class="zh">交易員棄守晶片股，那斯達克重挫 4%、創 2025 年 4 月以來最慘單日。</div>
+    </div>
+    <div class="card dn">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-08</span><a class="golink" href="https://www.cnbc.com/2026/06/08/stock-market-today-live-updates.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/08/stock-market-today-live-updates.html" target="_blank" rel="noopener noreferrer">S&P 500 and Nasdaq <mark class="d">close lower</mark> as chip stock rebound <mark class="d">fails</mark></a>
+      <div class="zh">晶片股反彈無力，標普 500 與那斯達克雙雙收黑。</div>
+    </div>
+  </div>
+
+  <!-- 財報亮眼 -->
+  <div class="sec-h" id="beat"><h2>② 財報亮眼</h2><span class="ctx">Earnings beats — 優於預期、股價噴出</span></div>
+  <div class="feed">
+    <div class="card up">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-01</span><a class="golink" href="https://www.cnbc.com/2026/06/01/hpe-stock-earnings-q2.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/01/hpe-stock-earnings-q2.html" target="_blank" rel="noopener noreferrer">HPE <mark class="u">skyrockets</mark> 30% on biggest earnings <mark class="u">beat</mark> since 2018</a>
+      <div class="facts"><b>Adjusted EPS 79¢ vs. 53¢ expected</b>; <b>revenue $10.68B vs. $9.79B expected</b>，AI 伺服器需求帶動。</div>
+      <div class="zh">慧與科技繳出 2018 年來最大優於預期財報，股價狂飆 30%。</div>
+    </div>
+    <div class="card up">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-04-23</span><a class="golink" href="https://www.cnbc.com/2026/04/23/intel-intc-q1-2026-earnings-report.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/04/23/intel-intc-q1-2026-earnings-report.html" target="_blank" rel="noopener noreferrer">Intel's stock <mark class="u">soars</mark> 20% as results <mark class="u">top estimates</mark>, with chipmaker showing signs of growth</a>
+      <div class="zh">英特爾財報優於預期、出現成長跡象，股價大漲 20%。</div>
+    </div>
+    <div class="card up">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-05-04</span><a class="golink" href="https://www.cnbc.com/2026/05/04/pinterest-pins-q1-earnings-report-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/05/04/pinterest-pins-q1-earnings-report-2026.html" target="_blank" rel="noopener noreferrer">Pinterest <mark class="u">surges</mark> 15% after earnings <mark class="u">beat</mark> as company posts strong <mark class="u">guidance</mark></a>
+      <div class="zh">Pinterest 財報優於預期、財測強勁，股價急拉 15%。</div>
+    </div>
+    <div class="card up">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-05-08</span><a class="golink" href="https://www.cnbc.com/2026/05/08/rocket-lab-rklb-q1-earnings-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/05/08/rocket-lab-rklb-q1-earnings-2026.html" target="_blank" rel="noopener noreferrer">Rocket Lab <mark class="u">surges</mark> 34% in best day ever on revenue <mark class="u">beat</mark>, record-setting launch deal</a>
+      <div class="zh">火箭實驗室營收優於預期、簽下史上最大發射合約，單日狂漲 34% 創紀錄。</div>
+    </div>
+  </div>
+
+  <!-- 財報踩雷 -->
+  <div class="sec-h" id="miss"><h2>③ 財報踩雷</h2><span class="ctx">Misses & guidance cuts — 財測差、股價殺</span></div>
+  <div class="feed">
+    <div class="card dn">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-10</span><a class="golink" href="https://www.cnbc.com/2026/06/10/oracle-orcl-q4-earnings-report-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/10/oracle-orcl-q4-earnings-report-2026.html" target="_blank" rel="noopener noreferrer">Oracle <mark class="u">beats</mark> on earnings, but stock <mark class="d">drops</mark> on plans to raise another $20 billion</a>
+      <div class="facts">「beat 卻跌」經典：獲利優於預期，但 free cash flow 轉負、計畫再籌資 $20B。</div>
+      <div class="zh">甲骨文獲利優於預期，卻因要再籌資 200 億美元而下跌。</div>
+    </div>
+    <div class="card dn">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-05-27</span><a class="golink" href="https://www.cnbc.com/2026/05/27/zscaler-zs-earnings-q3-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/05/27/zscaler-zs-earnings-q3-2026.html" target="_blank" rel="noopener noreferrer">Zscaler <mark class="d">tanks</mark> 31% for worst day ever on 'prudent' <mark class="d">guidance</mark>, sales shakeup</a>
+      <div class="facts">財報優於預期，卻因 <b>guided for just 16%–17% ARR growth</b>（低於市場預估）而暴殺——財測壓過好數字。</div>
+      <div class="zh">財報雖好，但保守財測＋業務調整，股價崩跌 31% 創最慘單日。</div>
+    </div>
+    <div class="card dn">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-03</span><a class="golink" href="https://www.cnbc.com/2026/06/03/broadcom-avgo-earnings-report-q2-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/03/broadcom-avgo-earnings-report-q2-2026.html" target="_blank" rel="noopener noreferrer">Broadcom stock <mark class="d">plunges</mark> on weak software sales, unchanged AI chip forecast for the year</a>
+      <div class="facts"><b>Revenue $22.19B vs. $22.27B estimated</b>；CEO 未上調全年 $100B AI 晶片目標，股價約 -15%。</div>
+      <div class="zh">博通軟體營收疲弱、未上修 AI 晶片財測，股價重挫。</div>
+    </div>
+    <div class="card dn">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-05-07</span><a class="golink" href="https://www.cnbc.com/2026/05/07/coreweave-crwv-q1-earnings-report-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/05/07/coreweave-crwv-q1-earnings-report-2026.html" target="_blank" rel="noopener noreferrer">CoreWeave stock <mark class="d">sinks</mark> 10% on weak revenue <mark class="d">guidance</mark>, increased spending forecast</a>
+      <div class="zh">CoreWeave 因財測疲弱＋資本支出上修，盤後下挫 10%。</div>
+    </div>
+    <div class="card dn">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-04</span><a class="golink" href="https://www.cnbc.com/2026/06/04/lululemon-lulu-earnings-q1-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/04/lululemon-lulu-earnings-q1-2026.html" target="_blank" rel="noopener noreferrer">Lululemon <mark class="d">cuts annual outlook</mark>, citing 'negative' media commentary and disappointing product launches</a>
+      <div class="facts">FY2026 營收財測 <b>下修至 $11–11.15B（原 $11.35–11.5B）</b>，盤後 -11%。</div>
+      <div class="zh">Lululemon 下修全年財測，怪罪負面輿論與新品不如預期，盤後跌 11%。</div>
+    </div>
+  </div>
+
+  <!-- 分析師 -->
+  <div class="sec-h" id="anly"><h2>④ 分析師評等</h2><span class="ctx">Analyst calls — 升降評等、目標價</span></div>
+  <div class="feed">
+    <div class="card">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-10</span><a class="golink" href="https://www.cnbc.com/2026/06/10/wednesday-biggest-stocks-by-analyst-calls-like-nvidia.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/10/wednesday-biggest-stocks-by-analyst-calls-like-nvidia.html" target="_blank" rel="noopener noreferrer">Here are Wednesday's biggest <mark class="n">analyst calls</mark>: Nvidia, Tesla, Netflix, Chipotle, Nike & more</a>
+      <div class="facts">Morgan Stanley <b>raised</b> Broadcom price target to $502 (from $485); JPMorgan <b>upgraded</b> Tesla to neutral; <b>upgraded</b> Chipotle to overweight; Lululemon <b>downgraded</b> to Neutral.</div>
+      <div class="zh">每日「analyst calls」彙整：升評（upgrade）、降評（downgrade）、調目標價（price target）一次看。</div>
+    </div>
+    <div class="card dn">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2025-12-07</span><a class="golink" href="https://www.cnbc.com/2025/12/07/huge-wall-street-call-morgan-stanleys-new-tesla-analyst-downgrades-stock-over-valuation-concerns.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2025/12/07/huge-wall-street-call-morgan-stanleys-new-tesla-analyst-downgrades-stock-over-valuation-concerns.html" target="_blank" rel="noopener noreferrer">Huge Wall Street call: Morgan Stanley's new Tesla analyst <mark class="d">downgrades</mark> stock over <mark class="d">valuation</mark> concerns</a>
+      <div class="zh">大摩新任分析師以「估值過高」為由調降特斯拉評等——valuation downgrade 範例。</div>
+    </div>
+  </div>
+
+  <!-- 併購IPO -->
+  <div class="sec-h" id="deal"><h2>⑤ 併購・IPO</h2><span class="ctx">Deals — 收購、上市</span></div>
+  <div class="feed">
+    <div class="card up">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2025-12-08</span><a class="golink" href="https://www.cnbc.com/2025/12/08/ibm-confluent-deal-data.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2025/12/08/ibm-confluent-deal-data.html" target="_blank" rel="noopener noreferrer">Confluent stock <mark class="u">soars</mark> 29% as IBM announces $11 billion <mark class="n">acquisition</mark> deal</a>
+      <div class="facts"><b>IBM to pay $31 per share in cash</b>，交易約 $11B，預計 2026 年中完成；被收購方 Confluent +29%。</div>
+      <div class="zh">IBM 宣布以 110 億美元收購 Confluent，被收購方股價狂漲 29%（併購標的常見的反應）。</div>
+    </div>
+    <div class="card">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·專區</span><a class="golink" href="https://www.cnbc.com/deals-and-ipos/" target="_blank" rel="noopener noreferrer">🔗 前往</a></div>
+      <a class="headline" href="https://www.cnbc.com/deals-and-ipos/" target="_blank" rel="noopener noreferrer">CNBC <mark class="n">Deals and IPOs</mark> — 併購與新股上市報導專區</a>
+      <div class="zh">想看更多 M&A／IPO 報導與用語（acquire、merger、go public、debut），到這個專區。</div>
+    </div>
+  </div>
+
+  <!-- 總經 -->
+  <div class="sec-h" id="macro"><h2>⑥ 總經數據</h2><span class="ctx">Macro — 通膨、就業、聯準會</span></div>
+  <div class="feed">
+    <div class="card">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-10</span><a class="golink" href="https://www.cnbc.com/2026/06/10/cpi-inflation-report-may-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/10/cpi-inflation-report-may-2026.html" target="_blank" rel="noopener noreferrer">CPI inflation report May 2026: Prices <mark class="n">rose 4.2% annually</mark></a>
+      <div class="facts"><b>CPI +0.5% m/m, 4.2% y/y</b>（與預期一致）；energy +3.9%；<b>core CPI +0.2% m/m, 2.9% y/y</b>。</div>
+      <div class="zh">5 月消費者物價年增 4.2%，能源帶動；核心通膨年增 2.9%。</div>
+    </div>
+    <div class="card">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-06-05</span><a class="golink" href="https://www.cnbc.com/2026/06/05/jobs-report-may-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/06/05/jobs-report-may-2026.html" target="_blank" rel="noopener noreferrer">Jobs report May 2026 — payrolls <mark class="n">far above</mark> expectations</a>
+      <div class="facts"><b>Nonfarm payrolls +172,000</b> vs. 80,000 consensus; <b>unemployment held steady at 4.3%</b>，強勁數據降低 Fed 短期降息機率。</div>
+      <div class="zh">5 月非農就業增 17.2 萬、遠超預期 8 萬，失業率持平 4.3%。</div>
+    </div>
+    <div class="card">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-04-29</span><a class="golink" href="https://www.cnbc.com/2026/04/29/fed-interest-rate-decision-april-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/04/29/fed-interest-rate-decision-april-2026.html" target="_blank" rel="noopener noreferrer">Fed interest rate decision April 2026: Fed <mark class="n">holds rates steady</mark> amid dissent</a>
+      <div class="facts"><b>Held at 3.5%–3.75%</b>，投票 split 8-4（自 1992 年 10 月來最多異議）。</div>
+      <div class="zh">聯準會 4 月維持利率不變，但內部分歧為數十年最大。</div>
+    </div>
+    <div class="card">
+      <div class="meta"><span class="src"><span class="out">CNBC</span>·2026-03-18</span><a class="golink" href="https://www.cnbc.com/2026/03/18/fed-interest-rate-decision-march-2026.html" target="_blank" rel="noopener noreferrer">🔗 原文</a></div>
+      <a class="headline" href="https://www.cnbc.com/2026/03/18/fed-interest-rate-decision-march-2026.html" target="_blank" rel="noopener noreferrer">Fed interest rate decision March 2026: <mark class="n">Holds rates steady</mark></a>
+      <div class="facts">維持 3.5%–3.75%；<b>dot plot</b>（點陣圖）暗示今年 1 次、2027 再 1 次降息。</div>
+      <div class="zh">3 月維持利率不變，點陣圖指向今年僅一次降息。</div>
+    </div>
+  </div>
+
+  <!-- 自己讀更多 -->
+  <div class="sec-h" id="more"><h2>⑦ 自己讀更多（可信來源）</h2><span class="ctx">點進去讀真實英文報導</span></div>
+  <div class="srcs">
+    <a href="https://www.cnbc.com/markets/" target="_blank" rel="noopener noreferrer"><div class="n">CNBC Markets<span class="lv">即時</span></div><div class="d">每日盤中／收盤行情，語感最標準。</div><div class="u">cnbc.com/markets</div></a>
+    <a href="https://www.cnbc.com/earnings/" target="_blank" rel="noopener noreferrer"><div class="n">CNBC Earnings<span class="lv">財報</span></div><div class="d">個股財報，beat／miss／guidance 密集。</div><div class="u">cnbc.com/earnings</div></a>
+    <a href="https://www.cnbc.com/federal-reserve/" target="_blank" rel="noopener noreferrer"><div class="n">CNBC Federal Reserve<span class="lv">總經</span></div><div class="d">聯準會與利率，hawkish／dovish／dot plot。</div><div class="u">cnbc.com/federal-reserve</div></a>
+    <a href="https://www.reuters.com/markets/" target="_blank" rel="noopener noreferrer"><div class="n">Reuters Markets<span class="lv">通訊社</span></div><div class="d">全球財經通訊社，文字精煉、可信度高。</div><div class="u">reuters.com/markets</div></a>
+    <a href="https://apnews.com/hub/financial-markets" target="_blank" rel="noopener noreferrer"><div class="n">AP Financial Markets<span class="lv">通訊社</span></div><div class="d">美聯社，標準新聞英文、用字中性。</div><div class="u">apnews.com/hub/financial-markets</div></a>
+    <a href="https://www.investopedia.com/markets-news-4427704" target="_blank" rel="noopener noreferrer"><div class="n">Investopedia Markets<span class="lv">教學</span></div><div class="d">報導＋名詞解釋並陳，初學最友善。</div><div class="u">investopedia.com</div></a>
+    <a href="https://www.marketwatch.com/markets" target="_blank" rel="noopener noreferrer"><div class="n">MarketWatch<span class="lv">即時</span></div><div class="d">盤勢與個股快訊，標題式短句多。</div><div class="u">marketwatch.com/markets</div></a>
+    <a href="https://finance.yahoo.com/" target="_blank" rel="noopener noreferrer"><div class="n">Yahoo Finance<span class="lv">綜合</span></div><div class="d">行情＋彙整新聞，免費好查個股。</div><div class="u">finance.yahoo.com</div></a>
+  </div>
+
+  <div class="foot">真實英文財經報導選輯 · 標題與數據引自 CNBC 報導，著作權屬原媒體；本頁僅供語言學習與導讀，點連結閱讀原文全文。</div>
+</div>
+</body>
+</html>

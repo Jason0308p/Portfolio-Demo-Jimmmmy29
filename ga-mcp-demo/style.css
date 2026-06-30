@@ -233,3 +233,15 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:5px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
 .bar-row .v{text-align:right;font-family:var(--mono);color:var(--text)}
 .chart-foot{font-size:11px;color:var(--text3);margin-top:10px}
+
+/* ===== 手機 RWD 修正 ===== */
+@media (max-width:640px){
+  html,body{overflow-x:hidden;max-width:100%}
+  .wrap{padding-left:15px;padding-right:15px}
+  nav{flex-wrap:wrap;row-gap:8px;padding:11px 14px}
+  .brand{font-size:15px}
+  .nav-right{gap:10px;font-size:12px}
+  .badge-demo{font-size:10px;padding:2px 8px}
+  .hero h1{font-size:23px;line-height:1.3;overflow-wrap:break-word}
+  .hero p{font-size:13.5px}
+}

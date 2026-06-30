@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>商品上架 SEO 自動化 — 展示用 (MVP)</title>
+<meta name="description" content="爬蟲商品自動補圖、補敘述、生成 SEO/GEO 商品名與標籤，透過自建宜搭(Yida) MCP 寫回，並用 n8n 自動社群貼文與回收成效數據的電商上架自動化作品集展示。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="brand"><span class="dot"></span>商品上架<span>·SEO 自動化</span></div>
+  <div class="nav-right">
+    <span class="badge-demo">DEMO · 模擬資料</span>
+    <a href="../index.html">← 作品集首頁</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>電商商品上架 SEO 自動化</h1>
+    <p>爬蟲抓回的陽春商品資料，自動<b>補圖、補敘述、生成 SEO/GEO 商品名與標籤</b>，透過<b>自建宜搭 (Yida) MCP</b>
+       寫回表單，再用 <b>n8n</b> 自動發社群貼文並回收成效。本頁為<b>純前端展示</b>，商品與數據皆為虛構。</p>
+    <div class="tags">
+      <span class="tag cool">自建宜搭 (Yida) MCP Server</span>
+      <span class="tag">AI SEO / GEO 內容生成</span>
+      <span class="tag">爬蟲商品資料</span>
+      <span class="tag">自動補圖 / 補敘述</span>
+      <span class="tag">n8n 社群自動化</span>
+      <span class="tag">成效數據回收</span>
+      <span class="tag">批次 diff / preflight</span>
+      <span class="tag">Python / Node</span>
+    </div>
+  </div>
+
+  <div class="note">
+    📌 <b>展示聲明</b>：本頁為公開作品集，商品、圖片、文案與成效數字皆為<b>虛構範例</b>；
+    不含任何金鑰、宜搭 token、表單 id 或真實商品/營運資料。下方流程動畫為架構「示意」，非真實連線。
+  </div>
+
+  <!-- ===== 流程順序 ===== -->
+  <h2 class="sec">流程順序（載入時依序亮燈示意）</h2>
+  <div class="pipe" id="pipe">
+    <div class="node" data-k="scrape"><span class="step">1</span><div class="ic">🕷️</div><div class="nm">爬蟲商品</div><div class="sub">原始陽春資料</div></div>
+    <div class="node yida" data-k="read"><span class="step">2</span><div class="ic">📋</div><div class="nm">宜搭 J1 讀取</div><div class="sub">篩選待處理</div></div>
+    <div class="node" data-k="ai"><span class="step">3</span><div class="ic">🤖</div><div class="nm">AI 補圖/敘述/SEO</div><div class="sub">生成內容</div></div>
+    <div class="node yida" data-k="write"><span class="step">4</span><div class="ic">💾</div><div class="nm">寫回宜搭</div><div class="sub">J1 / J1A</div></div>
+    <div class="node social" data-k="post"><span class="step">5</span><div class="ic">📣</div><div class="nm">n8n 社群貼文</div><div class="sub">自動發佈</div></div>
+    <div class="node social" data-k="data"><span class="step">6</span><div class="ic">📈</div><div class="nm">回收成效</div><div class="sub">數據返回</div></div>
+  </div>
+  <div class="runbar"><button id="runBtn">▶ 重播流程</button><span class="runhint">頁面載入會自動播一次；亦可手動重播</span></div>
+
+  <!-- ===== 前後對比 ===== -->
+  <h2 class="sec">AI 上架處理：原始 → 完成（模擬）</h2>
+  <div class="picker" id="picker"></div>
+  <div class="ba">
+    <div class="pcard before">
+      <span class="ptag">原始爬蟲資料</span>
+      <div class="pimg empty" id="bImg">無商品圖</div>
+      <div class="pfield"><div class="k">商品名稱</div><div class="v" id="bName">—</div></div>
+      <div class="pfield"><div class="k">商品敘述</div><div class="v empty" id="bDesc">（無，待補）</div></div>
+      <div class="pfield"><div class="k">SEO 標籤</div><div class="v empty" id="bTags">（無）</div></div>
+    </div>
+    <div class="pcard after">
+      <span class="ptag">✓ AI 處理完成</span>
+      <div class="pimg empty" id="aImg">尚未處理</div>
+      <div class="pfield"><div class="k">AI 產品名稱（SEO）</div><div class="v" id="aName">—</div></div>
+      <div class="pfield"><div class="k">AI 產品敘述（列點 + GEO）</div><div class="v" id="aDesc">—</div></div>
+      <div class="pfield"><div class="k">AI 產品標籤</div><div class="ptags-row" id="aTags"></div></div>
+    </div>
+  </div>
+  <div class="runbar">
+    <button id="genBtn">✨ 執行 AI 上架處理</button>
+    <button id="postBtn" class="alt" disabled>📣 發佈到社群並回收數據</button>
+  </div>
+
+  <!-- ===== 社群成效 ===== -->
+  <div class="social-out" id="socialOut">
+    <h2 class="sec" style="margin-top:4px">n8n 社群貼文與回收成效（模擬）</h2>
+    <div class="sp">
+      <div class="sp-head"><div class="sp-av">🛍️</div><div class="sp-name">禮品官方<span>由 n8n 自動發佈 · 剛剛</span></div></div>
+      <div class="sp-body" id="spBody"></div>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="m-v" id="mView">—</div><div class="m-k">觸及</div></div>
+      <div class="metric"><div class="m-v" id="mLike">—</div><div class="m-k">讚</div></div>
+      <div class="metric"><div class="m-v" id="mShare">—</div><div class="m-k">分享</div></div>
+      <div class="metric"><div class="m-v" id="mClick">—</div><div class="m-k">點擊</div></div>
+    </div>
+    <p class="back-note">＊ 成效數字由 n8n 回收後寫回追蹤表（此處為虛構示意）。</p>
+  </div>
+
+  <!-- ===== 技術與設計說明 ===== -->
+  <h2 class="sec">技術與設計說明</h2>
+
+  <details class="acc acc-lg" open>
+    <summary><span class="ic">✨</span> 設計重點<span class="cnt">5 項</span></summary>
+    <div class="abody">
+      <ul class="dlist">
+        <li><span class="ic">🔌</span><div class="tx"><h4>自建宜搭 MCP 標準化寫回</h4><p>把宜搭表單的讀取／寫回包成 MCP 工具，讓 AI 直接讀待處理商品並回寫結果，不必人工搬資料。</p></div></li>
+        <li><span class="ic">🛡️</span><div class="tx"><h4>不編造、不誇大、可追溯</h4><p>內容只來自原始商品資料或圖片，不用「最好/第一」等無法驗證的詞，每筆都有日誌可查。</p></div></li>
+        <li><span class="ic">🔍</span><div class="tx"><h4>SEO + GEO 文案策略</h4><p>名稱核心關鍵字前置、敘述用列點＋自然語言句式，兼顧搜尋引擎與生成式搜尋（GEO）。</p></div></li>
+        <li><span class="ic">⚙️</span><div class="tx"><h4>批次 diff + preflight</h4><p>先預檢擋掉缺資料/錯欄位，只更新真正有變動的欄位，API 失敗有限次重試。</p></div></li>
+        <li><span class="ic">🔁</span><div class="tx"><h4>n8n 串接社群與回收</h4><p>處理完成自動發社群貼文，再把觸及/互動等成效回收寫回追蹤，形成閉環。</p></div></li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="acc acc-lg">
+    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項 · 點開</span></summary>
+    <div class="abody">
+      <div class="didblock" style="border:none;padding:0;background:none">
+        <p class="lead">從 <b>自建宜搭 MCP、AI 內容生成、批次同步到 n8n 社群自動化</b>都自行完成的電商上架自動化專案。</p>
+        <ul class="did">
+          <li><div class="h"><span class="ic">🔌</span>自建宜搭 (Yida) MCP Server</div><p class="d">自行開發 <b>宜搭 MCP server</b>，讓 AI 以標準化介面讀取 J1 新品表單、回寫 J1 / J1A，支援 <b>insertOrUpdate</b> 與最新版本更新。</p></li>
+          <li><div class="h"><span class="ic">🤖</span>AI SEO / GEO 內容生成</div><p class="d">依爬蟲商品原始資料生成 <b>SEO 商品名、純文字敘述、HTML 敘述、標籤</b>，採關鍵字前置與 GEO 句式。</p></li>
+          <li><div class="h"><span class="ic">🖼️</span>自動補圖 / 補敘述</div><p class="d">針對缺圖缺敘述的爬蟲商品，自動補上商品圖與結構化敘述，讓陽春資料變成可上架內容。</p></li>
+          <li><div class="h"><span class="ic">⚙️</span>批次工具：diff / preflight / 重試</div><p class="d">把一次性腳本整理成<b>可配置、可預檢、只更新差異、可重試</b>的批次同步流程，並落地中繼 JSON / 報表 / 統計。</p></li>
+          <li><div class="h"><span class="ic">📣</span>n8n 社群自動化與成效回收</div><p class="d">用 <b>n8n</b> 把上架完成的商品自動發到社群，並把<b>觸及、互動、點擊</b>等成效回收寫回追蹤表。</p></li>
+          <li><div class="h"><span class="ic">📒</span>品質管控與日誌</div><p class="d">每次讀取／生成／寫回都強制寫日誌，記錄筆數、AI 模型與成敗，確保<b>可追溯、可稽核</b>。</p></li>
+        </ul>
+        <p class="foot">＊ 實際表單 id、欄位對照、生成 prompt 與商品資料屬營運 know-how，未公開於本展示，可於面談時說明。</p>
+      </div>
+    </div>
+  </details>
+
+  <footer>Jason ｜ jason0308p@gmail.com ｜ 本頁為展示用途，商品與數據為虛構範例，僅供參考。</footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

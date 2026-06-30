@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 自動化求職 Pipeline — 展示用 (MVP)</title>
+<meta name="description" content="多平台職缺爬蟲、規則與 AI 評分、JD 解析、AI 生成 CV 與面試 QA、Notion API 自動化追蹤的求職 pipeline 作品集展示。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="brand"><span class="dot"></span>AI 求職<span>·自動化 Pipeline</span></div>
+  <div class="nav-right">
+    <span class="badge-demo">DEMO · 模擬資料</span>
+    <a href="../index.html">← 作品集首頁</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>AI 自動化求職 Pipeline</h1>
+    <p>多平台<b>職缺爬蟲</b> → 去重合併 → <b>規則 + AI 評分</b> → 抓取 JD → <b>AI 生成 CV / 面試 QA</b> → 寫入 <b>Notion</b> 追蹤。
+       一條龍把找工作流程自動化。本頁為<b>純前端展示</b>，職缺、公司、薪資與履歷內容皆為虛構。</p>
+    <div class="tags">
+      <span class="tag">多平台爬蟲 (104 / 1111)</span>
+      <span class="tag">Web Scraping</span>
+      <span class="tag">規則 + AI 評分</span>
+      <span class="tag">JD 解析</span>
+      <span class="tag cool">AI 生成 (CV / 面試 QA)</span>
+      <span class="tag">Notion API</span>
+      <span class="tag">Pipeline 設計</span>
+      <span class="tag">Python</span>
+    </div>
+  </div>
+
+  <div class="note">
+    📌 <b>展示聲明</b>：本頁為公開作品集，職缺、公司名稱、薪資、評分與履歷內容皆為<b>虛構範例</b>；
+    不含任何金鑰、Notion token、真實個人履歷或個資。下方流程動畫為架構「示意」，非真實連線。
+  </div>
+
+  <!-- ===== Pipeline 流程順序 ===== -->
+  <h2 class="sec">Pipeline 流程順序（載入時依序亮燈示意）</h2>
+  <div class="pipe" id="pipe">
+    <div class="node scrape" data-k="scrape"><span class="step">1</span><div class="ic">🕷️</div><div class="nm">多平台爬蟲</div><div class="sub">104 / 1111</div></div>
+    <div class="node" data-k="merge"><span class="step">2</span><div class="ic">🧹</div><div class="nm">去重合併</div><div class="sub">跨平台整併</div></div>
+    <div class="node" data-k="score"><span class="step">3</span><div class="ic">⭐</div><div class="nm">規則 + AI 評分</div><div class="sub">A / B / C 分級</div></div>
+    <div class="node" data-k="jd"><span class="step">4</span><div class="ic">📄</div><div class="nm">抓取 JD</div><div class="sub">職缺內容解析</div></div>
+    <div class="node" data-k="gen"><span class="step">5</span><div class="ic">🤖</div><div class="nm">AI 生成</div><div class="sub">CV / 面試 QA</div></div>
+    <div class="node out" data-k="notion"><span class="step">6</span><div class="ic">🗂️</div><div class="nm">寫入 Notion</div><div class="sub">去重追蹤</div></div>
+  </div>
+  <div class="runbar">
+    <button id="runBtn">▶ 重播 Pipeline</button>
+    <span class="runhint">頁面載入會自動播一次；亦可手動重播</span>
+  </div>
+
+  <!-- ===== 職缺看板 + AI 生成 ===== -->
+  <h2 class="sec">職缺看板 → 點職缺讓 AI 生成（模擬）</h2>
+  <div class="board">
+    <div>
+      <div id="jobgroups"></div>
+    </div>
+    <div class="gen-panel">
+      <div class="ai-head">
+        <span class="av-ai">🤖</span>
+        <div>
+          <div class="ai-name">AI 求職助手<span class="badge-ai">AI</span></div>
+          <div class="ai-st">● 依選中職缺的 JD 生成</div>
+        </div>
+      </div>
+      <div class="ai-out" id="aiOut"><div class="ai-placeholder">← 從左側點一個職缺，再選下方按鈕，讓 AI 依該職缺逐字生成「客製 CV 重點」或「面試 QA」（純前端模擬）。</div></div>
+      <div class="ai-actions">
+        <button id="genCV">📝 生成客製 CV 重點</button>
+        <button id="genQA" class="alt">💬 生成面試 QA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 技術與設計說明 ===== -->
+  <h2 class="sec">技術與設計說明</h2>
+
+  <details class="acc acc-lg" open>
+    <summary><span class="ic">✨</span> 設計重點<span class="cnt">5 項</span></summary>
+    <div class="abody">
+      <ul class="dlist">
+        <li><span class="ic">🕷️</span><div class="tx"><h4>多平台爬蟲 + 反爬處理</h4><p>同時爬多個求職平台，處理各家參數差異與防爬機制（如先打首頁取 cookie），輸出統一格式。</p></div></li>
+        <li><span class="ic">⚡</span><div class="tx"><h4>規則評分秒級、AI 評分加值</h4><p>先用純規則秒級評分（無需 API），再用 AI 對重點職缺加值分析，兼顧速度與品質。</p></div></li>
+        <li><span class="ic">📄</span><div class="tx"><h4>JD 自動抓取與解析</h4><p>自動補抓職缺詳細 JD，作為後續 AI 生成 CV / QA 的依據，減少人工複製貼上。</p></div></li>
+        <li><span class="ic">🤖</span><div class="tx"><h4>AI 客製生成</h4><p>依每個職缺的 JD 生成對應的客製 CV 重點與面試 QA，讓每份應徵都對症下藥。</p></div></li>
+        <li><span class="ic">🗂️</span><div class="tx"><h4>Notion 去重同步</h4><p>把職缺與進度寫入 Notion 追蹤，並去重避免重複投遞，求職進度一目了然。</p></div></li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="acc acc-lg">
+    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項 · 點開</span></summary>
+    <div class="abody">
+      <div class="didblock" style="border:none;padding:0;background:none">
+        <p class="lead">從 <b>多來源爬蟲、評分、AI 生成到 Notion 自動化</b>都自行完成的求職自動化 pipeline。</p>
+        <ul class="did">
+          <li><div class="h"><span class="ic">🕷️</span>多來源爬蟲 pipeline</div><p class="d">設計 <b>104 / 1111</b> 等多平台爬蟲，處理 <b>Cloudflare cookie</b>、參數差異與分頁，輸出統一 JSON 並可擴充新平台。</p></li>
+          <li><div class="h"><span class="ic">⭐</span>規則 + AI 雙層評分</div><p class="d">先以<b>純規則</b>合併多平台輸出秒級評分（無需 API），再用 <b>AI</b> 對高分職缺加值，分成 A / B / C。</p></li>
+          <li><div class="h"><span class="ic">📄</span>JD 解析</div><p class="d">自動補抓各平台職缺 JD（部分平台 description 已內含、部分需另抓），作為生成依據。</p></li>
+          <li><div class="h"><span class="ic">🤖</span>AI 生成 CV / 面試 QA</div><p class="d">依 JD 用 <b>LLM</b> 產出客製化履歷重點與面試問答，提升投遞效率與命中率。</p></li>
+          <li><div class="h"><span class="ic">🗂️</span>Notion API 自動化</div><p class="d">以 <b>Notion API</b> 把職缺與進度寫入資料庫並<b>去重</b>，建立可追蹤的求職看板。</p></li>
+          <li><div class="h"><span class="ic">🏗️</span>可擴充 pipeline 架構</div><p class="d">主流程一鍵跑全平台（`--source all`），模組化設計方便加入新爬蟲與新步驟。</p></li>
+        </ul>
+        <p class="foot">＊ 實際爬蟲細節、評分規則、生成 prompt 與個人履歷資料屬隱私 / know-how，未公開於本展示，可於面談時說明。</p>
+      </div>
+    </div>
+  </details>
+
+  <footer>Jason ｜ jason0308p@gmail.com ｜ 本頁為展示用途，職缺與資料為虛構範例，僅供參考。</footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

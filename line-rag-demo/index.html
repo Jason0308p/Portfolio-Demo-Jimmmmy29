@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LINE 智能客服機器人 — 展示用 (MVP)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="brand"><span class="dot"></span>LINE 智能客服<span>·RAG</span></div>
+  <div class="nav-right">
+    <span class="badge-demo">DEMO · 模擬資料</span>
+    <a href="../index.html">← 作品集首頁</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>B2B 禮品 LINE 智能客服機器人</h1>
+    <p>串接 LINE、n8n、RAG 向量資料庫與 AI，客戶在 LINE 上詢問產品、價格、交期時自動分流並回覆，
+       並把詢問同步通知內部。本頁為<b>純前端互動展示</b>，資料與 AI 回應皆為模擬。</p>
+    <div class="tags">
+      <span class="tag">LINE Messaging API</span>
+      <span class="tag">n8n</span>
+      <span class="tag">RAG / 向量檢索</span>
+      <span class="tag">AI 生成回覆</span>
+      <span class="tag">宜搭表單</span>
+      <span class="tag">群組通知</span>
+      <span class="tag hot">熱資料</span>
+      <span class="tag cool">冷資料</span>
+    </div>
+  </div>
+
+  <div class="note">
+    📌 <b>展示聲明</b>：本頁為公開作品集，僅保留介面、互動與少量<b>虛構範例資料</b>；
+    不含任何金鑰、真實客戶/產品資料或實際檢索與報價邏輯。下方流程動畫為架構「示意」，非真實連線。
+  </div>
+
+  <!-- ===== 處理流程順序 ===== -->
+  <h2 class="sec">處理流程順序（送出訊息後依序亮燈示意）</h2>
+  <div class="pipe" id="pipe">
+    <div class="node line" data-k="line"><span class="step">1</span><div class="ic">💬</div><div class="nm">LINE 用戶</div><div class="sub">收到訊息</div><div class="ms" data-ms="line"></div></div>
+    <div class="node" data-k="n8n"><span class="step">2</span><div class="ic">🔀</div><div class="nm">n8n Webhook</div><div class="sub">去抖動·驗章</div><div class="ms" data-ms="n8n"></div></div>
+    <div class="node" data-k="route"><span class="step">3</span><div class="ic">🧭</div><div class="nm">路由判斷</div><div class="sub">分流問題類型</div><div class="ms" data-ms="route"></div></div>
+    <div class="node" data-k="rag"><span class="step">4</span><div class="ic">🗂️</div><div class="nm">RAG 檢索</div><div class="sub">冷熱資料分層</div><div class="ms" data-ms="rag"></div></div>
+    <div class="node" data-k="ai"><span class="step">5</span><div class="ic">🤖</div><div class="nm">AI 生成</div><div class="sub">組裝回覆</div><div class="ms" data-ms="ai"></div></div>
+    <div class="node line" data-k="reply"><span class="step">6</span><div class="ic">📤</div><div class="nm">回覆 + 通知</div><div class="sub">LINE·內部群組</div><div class="ms" data-ms="reply"></div></div>
+  </div>
+  <div class="aux">
+    <div class="node side" data-k="sheet"><div class="ic">❄️</div><div class="nm">冷資料源</div><div class="sub">FAQ／產品／牌價（批次同步）</div></div>
+    <div class="node side" data-k="vec"><div class="ic">🔥</div><div class="nm">熱資料</div><div class="sub">向量庫快取／即時檢索</div></div>
+    <div class="node side" data-k="yida"><div class="ic">📋</div><div class="nm">宜搭表單</div><div class="sub">需人工報價時建單</div></div>
+  </div>
+
+  <!-- ===== 互動聊天 ===== -->
+  <h2 class="sec">互動體驗（模擬對話）</h2>
+  <div class="chat-area">
+    <div class="phone">
+      <div class="phone-top"><span class="av">🤖</span>
+        <div class="pt-info"><div class="pt-name">AI 客服 · 禮品小幫手</div>
+        <div class="pt-st">● 線上 · 自動回覆中</div></div>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="compose">
+        <input id="inp" placeholder="輸入問題，或點右側範例…" autocomplete="off">
+        <button id="send">送出</button>
+      </div>
+    </div>
+
+    <div class="side-panel">
+      <div class="panel">
+        <h3>試試這些問題（依技術分類）</h3>
+        <div id="chips"></div>
+      </div>
+      <div class="panel">
+        <h3>本次處理流程（模擬耗時）</h3>
+        <div class="tl" id="timeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 技術與設計說明（摺疊，預設收起以保持精簡） ===== -->
+  <h2 class="sec">技術與設計說明</h2>
+
+  <details class="acc acc-lg" open>
+    <summary><span class="ic">✨</span> 設計重點<span class="cnt">5 項</span></summary>
+    <div class="abody">
+  <ul class="dlist">
+    <li><span class="ic">🎯</span><div class="tx"><h4>分層檢索（先精準、後語意）</h4><p>先用編號／關鍵字做精準比對，命中就直接回覆；找不到才動用 AI 語意搜尋，同時顧到準確度與運算成本。</p></div></li>
+    <li><span class="ic">❄️🔥</span><div class="tx"><h4>冷熱資料分流</h4><p>變動少的 FAQ／產品／牌價以批次方式同步為「冷資料」，查詢時走「熱資料」快取與向量索引，明顯降低回應延遲。</p></div></li>
+    <li><span class="ic">🛡️</span><div class="tx"><h4>報價保守、不亂估</h4><p>沒有對應牌價時不臆測價格，改提示「需人工確認」並自動建立宜搭詢價單，避免報錯價造成商業風險。</p></div></li>
+    <li><span class="ic">🔔</span><div class="tx"><h4>即時通知、不漏單</h4><p>客戶詢問同步通知內部群組，重要詢價與需人工處理的案件不漏接。</p></div></li>
+    <li><span class="ic">🧪</span><div class="tx"><h4>測試／正式雙環境</h4><p>提供瀏覽器測試入口與正式 LINE 共用同一套後端邏輯，確保「測到的就是上線的」。</p></div></li>
+  </ul>
+    </div>
+  </details>
+
+  <details class="acc acc-lg">
+    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項 · 點開</span></summary>
+    <div class="abody">
+  <div class="didblock" style="border:none;padding:0;background:none">
+    <p class="lead">這是一個從<b>系統設計、外部服務整合到生產化維運</b>都自行完成的 B2B 客服機器人專案，
+    涵蓋多平台串接、檢索式生成（RAG）與成本／風險控管。</p>
+    <ul class="did">
+      <li>
+        <div class="h"><span class="ic">🔗</span>多平台整合</div>
+        <p class="d">串接 <b>LINE Messaging API</b>、<b>n8n</b> 自動化流程、<b>向量資料庫</b>與 <b>AI 生成模型</b>，
+        並整合 <b>宜搭表單</b>與內部群組通知，串起「客戶詢問 → 自動回覆 → 內部跟進」的完整閉環。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🧠</span>檢索式生成（RAG）架構</div>
+        <p class="d">將 FAQ 與產品知識向量化建立索引，依問題語意檢索相關內容後再交給模型生成回答，
+        讓回覆<b>有所本、可控、可追溯</b>，而非單純讓模型自由發揮。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">⚡</span>檢索策略與成本最佳化</div>
+        <p class="d">設計<b>多層檢索</b>：精準比對優先、語意搜尋為後備，並以<b>冷熱資料分層</b>與本地快取
+        減少不必要的向量運算與外部呼叫，<b>同時改善回應速度與 API 成本</b>。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🛡️</span>商業風險控管</div>
+        <p class="d">針對報價情境採<b>保守策略</b>，無對應牌價即轉人工並自動建單，
+        把「AI 答錯造成的營運風險」納入系統設計，而不只是追求看起來會回答。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🏗️</span>生產化與工程紀律</div>
+        <p class="d">處理 webhook 驗章、訊息去抖動、增量資料同步等生產細節，
+        並以<b>自動化測試</b>與<b>測試／正式雙環境</b>確保關鍵行為穩定、可持續維護。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🔁</span>從低程式碼到工程實作</div>
+        <p class="d">先以 <b>n8n</b> 快速驗證可行性並上線，再為了效能、成本與可控性
+        <b>重構為可維護的服務</b>——兼具「快速落地」與「長期可維運」兩種能力。</p>
+      </li>
+    </ul>
+    <p class="foot">＊ 實際的檢索邏輯、資料結構、prompt 與門檻參數屬營運 know-how，未公開於本展示，可於面談時進一步說明。</p>
+  </div>
+    </div>
+  </details>
+
+  <footer>
+    Jason ｜ jason0308p@gmail.com ｜ 本頁為展示用途，資料為虛構範例，僅供參考。
+  </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

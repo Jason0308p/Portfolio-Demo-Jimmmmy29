@@ -1,0 +1,8 @@
+.env
+.env.*
+*service-account*.json
+*credential*.json
+.secrets/
+node_modules/
+*.key
+*.pem

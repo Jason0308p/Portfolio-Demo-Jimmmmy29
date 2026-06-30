@@ -67,7 +67,7 @@
     },
     {
       label: "❓ 一般客服 FAQ",
-      tech: "對知識庫做<b>向量檢索</b>命中主題 → 交給 AI 生成回答（同義詞也能命中）。",
+      tech: "FAQ 知識庫屬<b>冷資料</b>（批次同步）；命中主題後交 AI 生成回答（同義詞也能命中）。",
       route: "faq",
       items: [
         { q: "寄送要運費嗎？", hint: "→ 寄送 / 運費" },
@@ -129,7 +129,7 @@
         faq = detectFaq(text), fuzzy = isFuzzyGift(text);
 
     if (code) {
-      steps.push({ k: "rag", ms: 4, label: "產品編號精準命中（跳過向量搜尋）", side: "vec" });
+      steps.push({ k: "rag", ms: 4, label: "產品編號精準命中（讀冷資料、跳過向量搜尋）", side: "sheet" });
       var p = findByCode(code);
       if (p) {
         steps.push({ k: "ai", ms: 280, label: "組裝產品回覆" });
@@ -144,7 +144,7 @@
         reply = "查無「" + code + "」這個編號，請再確認一下，或直接描述想找的品項，我幫您找 🙆";
       }
     } else if (cat) {
-      steps.push({ k: "rag", ms: 5, label: "品類命中：" + cat + "（本地索引）" });
+      steps.push({ k: "rag", ms: 5, label: "品類命中：" + cat + "（冷資料本地索引）", side: "sheet" });
       steps.push({ k: "ai", ms: 320, label: "整理推薦清單" });
       reply = "為您推薦幾款「" + cat + "」可優先參考：\n" +
         CATEGORY[cat].map(function (c, i) {
@@ -163,14 +163,14 @@
         }).join("\n") +
         "\n方便的話，告訴我預算與數量，我再幫您縮小範圍 😊";
     } else if (faq) {
-      steps.push({ k: "rag", ms: 36, label: "向量檢索知識庫 → " + faq.topic, side: "vec" });
+      steps.push({ k: "rag", ms: 36, label: "查 FAQ 知識庫（冷資料）→ " + faq.topic, side: "sheet" });
       steps.push({ k: "ai", ms: 340, label: "依檢索內容生成回答" });
       reply = faq.a;
     }
 
     if (route === "mixed" && faq && (code || cat)) {
       reply += "\n\n另外關於「" + faq.topic + "」：" + faq.a;
-      steps.push({ k: "rag", ms: 30, label: "補查知識庫：" + faq.topic, side: "vec" });
+      steps.push({ k: "rag", ms: 30, label: "補查 FAQ 知識庫（冷資料）：" + faq.topic, side: "sheet" });
     }
     if (!reply) {
       steps.push({ k: "rag", ms: 34, label: "語意檢索（無精準命中）", side: "vec" });

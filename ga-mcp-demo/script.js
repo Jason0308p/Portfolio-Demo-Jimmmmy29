@@ -198,6 +198,27 @@
     funEl.appendChild(row); funFills.push({ el: row.querySelector(".ffill"), pct: f.w });
   });
 
+  /* ---------- 流量熱力圖（星期 × 時段） ---------- */
+  (function () {
+    var DAYS = ["一", "二", "三", "四", "五", "六", "日"];
+    var heat = document.getElementById("heatmap");
+    var head = document.createElement("div"); head.className = "hm-row";
+    var hh = '<div class="hm-lab"></div>';
+    for (var c = 0; c < 12; c++) hh += '<div class="hm-colhead">' + (c * 2) + '</div>';
+    head.innerHTML = hh; heat.appendChild(head);
+    DAYS.forEach(function (d, r) {
+      var row = document.createElement("div"); row.className = "hm-row";
+      var cells = '<div class="hm-lab">' + d + '</div>';
+      for (var c = 0; c < 12; c++) {
+        var hour = c * 2;
+        var base = (r < 5) ? ((hour >= 8 && hour <= 20) ? 0.82 : 0.18) : ((hour >= 10 && hour <= 22) ? 0.6 : 0.22);
+        var v = Math.max(0.06, Math.min(1, base + ((r * 5 + c) % 5) * 0.05 - 0.1));
+        cells += '<div class="hm-cell" title="週' + d + ' ' + hour + ':00｜熱度 ' + Math.round(v * 100) + '" style="background:rgba(34,211,238,' + v.toFixed(2) + ')"></div>';
+      }
+      row.innerHTML = cells; heat.appendChild(row);
+    });
+  })();
+
   function animateExtras() {
     document.querySelectorAll("#trend .tbar").forEach(function (b) { b.style.height = "0"; });
     srcFills.concat(funFills).forEach(function (f) { f.el.style.width = "0"; });

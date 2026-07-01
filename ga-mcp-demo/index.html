@@ -72,6 +72,12 @@
     <div class="panel"><h3>裝置分佈</h3><div class="donut-box" id="deviceDonut"></div></div>
   </div>
 
+  <h2 class="sec">流量熱力圖（星期 × 時段 · 虛構）</h2>
+  <div class="panel" style="overflow-x:auto">
+    <div class="heatmap" id="heatmap"></div>
+    <div class="hm-legend">低 <span class="hm-scale"><i style="background:rgba(34,211,238,.12)"></i><i style="background:rgba(34,211,238,.35)"></i><i style="background:rgba(34,211,238,.6)"></i><i style="background:rgba(34,211,238,.85)"></i><i style="background:rgba(34,211,238,1)"></i></span> 高　·　顏色越亮＝該時段流量越高</div>
+  </div>
+
   <h2 class="sec">GSC 熱門關鍵字（虛構）</h2>
   <div class="panel" style="overflow-x:auto"><table class="kwt"><thead><tr><th>關鍵字</th><th>點擊</th><th>曝光</th><th>CTR</th><th>平均排名</th></tr></thead><tbody id="kwBody"></tbody></table></div>
 
@@ -129,8 +135,8 @@
     <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項</span></summary>
     <div class="abody">
   <div class="didblock" style="border:none;padding:0;background:none">
-    <p class="lead">這是一個從<b>串接 Google 數據服務（官方 GA MCP + GSC / GTM API）、到 AI 自動產出可視化分析</b>都自行完成的數據分析專案，
-    重點在「讓 AI 能直接、可靠地取用多來源行銷數據並產出洞察」。</p>
+    <p class="lead">獨立完成的<b>行銷數據決策系統</b>：整合 GA4／GSC／GTM 三方數據，透過官方 GA MCP 讓 AI 直接取數並輸出可執行洞察，
+    把原本分散、需人工彙整的報表，轉化為能直接支援投放與 SEO 決策的依據。</p>
     <ul class="did">
       <li>
         <div class="h"><span class="ic">🔌</span>串接官方 GA MCP + GSC / GTM API</div>

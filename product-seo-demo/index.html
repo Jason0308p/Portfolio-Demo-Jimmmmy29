@@ -100,7 +100,7 @@
     <div class="abody">
       <ul class="dlist">
         <li><span class="ic">🔌</span><div class="tx"><h4>整合多個宜搭 API 成自建 MCP</h4><p>把宜搭多支表單 API（查詢／新增／更新 J1、J1A）整合封裝成自建 MCP 工具，讓 AI 以一致介面讀待處理商品並回寫結果，不必人工搬資料。</p></div></li>
-        <li><span class="ic">🛡️</span><div class="tx"><h4>不編造、不誇大、可追溯</h4><p>內容只來自原始商品資料或圖片，不用「最好/第一」等無法驗證的詞，每筆都有日誌可查。</p></div></li>
+        <li><span class="ic">🛡️</span><div class="tx"><h4>AI 生成 grounding / 防幻覺</h4><p>生成內容嚴格 grounding 在原始商品資料與圖片，並用規則過濾「最好／第一」等誇大或杜撰規格的字詞，降低 AI 幻覺、確保內容可追溯。</p></div></li>
         <li><span class="ic">🔍</span><div class="tx"><h4>SEO + GEO 文案策略</h4><p>名稱核心關鍵字前置、敘述用列點＋自然語言句式，兼顧搜尋引擎與生成式搜尋（GEO）。</p></div></li>
         <li><span class="ic">⚙️</span><div class="tx"><h4>批次 diff + preflight</h4><p>先預檢擋掉缺資料/錯欄位，只更新真正有變動的欄位，API 失敗有限次重試。</p></div></li>
         <li><span class="ic">🔁</span><div class="tx"><h4>n8n 串接社群與回收</h4><p>處理完成自動發社群貼文，再把觸及/互動等成效回收寫回追蹤，形成閉環。</p></div></li>
@@ -119,7 +119,7 @@
           <li><div class="h"><span class="ic">🖼️</span>自動補圖 / 補敘述</div><p class="d">針對缺圖缺敘述的爬蟲商品，自動補上商品圖與結構化敘述，讓陽春資料變成可上架內容。</p></li>
           <li><div class="h"><span class="ic">⚙️</span>批次工具：diff / preflight / 重試</div><p class="d">把一次性腳本整理成<b>可配置、可預檢、只更新差異、可重試</b>的批次同步流程，並落地中繼 JSON / 報表 / 統計。</p></li>
           <li><div class="h"><span class="ic">📣</span>n8n 社群自動化與成效回收</div><p class="d">用 <b>n8n</b> 把上架完成的商品自動發到社群，並把<b>觸及、互動、點擊</b>等成效回收寫回追蹤表。</p></li>
-          <li><div class="h"><span class="ic">📒</span>品質管控與日誌</div><p class="d">每次讀取／生成／寫回都強制寫日誌，記錄筆數、AI 模型與成敗，確保<b>可追溯、可稽核</b>。</p></li>
+          <li><div class="h"><span class="ic">🛡️</span>AI 生成防幻覺（grounding）與可追溯</div><p class="d">生成內容嚴格 <b>grounding</b> 在原始商品資料，規則過濾誇大／杜撰規格；每筆記錄使用模型與結果供<b>稽核追溯</b>。</p></li>
         </ul>
         <p class="foot">＊ 實際表單 id、欄位對照、生成 prompt 與商品資料屬營運 know-how，未公開於本展示，可於面談時說明。</p>
       </div>

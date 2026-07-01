@@ -4,14 +4,14 @@
 
   /* ---------- 虛構範例資料（非真實營運資料） ---------- */
   var PRODUCTS = [
-    { code: "GIFT-1001", name: "客製不織布環保袋（W29×H28）", moq: 100, price: 38, tags: ["不織布袋", "環保袋", "袋"] },
-    { code: "GIFT-1002", name: "雙層不鏽鋼保溫杯 500ml", moq: 50, price: 220, tags: ["保溫杯", "杯"] },
-    { code: "GIFT-1007", name: "厚磅帆布托特包", moq: 80, price: 145, tags: ["帆布袋", "環保袋", "袋"] },
-    { code: "GIFT-1012", name: "客製金屬鑰匙圈", moq: 200, price: 25, tags: ["鑰匙圈"] },
-    { code: "GIFT-1020", name: "霧面玻璃隨行杯", moq: 100, price: 130, tags: ["保溫杯", "杯"] },
+    { code: "GIFT-1001", name: "客製不織布環保袋（W29×H28）", moq: 100, price: 38, tags: ["不織布袋", "環保袋", "袋"], tiers: [{ q: 100, p: 38 }, { q: 300, p: 34 }, { q: 500, p: 30 }, { q: 1000, p: 26 }] },
+    { code: "GIFT-1002", name: "雙層不鏽鋼保溫杯 500ml", moq: 50, price: 220, tags: ["保溫杯", "杯"], tiers: [{ q: 50, p: 220 }, { q: 100, p: 195 }, { q: 300, p: 170 }, { q: 500, p: 155 }] },
+    { code: "GIFT-1007", name: "厚磅帆布托特包", moq: 80, price: 145, tags: ["帆布袋", "環保袋", "袋"], tiers: [{ q: 80, p: 145 }, { q: 200, p: 128 }, { q: 500, p: 110 }, { q: 1000, p: 98 }] },
+    { code: "GIFT-1012", name: "客製金屬鑰匙圈", moq: 200, price: 25, tags: ["鑰匙圈"], tiers: [{ q: 200, p: 25 }, { q: 500, p: 21 }, { q: 1000, p: 18 }, { q: 3000, p: 15 }] },
+    { code: "GIFT-1020", name: "霧面玻璃隨行杯", moq: 100, price: 130, tags: ["保溫杯", "杯"], tiers: [{ q: 100, p: 130 }, { q: 300, p: 115 }, { q: 500, p: 102 }] },
     { code: "GIFT-2003", name: "無線充電滑鼠墊", moq: 100, price: 0, tags: ["滑鼠墊", "3c"] }, // 0 = 無精準牌價
     { code: "GIFT-2008", name: "10000mAh 行動電源", moq: 100, price: 0, tags: ["行動電源", "3c"] }, // 無牌價
-    { code: "GIFT-2010", name: "竹纖維折疊餐具組", moq: 200, price: 56, tags: ["餐具", "環保"] }
+    { code: "GIFT-2010", name: "竹纖維折疊餐具組", moq: 200, price: 56, tags: ["餐具", "環保"], tiers: [{ q: 200, p: 56 }, { q: 500, p: 49 }, { q: 1000, p: 43 }] }
   ];
   var CATEGORY = {
     "環保袋": ["GIFT-1001", "GIFT-1007", "GIFT-2010"],
@@ -135,9 +135,12 @@
         steps.push({ k: "ai", ms: 280, label: "組裝產品回覆" });
         reply = p.price > 0
           ? "為您查到 【" + p.code + "】\n" + p.name +
-            "\n・最小訂購量：" + p.moq + " 個起\n・參考單價：NT$" + p.price + " 起（量大另有優惠）\n・可客製印刷 LOGO，交期約 10–15 個工作天\n需要我幫您抓指定數量的報價嗎？😊"
+            "\n\n📦 最小訂購量：" + p.moq + " 個起" +
+            "\n💰 數量級距參考單價（未稅）：\n" +
+            p.tiers.map(function (t) { return "　・" + t.q + " 個 → NT$ " + t.p + " / 個"; }).join("\n") +
+            "\n\n・量越大單價越低，實際以正式報價為準\n・可客製印刷 / 雷雕 LOGO，交期約 10–15 個工作天\n・可先打樣確認品質\n要我幫您抓「指定數量」的報價嗎？😊"
           : "為您查到 【" + p.code + "】\n" + p.name +
-            "\n・最小訂購量：" + p.moq + " 個起\n・此品項目前沒有精準牌價；為避免報錯價，將由專人依您的數量與規格正式報價 🙋\n（已為您建立宜搭詢價單，專人會盡快跟進）";
+            "\n\n📦 最小訂購量：" + p.moq + " 個起\n💰 此品項目前沒有精準牌價；為避免報錯價，將由專人依您的數量與規格正式報價 🙋\n（已為您建立宜搭詢價單，專人會盡快跟進）";
         if (p.price === 0) steps.push({ k: "ai", ms: 8, label: "建立宜搭詢價單", side: "yida" });
       } else {
         steps.push({ k: "ai", ms: 200, label: "查無此編號，引導重問" });
@@ -150,9 +153,9 @@
         CATEGORY[cat].map(function (c, i) {
           var pp = findByCode(c);
           return (i + 1) + ". 【" + pp.code + "】 " + pp.name +
-            (pp.price > 0 ? "（單價 NT$" + pp.price + " 起）" : "（價格需人工確認）");
+            "\n　　📦 MOQ " + pp.moq + " 個｜💰 " + (pp.price > 0 ? "NT$ " + pp.price + " 起（量大更優惠）" : "價格需人工確認");
         }).join("\n") +
-        "\n\n以上皆可客製印刷 LOGO；告訴我需要的數量，我再幫您抓精準報價與交期 😊";
+        "\n\n以上皆可客製印刷 LOGO；告訴我「品項 + 數量」，我再幫您抓精準報價與交期 😊";
     } else if (fuzzy) {
       steps.push({ k: "rag", ms: 41, label: "需求模糊 → 向量語意檢索", side: "vec" });
       steps.push({ k: "ai", ms: 380, label: "依語意挑選並生成推薦" });
@@ -160,9 +163,10 @@
       reply = "了解！送客戶的話，這幾款質感與實用度都不錯，可優先參考：\n" +
         picks.map(function (c, i) {
           var pp = findByCode(c);
-          return (i + 1) + ". 【" + pp.code + "】 " + pp.name;
+          return (i + 1) + ". 【" + pp.code + "】 " + pp.name +
+            "\n　　📦 MOQ " + pp.moq + " 個｜💰 NT$ " + pp.price + " 起";
         }).join("\n") +
-        "\n方便的話，告訴我預算與數量，我再幫您縮小範圍 😊";
+        "\n\n告訴我「預算 + 數量」，我再幫您縮小範圍並抓精準報價 😊";
     } else if (faq) {
       steps.push({ k: "rag", ms: 36, label: "查 FAQ 知識庫（冷資料）→ " + faq.topic, side: "sheet" });
       steps.push({ k: "ai", ms: 340, label: "依檢索內容生成回答" });

@@ -16,7 +16,8 @@
         "最小訂製量 50 個起，多色可選"
       ],
       geo: "在「企業送禮」與「活動贈品」情境中，保溫瓶是詢問度最高的實用型贈品之一。它兼具日常高頻使用與長期品牌曝光，適合作為員工福利禮、週年慶贈品或展會禮；少量即可客製 LOGO，是預算有限也能兼顧質感與實用的送禮選擇。",
-      tags: ["保溫瓶", "客製保溫杯", "不鏽鋼保溫瓶", "企業送禮", "活動贈品", "員工福利禮", "雷雕LOGO"]
+      tags: ["保溫瓶", "客製保溫杯", "不鏽鋼保溫瓶", "企業送禮", "活動贈品", "員工福利禮", "雷雕LOGO"],
+      moq: 50, tiers: [{ q: 50, p: 220 }, { q: 100, p: 195 }, { q: 300, p: 170 }, { q: 500, p: 155 }]
     },
     {
       id: "P-002", emoji: "👜",
@@ -30,7 +31,8 @@
         "最小訂製量 80 個起，尺寸與提帶長度可調"
       ],
       geo: "隨環保意識與 ESG 訴求抬頭，客製帆布袋成為兼顧企業形象與永續價值的熱門贈品。適合展會發放、會員禮、開幕活動與品牌聯名；厚磅材質提升質感與重複使用率，讓品牌 LOGO 在日常通勤中持續曝光。",
-      tags: ["帆布袋", "托特包", "客製帆布袋", "環保袋", "展會贈品", "購物袋", "ESG永續"]
+      tags: ["帆布袋", "托特包", "客製帆布袋", "環保袋", "展會贈品", "購物袋", "ESG永續"],
+      moq: 80, tiers: [{ q: 80, p: 145 }, { q: 200, p: 128 }, { q: 500, p: 110 }, { q: 1000, p: 98 }]
     },
     {
       id: "P-003", emoji: "🔌",
@@ -44,7 +46,8 @@
         "最小訂製量 100 個起，附收納袋可加購"
       ],
       geo: "3C 快充類贈品在科技業、金融業與大型展會的詢問度長年居高不下。行動電源使用頻率高、攜帶時間長，品牌 LOGO 曝光效益佳；金屬機身呈現科技質感，適合高階客戶禮、股東會贈品與新品發表活動。",
-      tags: ["行動電源", "PD快充", "客製行動電源", "科技贈品", "商務禮品", "Type-C", "BSMI認證"]
+      tags: ["行動電源", "PD快充", "客製行動電源", "科技贈品", "商務禮品", "Type-C", "BSMI認證"],
+      moq: 100, tiers: [{ q: 100, p: 320 }, { q: 300, p: 295 }, { q: 500, p: 275 }, { q: 1000, p: 255 }]
     }
   ];
 
@@ -55,7 +58,7 @@
   // before/after DOM
   var bImg = document.getElementById("bImg"), bName = document.getElementById("bName");
   var aImg = document.getElementById("aImg"), aName = document.getElementById("aName");
-  var aDesc = document.getElementById("aDesc"), aTags = document.getElementById("aTags");
+  var aDesc = document.getElementById("aDesc"), aTags = document.getElementById("aTags"), aPrice = document.getElementById("aPrice");
   var genBtn = document.getElementById("genBtn"), postBtn = document.getElementById("postBtn");
   var socialOut = document.getElementById("socialOut");
 
@@ -65,7 +68,7 @@
     bName.textContent = p.bName;
     aImg.className = "pimg empty"; aImg.textContent = "尚未處理";
     aName.textContent = "—"; aName.classList.remove("done");
-    aDesc.innerHTML = "—"; aTags.innerHTML = "";
+    aDesc.innerHTML = "—"; aPrice.innerHTML = "—"; aTags.innerHTML = "";
     postBtn.disabled = true; socialOut.classList.remove("show");
     document.querySelectorAll(".pchip").forEach(function (c) { c.classList.toggle("sel", c.dataset.id === p.id); });
   }
@@ -91,6 +94,9 @@
       var html = "<ul>" + p.bullets.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>" +
         '<p style="margin:6px 0 0;color:var(--text2)">' + p.geo + "</p>";
       aDesc.innerHTML = html;
+      // 3b. 數量 / 價格級距（兩大關鍵因子）
+      aPrice.innerHTML = '最小訂購量 <b style="color:#fff">' + p.moq + ' 個</b> 起，量大越優惠：<br>' +
+        p.tiers.map(function (t) { return '・' + t.q + ' 個 → NT$ <b style="color:var(--accent2)">' + t.p + '</b> / 個'; }).join('<br>');
       // 4. 標籤逐一出現
       aTags.innerHTML = "";
       p.tags.forEach(function (t, i) {
@@ -119,8 +125,14 @@
     if (!processed || busy) return;
     var p = cur;
     socialOut.classList.add("show");
-    var post = "🎁 新品上架｜" + p.aName.split("｜")[0] + "\n\n" +
-      p.geo + "\n\n#" + p.tags.slice(0, 4).join(" #") + "\n👉 詢問請私訊";
+    var tierline = p.tiers.map(function (t) { return t.q + "個 NT$" + t.p; }).join("｜");
+    var post = "🎁【新品上架】" + p.aName.split("｜")[0] + "\n\n" +
+      p.bullets.slice(0, 3).map(function (b) { return "✓ " + b; }).join("\n") + "\n\n" +
+      p.geo + "\n\n" +
+      "📦 最小訂購量 " + p.moq + " 個起｜" + tierline + "\n" +
+      "🎨 可客製印刷／雷雕 LOGO，歡迎索取樣品\n" +
+      "👉 詢價・報價請私訊小編\n\n" +
+      "#" + p.tags.join(" #");
     spBody.textContent = "";
     var i = 0;
     (function step() {

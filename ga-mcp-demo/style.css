@@ -233,6 +233,22 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:5px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
 .bar-row .v{text-align:right;font-family:var(--mono);color:var(--text)}
 .chart-foot{font-size:11px;color:var(--text3);margin-top:10px}
+.trend{display:flex;align-items:flex-end;gap:5px;height:150px}
+.trend .tcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%}
+.trend .tbar{width:100%;background:linear-gradient(180deg,var(--accent2),var(--accent));border-radius:3px 3px 0 0;height:0;transition:height .9s cubic-bezier(.2,.8,.2,1);min-height:2px}
+.trend .tlab{font-size:9px;color:var(--text3)}
+.kwt{width:100%;border-collapse:collapse;font-size:12.5px;min-width:460px}
+.kwt th{text-align:right;color:var(--text3);font-weight:600;font-size:11px;padding:6px 10px;border-bottom:1px solid var(--border)}
+.kwt th:first-child,.kwt td:first-child{text-align:left}
+.kwt td{padding:7px 10px;border-bottom:1px solid var(--border);font-family:var(--mono);color:var(--text);text-align:right}
+.kwt td:first-child{font-family:inherit;color:var(--text2)}
+.kwt .up{color:var(--red)} .kwt .down{color:var(--green)}
+.funnel{display:flex;flex-direction:column;gap:8px}
+.funnel .frow{display:grid;grid-template-columns:110px 1fr 84px;align-items:center;gap:10px;font-size:12.5px}
+.funnel .fname{color:var(--text2)}
+.funnel .ftrack{height:22px;background:var(--card2);border-radius:5px;overflow:hidden}
+.funnel .ffill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:5px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.funnel .fval{text-align:right;font-family:var(--mono);color:var(--text)}
 
 /* ===== 手機 RWD 修正 ===== */
 @media (max-width:640px){

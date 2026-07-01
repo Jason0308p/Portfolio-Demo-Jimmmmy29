@@ -39,11 +39,6 @@
     </div>
   </div>
 
-  <div class="note">
-    📌 <b>展示聲明</b>：本頁為公開作品集，商品、圖片、文案與成效數字皆為<b>虛構範例</b>；
-    不含任何金鑰、宜搭 token、表單 id 或真實商品/營運資料。下方流程動畫為架構「示意」，非真實連線。
-  </div>
-
   <!-- ===== 流程順序 ===== -->
   <h2 class="sec">流程順序（載入時依序亮燈示意）</h2>
   <div class="pipe" id="pipe">
@@ -103,7 +98,7 @@
     <summary><span class="ic">✨</span> 設計重點<span class="cnt">5 項</span></summary>
     <div class="abody">
       <ul class="dlist">
-        <li><span class="ic">🔌</span><div class="tx"><h4>自建宜搭 MCP 標準化寫回</h4><p>把宜搭表單的讀取／寫回包成 MCP 工具，讓 AI 直接讀待處理商品並回寫結果，不必人工搬資料。</p></div></li>
+        <li><span class="ic">🔌</span><div class="tx"><h4>整合多個宜搭 API 成自建 MCP</h4><p>把宜搭多支表單 API（查詢／新增／更新 J1、J1A）整合封裝成自建 MCP 工具，讓 AI 以一致介面讀待處理商品並回寫結果，不必人工搬資料。</p></div></li>
         <li><span class="ic">🛡️</span><div class="tx"><h4>不編造、不誇大、可追溯</h4><p>內容只來自原始商品資料或圖片，不用「最好/第一」等無法驗證的詞，每筆都有日誌可查。</p></div></li>
         <li><span class="ic">🔍</span><div class="tx"><h4>SEO + GEO 文案策略</h4><p>名稱核心關鍵字前置、敘述用列點＋自然語言句式，兼顧搜尋引擎與生成式搜尋（GEO）。</p></div></li>
         <li><span class="ic">⚙️</span><div class="tx"><h4>批次 diff + preflight</h4><p>先預檢擋掉缺資料/錯欄位，只更新真正有變動的欄位，API 失敗有限次重試。</p></div></li>
@@ -112,13 +107,13 @@
     </div>
   </details>
 
-  <details class="acc acc-lg">
-    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項 · 點開</span></summary>
+  <details class="acc acc-lg" open>
+    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項</span></summary>
     <div class="abody">
       <div class="didblock" style="border:none;padding:0;background:none">
         <p class="lead">從 <b>自建宜搭 MCP、AI 內容生成、批次同步到 n8n 社群自動化</b>都自行完成的電商上架自動化專案。</p>
         <ul class="did">
-          <li><div class="h"><span class="ic">🔌</span>自建宜搭 (Yida) MCP Server</div><p class="d">自行開發 <b>宜搭 MCP server</b>，讓 AI 以標準化介面讀取 J1 新品表單、回寫 J1 / J1A，支援 <b>insertOrUpdate</b> 與最新版本更新。</p></li>
+          <li><div class="h"><span class="ic">🔌</span>整合多個宜搭 API 自建 MCP Server</div><p class="d">將宜搭 (Yida) <b>多支表單 API</b> 整合封裝成<b>自建 MCP server</b>，讓 AI 以一致介面讀取 J1 新品表單、回寫 J1 / J1A，支援 <b>insertOrUpdate</b> 與最新版本更新。</p></li>
           <li><div class="h"><span class="ic">🤖</span>AI SEO / GEO 內容生成</div><p class="d">依爬蟲商品原始資料生成 <b>SEO 商品名、純文字敘述、HTML 敘述、標籤</b>，採關鍵字前置與 GEO 句式。</p></li>
           <li><div class="h"><span class="ic">🖼️</span>自動補圖 / 補敘述</div><p class="d">針對缺圖缺敘述的爬蟲商品，自動補上商品圖與結構化敘述，讓陽春資料變成可上架內容。</p></li>
           <li><div class="h"><span class="ic">⚙️</span>批次工具：diff / preflight / 重試</div><p class="d">把一次性腳本整理成<b>可配置、可預檢、只更新差異、可重試</b>的批次同步流程，並落地中繼 JSON / 報表 / 統計。</p></li>

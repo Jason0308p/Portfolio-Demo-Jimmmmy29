@@ -23,24 +23,20 @@
 <div class="wrap">
 
   <div class="hero">
-    <h1>GA4 + GSC + GTM 數據，透過自建 MCP 餵給 AI 分析</h1>
-    <p>把 Google Analytics 4、Search Console、Tag Manager 的數據，透過<b>自建 MCP Server</b>標準化後直接餵給 AI，
-       自動產出洞察分析與可視化儀表板。本頁為<b>純前端互動展示</b>，所有數字、頁面、品牌皆為虛構脫敏範例，AI 回應為前端模擬。</p>
+    <h1>GA4 + GSC + GTM 數據，透過官方 GA MCP 餵給 AI 分析</h1>
+    <p>把 Google Analytics 4、Search Console、Tag Manager 的數據，透過 <b>Google 官方 GA MCP</b> 與 GSC / GTM API 餵給 AI，
+       自動產出洞察分析與可視化儀表板。</p>
     <div class="tags">
       <span class="tag">GA4 Data API</span>
       <span class="tag">Google Search Console (GSC) API</span>
       <span class="tag">Google Tag Manager (GTM) API</span>
-      <span class="tag cool">自建 MCP Server (Model Context Protocol)</span>
+      <span class="tag cool">官方 GA MCP (Google)</span>
+      <span class="tag">GSC / GTM API 整合</span>
       <span class="tag">OAuth / Service Account</span>
       <span class="tag">AI 分析</span>
       <span class="tag">資料視覺化</span>
       <span class="tag">Python</span>
     </div>
-  </div>
-
-  <div class="note">
-    📌 <b>展示聲明</b>：本頁為公開作品集，僅保留介面、互動與少量<b>虛構範例資料</b>；
-    不含任何金鑰、真實 measurement id、真實帳號、真實品牌或實際查詢與分析邏輯。下方流程動畫為架構「示意」，非真實連線。
   </div>
 
   <!-- ===== 資料流程順序 ===== -->
@@ -49,7 +45,7 @@
     <div class="node src" data-k="ga"><span class="step">1</span><div class="ic">📊</div><div class="nm">GA4</div><div class="sub">流量 / 事件 / 轉換</div><div class="ms" data-ms="ga"></div></div>
     <div class="node src" data-k="gsc"><span class="step">1</span><div class="ic">🔍</div><div class="nm">GSC</div><div class="sub">點擊 / 曝光 / 排名</div><div class="ms" data-ms="gsc"></div></div>
     <div class="node src" data-k="gtm"><span class="step">1</span><div class="ic">🏷️</div><div class="nm">GTM</div><div class="sub">標籤 / 事件設定</div><div class="ms" data-ms="gtm"></div></div>
-    <div class="node" data-k="mcp"><span class="step">2</span><div class="ic">🔌</div><div class="nm">自建 MCP Server</div><div class="sub">標準化取數介面</div><div class="ms" data-ms="mcp"></div></div>
+    <div class="node" data-k="mcp"><span class="step">2</span><div class="ic">🔌</div><div class="nm">官方 GA MCP</div><div class="sub">＋GSC / GTM API 取數</div><div class="ms" data-ms="mcp"></div></div>
     <div class="node" data-k="ai"><span class="step">3</span><div class="ic">🤖</div><div class="nm">AI 分析</div><div class="sub">跨來源解讀</div><div class="ms" data-ms="ai"></div></div>
     <div class="node out" data-k="out"><span class="step">4</span><div class="ic">📈</div><div class="nm">儀表板 / 洞察</div><div class="sub">中英報告</div><div class="ms" data-ms="out"></div></div>
   </div>
@@ -66,6 +62,21 @@
   <!-- ===== KPI 假數據 ===== -->
   <h2 class="sec">本月概況 KPI（虛構脫敏資料）</h2>
   <div class="kpi-grid" id="kpiGrid"></div>
+
+  <!-- ===== 更多圖表 ===== -->
+  <h2 class="sec">每日流量趨勢（近 14 天 · 虛構）</h2>
+  <div class="panel"><div class="trend" id="trend"></div></div>
+
+  <div class="analysis-area" style="margin-top:16px">
+    <div class="panel"><h3>流量來源結構</h3><div class="bars" id="srcBars"></div></div>
+    <div class="panel"><h3>裝置分佈</h3><div class="bars" id="deviceBars"></div></div>
+  </div>
+
+  <h2 class="sec">GSC 熱門關鍵字（虛構）</h2>
+  <div class="panel" style="overflow-x:auto"><table class="kwt"><thead><tr><th>關鍵字</th><th>點擊</th><th>曝光</th><th>CTR</th><th>平均排名</th></tr></thead><tbody id="kwBody"></tbody></table></div>
+
+  <h2 class="sec">詢價轉換漏斗（虛構）</h2>
+  <div class="panel"><div class="funnel" id="funnel"></div></div>
 
   <!-- ===== AI 分析摘要 + 進站頁長條圖 ===== -->
   <h2 class="sec">AI 分析摘要與進站頁流量</h2>
@@ -105,7 +116,7 @@
     <summary><span class="ic">✨</span> 設計重點<span class="cnt">5 項</span></summary>
     <div class="abody">
   <ul class="dlist">
-    <li><span class="ic">🔌</span><div class="tx"><h4>MCP 標準化讓 AI 直接取數</h4><p>把 GA4 / GSC / GTM 的查詢包成標準化工具介面，AI 不必處理各家 API 細節，能直接「要什麼指標就取什麼指標」。</p></div></li>
+    <li><span class="ic">🔌</span><div class="tx"><h4>官方 GA MCP + GSC / GTM API 取數</h4><p>以 Google 官方 GA MCP 取 GA4 數據，並整合 GSC / GTM API，讓 AI 以一致介面取用跨來源指標，不必逐一處理各家 API 細節。</p></div></li>
     <li><span class="ic">🔗</span><div class="tx"><h4>跨來源資料整合</h4><p>流量（GA4）、自然搜尋（GSC）與事件設定（GTM）合在同一份脈絡裡解讀，洞察比單看任一來源更完整。</p></div></li>
     <li><span class="ic">🌡️</span><div class="tx"><h4>紅漲綠跌溫度圖</h4><p>沿用台股慣例：紅＝成長／正向、綠＝下滑／負向，表格依數值深淺上色，主管一眼看出強弱與變化。</p></div></li>
     <li><span class="ic">🧪</span><div class="tx"><h4>脫敏資料產生器</h4><p>另寫產生器把真實快照轉成結構相同、數字虛構的展示資料，作品集可公開又不洩任何真實數據。</p></div></li>
@@ -114,17 +125,17 @@
     </div>
   </details>
 
-  <details class="acc acc-lg">
-    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項 · 點開</span></summary>
+  <details class="acc acc-lg" open>
+    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項</span></summary>
     <div class="abody">
   <div class="didblock" style="border:none;padding:0;background:none">
-    <p class="lead">這是一個從<b>串接 Google 數據服務、自建 MCP、到 AI 自動產出可視化分析</b>都自行完成的數據分析專案，
+    <p class="lead">這是一個從<b>串接 Google 數據服務（官方 GA MCP + GSC / GTM API）、到 AI 自動產出可視化分析</b>都自行完成的數據分析專案，
     重點在「讓 AI 能直接、可靠地取用多來源行銷數據並產出洞察」。</p>
     <ul class="did">
       <li>
-        <div class="h"><span class="ic">🔌</span>自建 MCP Server 串 GA4 / GSC / GTM</div>
-        <p class="d">把 <b>GA4 Data API</b>、<b>Search Console API</b> 與 <b>Tag Manager</b> 的取數封裝成
-        <b>MCP 標準化工具</b>，讓 AI 以一致介面取得跨來源數據，不必各自處理授權與回應格式。</p>
+        <div class="h"><span class="ic">🔌</span>串接官方 GA MCP + GSC / GTM API</div>
+        <p class="d">以 <b>Google 官方 GA MCP</b> 取 <b>GA4</b> 數據，並整合 <b>Search Console</b> 與 <b>Tag Manager</b> API，
+        讓 AI 以一致介面取得跨來源數據，不必各自處理授權與回應格式。（另在宜搭、台股輿情等專案自建 MCP。）</p>
       </li>
       <li>
         <div class="h"><span class="ic">🧪</span>設計脫敏資料產生器</div>

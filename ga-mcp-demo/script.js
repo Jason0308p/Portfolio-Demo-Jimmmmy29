@@ -21,23 +21,48 @@
   /* ---------- AI 分析（模擬逐字） ---------- */
   var AI_TEXT = {
     overview:
-      "📊 本月整體成效摘要\n\n" +
-      "・流量較上月成長 12.4%，互動率同步提升，顯示新進站來源品質佳。\n" +
-      "・自然搜尋點擊成長 6.7%，平均排名前進 1.4，SEO 投入開始發酵。\n" +
-      "・推估詢價 +18，轉換動能來自 /products 與 /eco-bags 兩個頁面。\n\n" +
-      "🎯 建議：擴大表現最佳的 /eco-bags 內容，並為其建立內部連結強化權重。",
+      "📊 本月整體成效摘要（GA4 × GSC × GTM 交叉分析）\n\n" +
+      "【流量與互動】\n" +
+      "・Sessions 48.2k，較上月 +12.4%；互動率 63.1%（+3.2pt），顯示新進站來源品質提升。\n" +
+      "・來源結構：自然搜尋 42%、直接 27%、社群 18%、推薦 13%。\n" +
+      "・新訪客佔 61%，回訪率微升，品牌記憶度改善。\n\n" +
+      "【搜尋表現（GSC）】\n" +
+      "・自然點擊 9,840（+6.7%）、曝光 205k、平均 CTR 4.8%、平均排名前進 1.4 至 11.2。\n" +
+      "・品牌詞穩定第 1–3 名；非品牌長尾詞成長最快，是流量增量主力。\n\n" +
+      "【轉換】\n" +
+      "・推估詢價 312（+18），主要來自 /products 與 /eco-bags。\n" +
+      "・行動裝置轉換率仍低於桌機約 40%，為最大改善空間。\n\n" +
+      "🎯 三個優先動作：\n" +
+      "1. 擴充 /eco-bags 內容並建立內部連結，鞏固表現最佳頁面。\n" +
+      "2. 為成長中的非品牌長尾詞補上對應到達頁。\n" +
+      "3. 優化行動版詢價流程，縮小與桌機的轉換差距。",
     seo:
-      "🔍 自然搜尋 / SEO 機會\n\n" +
-      "・有 3 組關鍵字停在第 11–15 名（第二頁前段），小幅優化即可進首頁。\n" +
-      "・/blog/gift-guide 曝光高但 CTR 偏低，建議改寫 title 與 meta description。\n" +
-      "・行動裝置佔點擊 68%，需確認核心頁面行動體驗與載入速度。\n\n" +
-      "🎯 優先處理：先優化已接近首頁的關鍵字，投報率最高。",
+      "🔍 自然搜尋 / SEO 機會（Search Console）\n\n" +
+      "【接近首頁的機會詞】\n" +
+      "・偵測到 3 組關鍵字停在第 11–15 名（第二頁前段），曝光足但點擊少，小幅優化即可進首頁。\n" +
+      "・做法：強化對應頁的 H1、段落關鍵字與內部連結，並補充相關子題。\n\n" +
+      "【高曝光低點擊】\n" +
+      "・/blog/gift-guide 曝光高但 CTR 僅 1.9%，明顯低於站台平均 4.8%。\n" +
+      "・做法：改寫 title 與 meta description，加入數字與利益點提高吸引力。\n\n" +
+      "【技術與體驗】\n" +
+      "・行動裝置佔自然點擊 68%，但行動 LCP 偏慢，恐拖累排名與跳出率。\n" +
+      "・做法：壓縮首屏圖片、延後非必要腳本，改善 Core Web Vitals。\n\n" +
+      "🎯 優先順序：先做「接近首頁的機會詞」，投報率最高、見效最快。",
     conv:
-      "💰 轉換與詢價分析\n\n" +
-      "・詢價漏斗主要流失在「商品頁 → 詢價表單」這一步。\n" +
-      "・帶 GTM 事件的 CTA 點擊率，桌機高於行動 1.8 倍。\n" +
-      "・/products 進站者詢價率最高，是最值得加大投放的入口。\n\n" +
-      "🎯 建議：簡化行動版詢價表單欄位，並在商品頁強化 CTA。"
+      "💰 轉換與詢價分析（GA4 事件 × GTM）\n\n" +
+      "【詢價漏斗】\n" +
+      "・進站 → 瀏覽商品 72% → 點詢價 CTA 9% → 送出表單 41%。\n" +
+      "・最大流失在「商品頁 → 點詢價 CTA」，僅 9% 點擊。\n\n" +
+      "【裝置差異】\n" +
+      "・帶 GTM 事件的 CTA 點擊率，桌機為行動的 1.8 倍。\n" +
+      "・行動版表單欄位過多，送出率明顯偏低。\n\n" +
+      "【高價值入口】\n" +
+      "・/products 進站者詢價率最高（1.2%），/eco-bags 次之。\n" +
+      "・付費流量中，搜尋廣告帶來的詢價品質優於多數社群受眾。\n\n" +
+      "🎯 建議：\n" +
+      "1. 商品頁 CTA 上移並加對比色，提高點擊。\n" +
+      "2. 行動版詢價表單精簡為 3–4 欄，其餘改為送出後補填。\n" +
+      "3. 將預算向 /products 與搜尋廣告傾斜。"
   };
 
   /* ---------- 渲染 KPI ---------- */
@@ -118,6 +143,68 @@
   }
   aiBtn.addEventListener("click", function () { typeOut(AI_TEXT[aiScene.value] || AI_TEXT.overview); });
 
+  /* ---------- 更多圖表：每日趨勢 / 來源 / 裝置 / 關鍵字 / 漏斗 ---------- */
+  var TREND = [32, 35, 31, 38, 42, 40, 45, 43, 48, 46, 44, 49, 47, 48];
+  var tmax = Math.max.apply(null, TREND);
+  var trendEl = document.getElementById("trend");
+  TREND.forEach(function (v, i) {
+    var c = document.createElement("div"); c.className = "tcol";
+    var th = Math.round(v / tmax * 130);
+    c.innerHTML = '<div class="tbar" data-h="' + th + '" style="height:' + th + 'px" title="' + v + 'k"></div><div class="tlab">' + (i + 1) + '</div>';
+    trendEl.appendChild(c);
+  });
+
+  function makeBars(id, arr, unit) {
+    var el = document.getElementById(id), mx = Math.max.apply(null, arr.map(function (x) { return x.v; })), fs = [];
+    arr.forEach(function (x) {
+      var r = document.createElement("div"); r.className = "bar-row";
+      r.innerHTML = '<div class="nm">' + x.n + '</div><div class="bar-track"><div class="bar-fill"></div></div><div class="v">' + x.v + unit + '</div>';
+      el.appendChild(r); fs.push({ el: r.querySelector(".bar-fill"), pct: Math.round(x.v / mx * 100) });
+    });
+    return fs;
+  }
+  var srcFills = makeBars("srcBars", [{ n: "自然搜尋", v: 42 }, { n: "直接", v: 27 }, { n: "社群", v: 18 }, { n: "推薦", v: 13 }], "%");
+  var devFills = makeBars("deviceBars", [{ n: "行動", v: 64 }, { n: "桌機", v: 31 }, { n: "平板", v: 5 }], "%");
+
+  var KW = [
+    { k: "客製 保溫杯", c: 1240, i: 18500, ctr: 6.7, pos: 3.2, up: true },
+    { k: "環保袋 印logo", c: 980, i: 15200, ctr: 6.4, pos: 4.1, up: true },
+    { k: "企業 禮品 推薦", c: 760, i: 22100, ctr: 3.4, pos: 8.6, up: false },
+    { k: "帆布袋 客製", c: 640, i: 9800, ctr: 6.5, pos: 5.0, up: true },
+    { k: "行動電源 客製 logo", c: 410, i: 12600, ctr: 3.3, pos: 11.4, up: false },
+    { k: "活動 贈品 少量", c: 355, i: 8700, ctr: 4.1, pos: 9.8, up: true }
+  ];
+  var kwBody = document.getElementById("kwBody");
+  KW.forEach(function (r) {
+    var tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + r.k + "</td><td>" + r.c.toLocaleString() + "</td><td>" + r.i.toLocaleString() +
+      "</td><td>" + r.ctr + "%</td><td class='" + (r.up ? "up" : "down") + "'>" + r.pos + (r.up ? " ▲" : " ▼") + "</td>";
+    kwBody.appendChild(tr);
+  });
+
+  var FUN = [
+    { n: "進站", v: 48200, w: 100 },
+    { n: "瀏覽商品", v: 34700, w: 72 },
+    { n: "點詢價 CTA", v: 4340, w: 9 },
+    { n: "送出詢價", v: 312, w: 3 }
+  ];
+  var funEl = document.getElementById("funnel"), funFills = [];
+  FUN.forEach(function (f) {
+    var row = document.createElement("div"); row.className = "frow";
+    row.innerHTML = '<div class="fname">' + f.n + '</div><div class="ftrack"><div class="ffill"></div></div><div class="fval">' + f.v.toLocaleString() + '</div>';
+    funEl.appendChild(row); funFills.push({ el: row.querySelector(".ffill"), pct: f.w });
+  });
+
+  function animateExtras() {
+    document.querySelectorAll("#trend .tbar").forEach(function (b) { b.style.height = "0"; });
+    srcFills.concat(devFills, funFills).forEach(function (f) { f.el.style.width = "0"; });
+    setTimeout(function () {
+      document.querySelectorAll("#trend .tbar").forEach(function (b) { b.style.height = b.dataset.h + "px"; });
+      srcFills.concat(devFills, funFills).forEach(function (f) { f.el.style.width = f.pct + "%"; });
+    }, 130);
+  }
+  runBtn.addEventListener("click", animateExtras);
+
   /* ---------- 載入自動播一次 ---------- */
-  setTimeout(playFlow, 400);
+  setTimeout(function () { playFlow(); animateExtras(); }, 400);
 })();

@@ -3,145 +3,249 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Jason 作品集 — AI / 數據 / 自動化 Demo</title>
-<meta name="description" content="Jason 的作品集：LINE RAG 客服機器人、GA4+MCP 數據分析、AI 自動化求職 pipeline、台股輿情儀表板。涵蓋 LINE / n8n / RAG / Qdrant / Gemini / MCP / GA4 / GSC / GTM / 爬蟲 / Notion API。">
+<title>Jason｜AI × 數據 × 自動化 作品集</title>
+<meta name="description" content="Jason 的作品集：LINE RAG 客服機器人、GA4 官方 MCP 數據分析、AI 自動化求職 pipeline、宜搭自建 MCP 商品上架 SEO、台股輿情（自建 TWSE MCP）。技術涵蓋 LINE / n8n / RAG / Qdrant / Gemini / MCP / GA4 / GSC / GTM / 爬蟲 / Notion API / 宜搭 API。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0b1220;--card:#13213a;--card2:#0e1830;--border:#22324f;--border2:#2c4061;
-  --text:#e6edf7;--text2:#9fb2cc;--text3:#6b809e;--accent:#3b82f6;--accent2:#22d3ee;--gold:#f59e0b;--green:#22c55e;
+  --bg:#0a0e17; --card:#111c30; --card2:#0e1830; --border:#1e2c44; --border2:#2c4061;
+  --text:#e6edf7; --text2:#9fb2cc; --text3:#6b809e; --accent:#22d3ee; --accent2:#3b82f6; --gold:#f59e0b;
+  --nav-bg:rgba(10,14,23,.82); --t:all .3s ease;
 }
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#13233f,var(--bg) 55%);
-  color:var(--text);font-family:'Noto Sans TC','Inter',system-ui,sans-serif;line-height:1.6;min-height:100vh}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1080px;margin:0 auto;padding:54px 22px 60px}
-.head{margin-bottom:34px}
-.eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;color:var(--accent2);text-transform:uppercase}
-.head h1{font-size:38px;font-weight:900;margin:8px 0 6px;color:#fff;letter-spacing:.5px}
-.head p{margin:0;color:var(--text2);max-width:760px;font-size:15px}
-.contact{margin-top:14px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--text3)}
-.contact a{color:var(--accent2)}
-.skills{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
-.skill{font-size:12px;font-weight:600;color:var(--text2);background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:4px 12px}
-.note{margin:26px 0;padding:11px 15px;border-radius:10px;font-size:13px;color:var(--text2);
-  background:rgba(245,158,11,.06);border:1px solid #4a3a1a}
-.note b{color:var(--gold)}
-h2.sec{font-size:14px;font-weight:700;color:var(--text);margin:30px 0 16px;display:flex;align-items:center;gap:9px}
-h2.sec::before{content:"";width:4px;height:16px;background:var(--accent);border-radius:2px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
-.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);
-  border-radius:14px;padding:20px;transition:.2s;position:relative;overflow:hidden}
-.card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-.card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.35)}
-.card .ic{font-size:26px}
-.card h3{margin:10px 0 6px;font-size:18px;color:#fff;font-weight:800}
-.card .desc{font-size:13px;color:var(--text2);flex:1}
-.card .tags{display:flex;flex-wrap:wrap;gap:6px;margin:13px 0 14px}
-.card .t{font-size:11px;color:var(--text3);background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:2px 8px}
-.card .go{font-size:13px;font-weight:700;color:var(--accent2);display:flex;align-items:center;gap:6px}
-.card:hover .go{gap:10px}
-footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--text3);text-align:center}
-@media (max-width:640px){
-  html,body{overflow-x:hidden}
-  .wrap{padding:34px 16px 50px}
-  .head h1{font-size:26px;line-height:1.25;overflow-wrap:break-word}
-  .head p{font-size:14px}
-  .contact{font-size:12px;gap:10px}
-  .contact a{overflow-wrap:anywhere}
-}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+/* nav */
+.navbar{position:fixed;top:0;width:100%;padding:1.1rem 6%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);backdrop-filter:blur(10px);z-index:1000;border-bottom:1px solid transparent;transition:var(--t)}
+.navbar.scrolled{border-bottom-color:var(--border)}
+.logo{font-size:1.4rem;font-weight:900;color:var(--accent);letter-spacing:1px}
+.logo span{color:var(--text)}
+.nav-links{display:flex;list-style:none;gap:1.8rem}
+.nav-links a{font-size:.9rem;font-weight:500;color:var(--text2);transition:var(--t)}
+.nav-links a:hover{color:var(--accent)}
+@media(max-width:680px){.nav-links{gap:1rem;font-size:.8rem}.nav-links a{font-size:.8rem}}
+
+/* hero */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 8%;position:relative;
+  background:radial-gradient(900px 500px at 80% -10%,#12233f 0%,transparent 60%)}
+.greeting{color:var(--accent);font-family:var(--mono),monospace;font-size:1rem;margin-bottom:1rem;letter-spacing:1px}
+.hero h1{font-size:clamp(2.6rem,8vw,5rem);font-weight:900;line-height:1.05;color:#fff;letter-spacing:1px}
+.hero h2{font-size:clamp(1.4rem,5vw,2.8rem);color:var(--text2);margin:.4rem 0 1.4rem;font-weight:800}
+.hero .desc{max-width:600px;color:var(--text2);margin-bottom:2.4rem;font-size:1.05rem}
+.hero .desc b{color:var(--text)}
+.cta{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{display:inline-block;padding:.85rem 1.8rem;border-radius:6px;font-weight:700;transition:var(--t);font-size:.95rem}
+.btn.primary{border:1px solid var(--accent);color:var(--accent)}
+.btn.primary:hover{background:rgba(34,211,238,.1);transform:translateY(-2px)}
+.btn.secondary{color:var(--text2);border:1px solid var(--border2)}
+.btn.secondary:hover{color:var(--text);border-color:var(--text2)}
+.scroll-cue{position:absolute;bottom:1.6rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;opacity:.6;animation:bounce 2s infinite}
+.mouse{width:22px;height:36px;border:2px solid var(--text2);border-radius:12px;position:relative}
+.mouse::before{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:var(--text2);border-radius:50%;animation:sc 1.5s infinite}
+.scroll-cue span{font-size:.7rem;color:var(--text3);letter-spacing:1px}
+@keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0) translateX(-50%)}40%{transform:translateY(-8px) translateX(-50%)}60%{transform:translateY(-4px) translateX(-50%)}}
+@keyframes sc{0%{opacity:1;top:6px}100%{opacity:0;top:18px}}
+
+/* sections */
+section{padding:5.5rem 8%}
+.container{max-width:1160px;margin:0 auto}
+.sec-title{display:flex;align-items:center;gap:16px;font-size:1.6rem;font-weight:800;color:#fff;margin-bottom:2.4rem;white-space:nowrap}
+.sec-title .num{font-family:var(--mono),monospace;font-size:1rem;color:var(--accent);font-weight:500}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* works grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.3rem}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;transition:var(--t);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.card:hover{border-color:var(--accent);transform:translateY(-6px);box-shadow:0 14px 34px rgba(0,0,0,.4)}
+.card .ic{font-size:1.7rem}
+.card h3{margin:.7rem 0 .5rem;font-size:1.15rem;color:#fff;font-weight:800}
+.card .d{font-size:.9rem;color:var(--text2);flex:1}
+.card .tags{display:flex;flex-wrap:wrap;gap:6px;margin:.9rem 0 1rem}
+.card .t{font-size:.7rem;color:var(--text3);background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:2px 8px}
+.card .go{font-size:.85rem;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px}
+.card:hover .go{gap:11px}
+
+/* skills */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.3rem}
+.skill{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:var(--t)}
+.skill:hover{transform:translateY(-5px);border-color:var(--accent2)}
+.skill .ic{font-size:1.6rem;margin-bottom:.7rem}
+.skill h3{color:#fff;font-size:1.05rem;margin-bottom:.7rem}
+.skill .row{display:flex;flex-wrap:wrap;gap:6px}
+.skill .k{font-size:.75rem;color:var(--text2);background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:3px 10px}
+
+/* about */
+.about{color:var(--text2);max-width:820px;font-size:1.02rem}
+.about p{margin-bottom:1rem}
+.about b{color:var(--text)}
+.stats{display:flex;gap:2.5rem;margin-top:2rem;flex-wrap:wrap}
+.stat .n{font-size:2.2rem;font-weight:800;color:var(--accent);font-family:var(--mono),monospace}
+.stat .l{font-size:.85rem;color:var(--text3)}
+
+/* contact */
+.contact{text-align:center;max-width:600px;margin:0 auto}
+.contact p{color:var(--text2);font-size:1.1rem;margin-bottom:1.6rem}
+.email{font-size:clamp(1.3rem,4vw,2rem);color:var(--accent);font-weight:800;display:inline-block;margin-bottom:2rem;transition:var(--t)}
+.email:hover{transform:scale(1.04)}
+.socials{display:flex;justify-content:center;gap:1.6rem}
+.socials a{color:var(--text2);transition:var(--t)}
+.socials a:hover{color:var(--accent)}
+
+footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-top:1px solid var(--border)}
+.demo-note{font-size:.8rem;color:var(--text3);margin-top:1.5rem}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:all .7s ease}
+.reveal.on{opacity:1;transform:none}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="head">
-    <div class="eyebrow">Portfolio · 作品集</div>
-    <h1>Jason — AI / 數據 / 自動化</h1>
-    <p>把 AI、資料與多平台串接，做成能解決實際問題的系統。以下為各專案的<b>互動式展示版</b>
-       （資料皆為虛構脫敏、AI 回應為前端模擬），真實程式碼與架構可於面談時說明。</p>
-    <div class="contact">
-      <span>📧 <a href="mailto:jason0308p@gmail.com">jason0308p@gmail.com</a></span>
-      <span>💻 <a href="https://github.com/Jason0308p" target="_blank" rel="noopener">github.com/Jason0308p</a></span>
+<nav class="navbar" id="nav">
+  <div class="logo">Jason<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#work">作品</a></li>
+    <li><a href="#skills">技能</a></li>
+    <li><a href="#about">關於</a></li>
+    <li><a href="#contact">聯絡</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <span class="greeting">你好，我是</span>
+  <h1>Jason</h1>
+  <h2>AI × 數據 × 自動化 工程師</h2>
+  <p class="desc">把 <b>AI、資料與多平台串接</b>，做成能解決實際問題的系統——
+     從 LINE 客服機器人、GA/輿情數據分析，到爬蟲與電商上架自動化。以下每個專案都有可互動的展示版。</p>
+  <div class="cta">
+    <a href="#work" class="btn primary">看作品 →</a>
+    <a href="#contact" class="btn secondary">聯絡我</a>
+  </div>
+  <div class="scroll-cue"><div class="mouse"></div><span>SCROLL</span></div>
+</header>
+
+<!-- WORK -->
+<section id="work">
+  <div class="container">
+    <h2 class="sec-title reveal"><span class="num">01.</span> 專案作品</h2>
+    <div class="grid">
+
+      <a class="card reveal" href="line-rag-demo/index.html">
+        <div class="ic">💬</div>
+        <h3>LINE 智能客服機器人</h3>
+        <div class="d">串接 LINE + n8n + RAG 向量資料庫 + AI 的 B2B 客服：自動分流產品/FAQ、分層檢索、冷熱資料分流、報價保守防錯、宜搭建單與群組通知。</div>
+        <div class="tags"><span class="t">LINE API</span><span class="t">n8n</span><span class="t">RAG · Qdrant</span><span class="t">Gemini</span><span class="t">宜搭 API</span></div>
+        <div class="go">進入展示 →</div>
+      </a>
+
+      <a class="card reveal" href="ga-mcp-demo/index.html">
+        <div class="ic">📊</div>
+        <h3>GA4 + MCP 數據分析</h3>
+        <div class="d">以 Google <b>官方 GA MCP</b> 取 GA4 數據，整合 GSC / GTM API 餵給 AI 自動分析，產出 KPI、趨勢、SEO 與轉換洞察（中英雙語）。</div>
+        <div class="tags"><span class="t">官方 GA MCP</span><span class="t">GSC · GTM API</span><span class="t">AI 分析</span><span class="t">資料視覺化</span></div>
+        <div class="go">進入展示 →</div>
+      </a>
+
+      <a class="card reveal" href="job-automation-demo/index.html">
+        <div class="ic">🤖</div>
+        <h3>AI 自動化求職 Pipeline</h3>
+        <div class="d">多平台職缺爬蟲 → 資料清洗正規化 → 規則/AI 評分 → 抓 JD → AI 生成 CV/面試 QA → 寫入 Notion 的一條龍自動化。</div>
+        <div class="tags"><span class="t">爬蟲</span><span class="t">AI 評分</span><span class="t">資料正規化</span><span class="t">Notion API</span></div>
+        <div class="go">進入展示 →</div>
+      </a>
+
+      <a class="card reveal" href="product-seo-demo/index.html">
+        <div class="ic">🛍️</div>
+        <h3>商品上架 SEO 自動化</h3>
+        <div class="d">爬蟲商品自動補圖、補敘述、生成 SEO/GEO 名稱與標籤，透過<b>整合多個宜搭 API 的自建 MCP</b> 寫回，再用 n8n 自動社群貼文並回收成效。</div>
+        <div class="tags"><span class="t">自建宜搭 MCP</span><span class="t">AI SEO/GEO</span><span class="t">自動補圖</span><span class="t">n8n 社群</span></div>
+        <div class="go">進入展示 →</div>
+      </a>
+
+      <a class="card reveal" href="輿情_demo/index.html">
+        <div class="ic">📈</div>
+        <h3>台股輿情分析儀表板</h3>
+        <div class="d"><b>自建 MCP（基於台灣官方 TWSE API）</b> + 多來源爬蟲 + AI 情緒分析的台股輿情儀表板：族群燈號、討論攀升、個股深度卡，強調 UI/UX。</div>
+        <div class="tags"><span class="t">自建 TWSE MCP</span><span class="t">多源爬蟲</span><span class="t">AI 情緒分析</span><span class="t">UI/UX</span></div>
+        <div class="go">進入展示 →</div>
+      </a>
+
+      <a class="card reveal" href="輿情_demo/2026-06-30_Full_version_from_private/index.html">
+        <div class="ic">🗞️</div>
+        <h3>台股輿情日報（Beta 版）</h3>
+        <div class="d">單日完整靜態日報：情緒變化、多因子選股表、法人籌碼、智能選股快選，以 ECharts 視覺化呈現的進階版。</div>
+        <div class="tags"><span class="t">ECharts</span><span class="t">多因子選股</span><span class="t">法人籌碼</span><span class="t">單日完整版</span></div>
+        <div class="go">進入展示 →</div>
+      </a>
+
     </div>
-    <div class="skills">
-      <span class="skill">LINE Messaging API</span>
-      <span class="skill">n8n</span>
-      <span class="skill">RAG / 向量檢索</span>
-      <span class="skill">Qdrant</span>
-      <span class="skill">Gemini / LLM</span>
-      <span class="skill">自建 MCP Server</span>
-      <span class="skill">GA4 / GSC / GTM API</span>
-      <span class="skill">Shopify Storefront / Admin API</span>
-      <span class="skill">宜搭 (Yida) API</span>
-      <span class="skill">Web Scraping</span>
-      <span class="skill">Notion API</span>
-      <span class="skill">Python</span>
-      <span class="skill">資料視覺化</span>
+    <p class="demo-note reveal">＊ 以上皆為公開展示用的純前端靜態頁，資料為虛構脫敏、AI 與後端行為為模擬；真實程式碼、架構與 know-how 可於面談時說明。</p>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <h2 class="sec-title reveal"><span class="num">02.</span> 技術技能</h2>
+    <div class="skills-grid">
+      <div class="skill reveal"><div class="ic">🧠</div><h3>AI / 檢索式生成</h3><div class="row"><span class="k">RAG</span><span class="k">向量檢索</span><span class="k">Qdrant</span><span class="k">Embeddings</span><span class="k">Gemini / LLM</span><span class="k">MCP</span><span class="k">Prompt Engineering</span></div></div>
+      <div class="skill reveal"><div class="ic">🔌</div><h3>MCP / 串接整合</h3><div class="row"><span class="k">自建宜搭 (Yida) MCP</span><span class="k">自建 TWSE MCP</span><span class="k">官方 GA MCP</span><span class="k">LINE Messaging API</span><span class="k">Notion API</span><span class="k">Shopify API</span></div></div>
+      <div class="skill reveal"><div class="ic">⚙️</div><h3>自動化 / 資料處理</h3><div class="row"><span class="k">n8n</span><span class="k">Webhook</span><span class="k">Web Scraping</span><span class="k">資料正規化 / 清洗</span><span class="k">ETL / 同步</span><span class="k">排程</span></div></div>
+      <div class="skill reveal"><div class="ic">📊</div><h3>數據 / 視覺化</h3><div class="row"><span class="k">GA4 Data API</span><span class="k">GSC API</span><span class="k">GTM API</span><span class="k">資料視覺化</span><span class="k">ECharts</span><span class="k">SEO / GEO</span></div></div>
+      <div class="skill reveal"><div class="ic">💻</div><h3>開發語言 / 介面</h3><div class="row"><span class="k">Python</span><span class="k">JavaScript</span><span class="k">REST / GraphQL</span><span class="k">HTML / CSS</span><span class="k">RWD</span></div></div>
+      <div class="skill reveal"><div class="ic">🛡️</div><h3>工程實務</h3><div class="row"><span class="k">生產化部署</span><span class="k">增量同步</span><span class="k">自動化測試</span><span class="k">風險控管</span><span class="k">脫敏資料產生</span></div></div>
     </div>
   </div>
+</section>
 
-  <div class="note">
-    📌 <b>關於這些 Demo</b>：皆為公開展示用的<b>純前端靜態頁</b>，資料為虛構脫敏、AI 與後端行為為模擬，
-    不含任何金鑰、真實資料或營運邏輯。目的是快速呈現「做過什麼、會串接什麼」。
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <h2 class="sec-title reveal"><span class="num">03.</span> 關於我</h2>
+    <div class="about reveal">
+      <p>我專注於把 <b>AI、資料與多平台串接</b> 落地成能真正解決問題的系統。習慣從<b>系統設計、外部服務整合到生產化維運</b>一手包辦——例如自建 MCP server 讓 AI 直接、可靠地取用資料，並兼顧成本、準確度與商業風險。</p>
+      <p>擅長把重複的營運流程（客服、上架、數據分析、求職）<b>自動化</b>，並用清楚的視覺化把數據變成可行動的決策。</p>
+      <div class="stats">
+        <div class="stat"><div class="n">6</div><div class="l">互動作品展示</div></div>
+        <div class="stat"><div class="n">3</div><div class="l">自建 / 官方 MCP 整合</div></div>
+        <div class="stat"><div class="n">5+</div><div class="l">平台 API 串接</div></div>
+      </div>
+    </div>
   </div>
+</section>
 
-  <h2 class="sec">專案展示</h2>
-  <div class="grid">
-
-    <a class="card" href="line-rag-demo/index.html">
-      <div class="ic">💬</div>
-      <h3>LINE 智能客服機器人</h3>
-      <div class="desc">串接 LINE + n8n + RAG 向量資料庫 + AI 的 B2B 客服機器人：自動分流產品/FAQ、分層檢索、報價保守防錯、宜搭建單與群組通知。</div>
-      <div class="tags"><span class="t">LINE API</span><span class="t">n8n</span><span class="t">RAG · Qdrant</span><span class="t">Gemini</span><span class="t">宜搭 API</span></div>
-      <div class="go">進入展示 →</div>
-    </a>
-
-    <a class="card" href="ga-mcp-demo/index.html">
-      <div class="ic">📊</div>
-      <h3>GA4 + MCP 數據分析</h3>
-      <div class="desc">GA4 / GSC / GTM 數據，透過自建 MCP Server 餵給 AI 自動分析，產出 KPI 儀表板、SEO 與轉換洞察（中英雙語）。</div>
-      <div class="tags"><span class="t">GA4 API</span><span class="t">GSC · GTM</span><span class="t">自建 MCP</span><span class="t">AI 分析</span><span class="t">資料視覺化</span></div>
-      <div class="go">進入展示 →</div>
-    </a>
-
-    <a class="card" href="job-automation-demo/index.html">
-      <div class="ic">🤖</div>
-      <h3>AI 自動化求職 Pipeline</h3>
-      <div class="desc">多平台職缺爬蟲 → 去重 → 規則/AI 評分 → 抓 JD → AI 生成 CV/面試 QA → 寫入 Notion 的一條龍自動化。</div>
-      <div class="tags"><span class="t">爬蟲</span><span class="t">AI 評分</span><span class="t">CV/QA 生成</span><span class="t">Notion API</span><span class="t">Pipeline</span></div>
-      <div class="go">進入展示 →</div>
-    </a>
-
-    <a class="card" href="product-seo-demo/index.html">
-      <div class="ic">🛍️</div>
-      <h3>商品上架 SEO 自動化</h3>
-      <div class="desc">爬蟲商品自動補圖、補敘述、生成 SEO/GEO 名稱與標籤，透過自建宜搭 MCP 寫回，再用 n8n 自動社群貼文並回收成效。</div>
-      <div class="tags"><span class="t">宜搭 MCP</span><span class="t">AI SEO/GEO</span><span class="t">自動補圖</span><span class="t">n8n 社群</span><span class="t">成效回收</span></div>
-      <div class="go">進入展示 →</div>
-    </a>
-
-    <a class="card" href="輿情_demo/index.html">
-      <div class="ic">📈</div>
-      <h3>台股輿情分析儀表板</h3>
-      <div class="desc">自建 MCP + 多來源爬蟲 + AI 情緒分析的台股輿情儀表板：族群燈號、討論攀升、個股深度卡，強調 UI/UX。</div>
-      <div class="tags"><span class="t">自建 MCP</span><span class="t">多源爬蟲</span><span class="t">AI 情緒分析</span><span class="t">UI/UX</span><span class="t">資料視覺化</span></div>
-      <div class="go">進入展示 →</div>
-    </a>
-
-    <a class="card" href="輿情_demo/2026-06-30_Full_version_from_private/index.html">
-      <div class="ic">🗞️</div>
-      <h3>台股輿情日報（完整版）</h3>
-      <div class="desc">單日完整靜態日報：情緒變化、多因子選股表、法人籌碼、智能選股快選，以 ECharts 視覺化呈現的進階版。</div>
-      <div class="tags"><span class="t">ECharts</span><span class="t">多因子選股</span><span class="t">法人籌碼</span><span class="t">單日完整版</span><span class="t">資料視覺化</span></div>
-      <div class="go">進入展示 →</div>
-    </a>
-
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <h2 class="sec-title reveal"><span class="num">04.</span> 聯絡我</h2>
+    <div class="contact reveal">
+      <p>對合作、職缺或這些專案有興趣，歡迎來信聊聊。</p>
+      <a class="email" href="mailto:jason0308p@gmail.com">jason0308p@gmail.com</a>
+      <div class="socials">
+        <a href="https://github.com/Jason0308p" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="mailto:jason0308p@gmail.com">Email ↗</a>
+      </div>
+    </div>
   </div>
+</section>
 
-  <footer>© 2026 Jason ｜ jason0308p@gmail.com ｜ 作品集展示，資料皆為虛構脫敏範例。</footer>
-</div>
+<footer>© 2026 Jason ｜ AI × 數據 × 自動化 作品集 ｜ 展示資料皆為虛構脫敏範例</footer>
+
+<script>
+// nav 陰影
+var nav = document.getElementById("nav");
+addEventListener("scroll", function () { nav.classList.toggle("scrolled", scrollY > 20); });
+// reveal on scroll
+var io = new IntersectionObserver(function (es) {
+  es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } });
+}, { threshold: .12 });
+document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+</script>
 </body>
 </html>

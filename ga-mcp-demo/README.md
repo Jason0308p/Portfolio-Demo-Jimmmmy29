@@ -32,7 +32,7 @@ python -m http.server 8000   # 開 http://localhost:8000
 - 🔌 **自建 MCP Server**：以 Model Context Protocol 串接 GA4 / GSC / GTM API，讓 AI 以一致介面取數
 - 🔐 **授權**：處理 OAuth / Service Account；不同服務分離 OAuth client 避免 token 互踢
 - 🤖 **AI 自動分析**：MCP 取數後交 LLM 產出成效摘要、SEO 機會與轉換洞察
-- 📈 **資料視覺化**：KPI 卡、流量排名、走勢、轉換漏斗、溫度圖，輸出中英雙語儀表板
+- 📈 **資料視覺化**：KPI 卡、每日趨勢、流量來源、GSC 關鍵字、轉換漏斗、溫度圖儀表板
 - 🧪 **脫敏與自動發布**：脫敏資料產生器 + 一鍵重生/發布，真實版與展示版共用生成邏輯
 
 > 實際帳號、measurement id、查詢語法與分析 prompt 屬機密，未公開於此展示，可於面談時說明。

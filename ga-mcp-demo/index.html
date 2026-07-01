@@ -47,12 +47,12 @@
     <div class="node src" data-k="gtm"><span class="step">1</span><div class="ic">🏷️</div><div class="nm">GTM</div><div class="sub">標籤 / 事件設定</div><div class="ms" data-ms="gtm"></div></div>
     <div class="node" data-k="mcp"><span class="step">2</span><div class="ic">🔌</div><div class="nm">官方 GA MCP</div><div class="sub">＋GSC / GTM API 取數</div><div class="ms" data-ms="mcp"></div></div>
     <div class="node" data-k="ai"><span class="step">3</span><div class="ic">🤖</div><div class="nm">AI 分析</div><div class="sub">跨來源解讀</div><div class="ms" data-ms="ai"></div></div>
-    <div class="node out" data-k="out"><span class="step">4</span><div class="ic">📈</div><div class="nm">儀表板 / 洞察</div><div class="sub">中英報告</div><div class="ms" data-ms="out"></div></div>
+    <div class="node out" data-k="out"><span class="step">4</span><div class="ic">📈</div><div class="nm">儀表板 / 洞察</div><div class="sub">視覺化報告</div><div class="ms" data-ms="out"></div></div>
   </div>
   <div class="aux">
     <div class="node side" data-k="gen"><div class="ic">🧪</div><div class="nm">脫敏資料產生器</div><div class="sub">把真實快照轉成可公開假數據</div></div>
     <div class="node side" data-k="viz"><div class="ic">🌡️</div><div class="nm">溫度圖 / 紅綠慣例</div><div class="sub">紅漲綠跌、依數值深淺上色</div></div>
-    <div class="node side" data-k="lang"><div class="ic">🌐</div><div class="nm">中英雙語</div><div class="sub">同一套生成邏輯共用</div></div>
+    <div class="node side" data-k="lang"><div class="ic">🔐</div><div class="nm">OAuth 授權分離</div><div class="sub">多服務 token 不互踢</div></div>
   </div>
   <div class="runbar">
     <button id="runBtn">▶ 重播資料流程</button>
@@ -120,7 +120,7 @@
     <li><span class="ic">🔗</span><div class="tx"><h4>跨來源資料整合</h4><p>流量（GA4）、自然搜尋（GSC）與事件設定（GTM）合在同一份脈絡裡解讀，洞察比單看任一來源更完整。</p></div></li>
     <li><span class="ic">🌡️</span><div class="tx"><h4>紅漲綠跌溫度圖</h4><p>沿用台股慣例：紅＝成長／正向、綠＝下滑／負向，表格依數值深淺上色，主管一眼看出強弱與變化。</p></div></li>
     <li><span class="ic">🧪</span><div class="tx"><h4>脫敏資料產生器</h4><p>另寫產生器把真實快照轉成結構相同、數字虛構的展示資料，作品集可公開又不洩任何真實數據。</p></div></li>
-    <li><span class="ic">🌐</span><div class="tx"><h4>中英雙語、同一套邏輯</h4><p>儀表板中英版共用同一套生成邏輯，避免兩份各自維護造成數字或結構不一致。</p></div></li>
+    <li><span class="ic">🔐</span><div class="tx"><h4>OAuth 授權分離</h4><p>不同 Google 服務（GA / GTM）各用獨立 OAuth client，避免共用時 token 互踢（invalid_grant），確保長期穩定取數。</p></div></li>
   </ul>
     </div>
   </details>
@@ -148,9 +148,9 @@
         把「數字」轉成「人看得懂、可行動的建議」。</p>
       </li>
       <li>
-        <div class="h"><span class="ic">📈</span>資料視覺化儀表板（中英）</div>
-        <p class="d">建置 KPI 卡、進站頁排名、走勢與轉換漏斗等視覺化模組，
-        並提供<b>中英雙語</b>版本，方便對內外不同對象呈現。</p>
+        <div class="h"><span class="ic">📈</span>資料視覺化儀表板</div>
+        <p class="d">建置 KPI 卡、每日趨勢、流量來源、GSC 關鍵字表與轉換漏斗等視覺化模組，
+        把跨來源數據整理成一眼看懂、可據以決策的儀表板。</p>
       </li>
       <li>
         <div class="h"><span class="ic">🌡️</span>紅綠慣例與溫度圖</div>

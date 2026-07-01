@@ -50,9 +50,9 @@
     <div class="node out" data-k="out"><span class="step">4</span><div class="ic">📈</div><div class="nm">儀表板 / 洞察</div><div class="sub">視覺化報告</div><div class="ms" data-ms="out"></div></div>
   </div>
   <div class="aux">
-    <div class="node side" data-k="gen"><div class="ic">🧪</div><div class="nm">脫敏資料產生器</div><div class="sub">把真實快照轉成可公開假數據</div></div>
-    <div class="node side" data-k="viz"><div class="ic">🌡️</div><div class="nm">溫度圖 / 紅綠慣例</div><div class="sub">紅漲綠跌、依數值深淺上色</div></div>
-    <div class="node side" data-k="lang"><div class="ic">🔐</div><div class="nm">OAuth 授權分離</div><div class="sub">多服務 token 不互踢</div></div>
+    <div class="node side" data-k="gen"><div class="ic">🚦</div><div class="nm">API 配額 / 節流</div><div class="sub">分頁·退避重試·快取</div></div>
+    <div class="node side" data-k="viz"><div class="ic">🧩</div><div class="nm">跨資料模型對齊</div><div class="sub">GA4 / GSC / GTM 口徑統一</div></div>
+    <div class="node side" data-k="lang"><div class="ic">📉</div><div class="nm">GA4 抽樣處理</div><div class="sub">拆區間·偵測 sampling</div></div>
   </div>
   <div class="runbar">
     <button id="runBtn">▶ 重播資料流程</button>
@@ -118,9 +118,9 @@
   <ul class="dlist">
     <li><span class="ic">🔌</span><div class="tx"><h4>官方 GA MCP + GSC / GTM API 取數</h4><p>以 Google 官方 GA MCP 取 GA4 數據，並整合 GSC / GTM API，讓 AI 以一致介面取用跨來源指標，不必逐一處理各家 API 細節。</p></div></li>
     <li><span class="ic">🔗</span><div class="tx"><h4>跨來源資料整合</h4><p>流量（GA4）、自然搜尋（GSC）與事件設定（GTM）合在同一份脈絡裡解讀，洞察比單看任一來源更完整。</p></div></li>
-    <li><span class="ic">🌡️</span><div class="tx"><h4>紅漲綠跌溫度圖</h4><p>沿用台股慣例：紅＝成長／正向、綠＝下滑／負向，表格依數值深淺上色，主管一眼看出強弱與變化。</p></div></li>
-    <li><span class="ic">🧪</span><div class="tx"><h4>脫敏資料產生器</h4><p>另寫產生器把真實快照轉成結構相同、數字虛構的展示資料，作品集可公開又不洩任何真實數據。</p></div></li>
-    <li><span class="ic">🔐</span><div class="tx"><h4>OAuth 授權分離</h4><p>不同 Google 服務（GA / GTM）各用獨立 OAuth client，避免共用時 token 互踢（invalid_grant），確保長期穩定取數。</p></div></li>
+    <li><span class="ic">🚦</span><div class="tx"><h4>API 配額管理與節流</h4><p>GA4 / GSC API 有每日與每分鐘配額，大量取數時做分頁、節流、失敗退避重試與快取，避免 429 超額中斷。</p></div></li>
+    <li><span class="ic">📉</span><div class="tx"><h4>GA4 抽樣（sampling）處理</h4><p>大範圍或高基數查詢會被 GA4 抽樣導致數字失真；以拆分日期區間、縮小維度並偵測 samplingLevel 來降低或標示抽樣。</p></div></li>
+    <li><span class="ic">🧩</span><div class="tx"><h4>跨資料模型對齊</h4><p>GA4（事件）、GSC（查詢）、GTM（標籤）口徑不同，需對齊時間、維度與指標，才能把 GSC 關鍵字對應到 GA4 到達頁與轉換做可信交叉分析。</p></div></li>
   </ul>
     </div>
   </details>
@@ -138,9 +138,9 @@
         讓 AI 以一致介面取得跨來源數據，不必各自處理授權與回應格式。（另在宜搭、台股輿情等專案自建 MCP。）</p>
       </li>
       <li>
-        <div class="h"><span class="ic">🧪</span>設計脫敏資料產生器</div>
-        <p class="d">為了公開作品集，另寫產生器把真實快照轉為<b>結構相同、數值虛構</b>的假數據，
-        真實版與展示版<b>共用同一套生成邏輯</b>，確保版面一致又不外洩任何真實數據。</p>
+        <div class="h"><span class="ic">🚦</span>API 配額管理與快取</div>
+        <p class="d">針對 <b>GA4 / GSC API 配額</b> 設計請求<b>節流、分頁與增量快取</b>，
+        並對失敗做退避重試，確保大量、定期取數穩定不中斷（不撞 429）。</p>
       </li>
       <li>
         <div class="h"><span class="ic">🤖</span>AI 自動產出分析</div>
@@ -153,9 +153,9 @@
         把跨來源數據整理成一眼看懂、可據以決策的儀表板。</p>
       </li>
       <li>
-        <div class="h"><span class="ic">🌡️</span>紅綠慣例與溫度圖</div>
-        <p class="d">採台股<b>紅漲綠跌</b>慣例與<b>溫度圖</b>上色，讓成長／下滑、強弱在表格中一眼可辨，
-        降低閱讀門檻、加速決策。</p>
+        <div class="h"><span class="ic">🧩</span>跨資料模型整合</div>
+        <p class="d">對齊 <b>GA4 事件模型</b>與 <b>GSC 查詢模型</b>的維度、時間與口徑，
+        把 GSC 關鍵字對應到 GA4 到達頁與轉換，才能做可信的跨來源交叉分析。</p>
       </li>
       <li>
         <div class="h"><span class="ic">🏗️</span>自動化重生與發布</div>

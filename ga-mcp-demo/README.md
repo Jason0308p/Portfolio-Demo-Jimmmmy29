@@ -24,16 +24,17 @@ python -m http.server 8000   # 開 http://localhost:8000
 ## 技術關鍵字
 
 `GA4 Data API` · `Google Search Console (GSC) API` · `Google Tag Manager (GTM) API` ·
-`自建 MCP Server (Model Context Protocol)` · `OAuth / Service Account` · `AI 分析 / LLM` ·
-`資料視覺化` · `Python` · `脫敏資料產生`
+`官方 GA MCP (Google)` · `GSC / GTM API 整合` · `AI 分析 / LLM` ·
+`API 配額管理` · `GA4 抽樣處理` · `跨資料模型對齊` · `資料視覺化` · `Python`
 
 ## 在這個專案我實際做了什麼（高層說明）
 
-- 🔌 **自建 MCP Server**：以 Model Context Protocol 串接 GA4 / GSC / GTM API，讓 AI 以一致介面取數
-- 🔐 **授權**：處理 OAuth / Service Account；不同服務分離 OAuth client 避免 token 互踢
-- 🤖 **AI 自動分析**：MCP 取數後交 LLM 產出成效摘要、SEO 機會與轉換洞察
-- 📈 **資料視覺化**：KPI 卡、每日趨勢、流量來源、GSC 關鍵字、轉換漏斗、溫度圖儀表板
-- 🧪 **脫敏與自動發布**：脫敏資料產生器 + 一鍵重生/發布，真實版與展示版共用生成邏輯
+- 🔌 **官方 GA MCP + GSC / GTM API**：以 Google 官方 GA MCP 取 GA4 數據，整合 GSC / GTM API，讓 AI 以一致介面取數
+- 🚦 **API 配額管理**：對 GA4 / GSC API 做請求節流、分頁、快取與退避重試，避免撞 429、確保大量取數穩定
+- 📉 **GA4 抽樣處理**：拆分日期區間、縮小維度並偵測 samplingLevel，降低或標示 GA4 抽樣造成的失真
+- 🧩 **跨資料模型對齊**：對齊 GA4 事件模型與 GSC 查詢模型的維度、時間與口徑，做可信交叉分析
+- 🤖 **AI 自動分析**：取數後交 LLM 產出成效摘要、SEO 機會與轉換洞察
+- 📈 **資料視覺化**：KPI 卡、每日趨勢、流量來源、GSC 關鍵字、轉換漏斗等儀表板
 
 > 實際帳號、measurement id、查詢語法與分析 prompt 屬機密，未公開於此展示，可於面談時說明。
 

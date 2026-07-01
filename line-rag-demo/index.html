@@ -92,7 +92,7 @@
     <li><span class="ic">❄️🔥</span><div class="tx"><h4>冷熱資料分流</h4><p>變動少的 FAQ／產品／牌價以批次方式同步為「冷資料」，查詢時走「熱資料」快取與向量索引，明顯降低回應延遲。</p></div></li>
     <li><span class="ic">🛡️</span><div class="tx"><h4>報價保守、不亂估</h4><p>沒有對應牌價時不臆測價格，改提示「需人工確認」並自動建立宜搭詢價單，避免報錯價造成商業風險。</p></div></li>
     <li><span class="ic">🔔</span><div class="tx"><h4>即時通知、不漏單</h4><p>客戶詢問同步通知內部群組，重要詢價與需人工處理的案件不漏接。</p></div></li>
-    <li><span class="ic">🧪</span><div class="tx"><h4>測試／正式雙環境</h4><p>提供瀏覽器測試入口與正式 LINE 共用同一套後端邏輯，確保「測到的就是上線的」。</p></div></li>
+    <li><span class="ic">⚡</span><div class="tx"><h4>本地快照索引與快取重建</h4><p>把上萬筆產品建成記憶體索引（編號／分類／關鍵詞），並用檔案 mtime／size 判斷是否重建，避免每次查詢重讀整份資料、大幅降低延遲。</p></div></li>
   </ul>
     </div>
   </details>
@@ -126,8 +126,8 @@
       </li>
       <li>
         <div class="h"><span class="ic">🏗️</span>生產化與工程紀律</div>
-        <p class="d">處理 webhook 驗章、訊息去抖動、增量資料同步等生產細節，
-        並以<b>自動化測試</b>與<b>測試／正式雙環境</b>確保關鍵行為穩定、可持續維護。</p>
+        <p class="d">處理 webhook 簽章驗證、訊息去抖動、增量資料同步與本地快照索引等生產細節，
+        並以<b>自動化測試</b>守住關鍵行為（產品編號不被語意搜尋覆蓋、報價不亂估），確保穩定可維護。</p>
       </li>
       <li>
         <div class="h"><span class="ic">🔁</span>從低程式碼到工程實作</div>

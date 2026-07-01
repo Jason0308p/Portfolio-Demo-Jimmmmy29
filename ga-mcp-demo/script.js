@@ -198,6 +198,41 @@
     funEl.appendChild(row); funFills.push({ el: row.querySelector(".ffill"), pct: f.w });
   });
 
+  /* ---------- GTM 版本控制 diff ---------- */
+  (function () {
+    var G = {
+      cur: "v18", prev: "v17", by: "Jason", at: "2026-06-30 15:20",
+      note: "新增詢價轉換追蹤、清理舊版 UA",
+      groups: [
+        { name: "標籤 Tags", rows: [
+          { op: "add", nm: "GA4 事件 - 詢價完成（generate_lead）", note: "新增" },
+          { op: "mod", nm: "GA4 設定標籤", note: "加入 user_id 參數" },
+          { op: "del", nm: "UA 舊版通用分析（GA3）", note: "停用" }
+        ] },
+        { name: "觸發條件 Triggers", rows: [
+          { op: "add", nm: "表單送出 - 詢價表單", note: "新增" },
+          { op: "mod", nm: "全部頁面瀏覽", note: "排除 /admin 路徑" }
+        ] },
+        { name: "變數 Variables", rows: [
+          { op: "add", nm: "DLV - lead_value", note: "新增" },
+          { op: "add", nm: "常數 - GA4 Measurement ID", note: "新增" }
+        ] }
+      ]
+    };
+    var SYM = { add: "＋", mod: "～", del: "－" };
+    document.getElementById("gvCur").textContent = G.cur;
+    document.getElementById("gvPrev").textContent = G.prev;
+    document.getElementById("gtmMeta").innerHTML = "發布者：<b>" + G.by + "</b>　·　時間：<b>" + G.at + "</b>　·　版本說明：<b>" + G.note + "</b>";
+    var diff = document.getElementById("gtmDiff");
+    G.groups.forEach(function (g) {
+      var wrap = document.createElement("div"); wrap.className = "gtm-group";
+      wrap.innerHTML = "<h4>" + g.name + "</h4>" + g.rows.map(function (r) {
+        return '<div class="diff-row ' + r.op + '"><span class="op">' + SYM[r.op] + '</span><span class="nm">' + r.nm + '</span><span class="note">' + r.note + '</span></div>';
+      }).join("");
+      diff.appendChild(wrap);
+    });
+  })();
+
   /* ---------- 流量熱力圖（星期 × 時段） ---------- */
   (function () {
     var DAYS = ["一", "二", "三", "四", "五", "六", "日"];

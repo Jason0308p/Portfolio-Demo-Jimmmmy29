@@ -76,23 +76,19 @@
     grid.appendChild(d);
   });
 
-  /* ---------- 渲染長條圖 ---------- */
-  var bars = document.getElementById("bars");
+  /* ---------- 進站頁排名卡片 ---------- */
+  var rankEl = document.getElementById("rankCards");
   var maxV = Math.max.apply(null, PAGES.map(function (p) { return p.v; }));
-  var fills = [];
-  PAGES.forEach(function (p) {
-    var row = document.createElement("div");
-    row.className = "bar-row";
-    row.innerHTML = '<div class="nm">' + p.nm + "</div>" +
-      '<div class="bar-track"><div class="bar-fill"></div></div>' +
-      '<div class="v">' + p.v.toLocaleString() + "</div>";
-    bars.appendChild(row);
-    fills.push({ el: row.querySelector(".bar-fill"), pct: Math.round(p.v / maxV * 100) });
+  var rankFills = [];
+  PAGES.forEach(function (p, i) {
+    var d = document.createElement("div");
+    d.className = "rc" + (i < 3 ? " top" : "");
+    d.innerHTML = '<div class="rc-rank">' + (i + 1) + '</div>' +
+      '<div class="rc-body"><div class="rc-nm">' + p.nm + '</div><div class="rc-bar"><i data-w="' + Math.round(p.v / maxV * 100) + '"></i></div></div>' +
+      '<div class="rc-v">' + p.v.toLocaleString() + '</div>';
+    rankEl.appendChild(d);
+    rankFills.push(d.querySelector(".rc-bar i"));
   });
-  function animateBars() {
-    fills.forEach(function (f) { f.el.style.width = "0"; });
-    setTimeout(function () { fills.forEach(function (f) { f.el.style.width = f.pct + "%"; }); }, 120);
-  }
 
   /* ---------- 流程動畫 ---------- */
   var STEPS = [["ga", "gsc", "gtm"], ["mcp"], ["ai"], ["out"]];
@@ -116,7 +112,6 @@
       if (i < STEPS.length) {
         STEPS[i].forEach(function (k) { setNode(k, "active"); });
         if (SIDE_AT[i]) pingSide(SIDE_AT[i]);
-        if (i === 0) animateBars();
         i++; setTimeout(tick, 520);
       } else { runBtn.disabled = false; }
     }
@@ -164,7 +159,15 @@
     return fs;
   }
   var srcFills = makeBars("srcBars", [{ n: "自然搜尋", v: 42 }, { n: "直接", v: 27 }, { n: "社群", v: 18 }, { n: "推薦", v: 13 }], "%");
-  var devFills = makeBars("deviceBars", [{ n: "行動", v: 64 }, { n: "桌機", v: 31 }, { n: "平板", v: 5 }], "%");
+
+  /* 裝置分佈：甜甜圈圖（conic-gradient） */
+  (function () {
+    var DEV = [{ n: "行動", v: 64, c: "#22d3ee" }, { n: "桌機", v: 31, c: "#3b82f6" }, { n: "平板", v: 5, c: "#6b809e" }];
+    var acc = 0, segs = DEV.map(function (d) { var s = acc; acc += d.v; return d.c + " " + s + "% " + acc + "%"; }).join(", ");
+    document.getElementById("deviceDonut").innerHTML =
+      '<div class="donut" style="background:conic-gradient(' + segs + ')"><div class="donut-c"><div class="cv">' + DEV[0].v + '%</div><div class="cl">' + DEV[0].n + '</div></div></div>' +
+      '<div class="donut-legend">' + DEV.map(function (d) { return '<div class="li"><span class="dot" style="background:' + d.c + '"></span>' + d.n + '<b>' + d.v + '%</b></div>'; }).join('') + '</div>';
+  })();
 
   var KW = [
     { k: "客製 保溫杯", c: 1240, i: 18500, ctr: 6.7, pos: 3.2, up: true },
@@ -197,10 +200,12 @@
 
   function animateExtras() {
     document.querySelectorAll("#trend .tbar").forEach(function (b) { b.style.height = "0"; });
-    srcFills.concat(devFills, funFills).forEach(function (f) { f.el.style.width = "0"; });
+    srcFills.concat(funFills).forEach(function (f) { f.el.style.width = "0"; });
+    rankFills.forEach(function (el) { el.style.width = "0"; });
     setTimeout(function () {
       document.querySelectorAll("#trend .tbar").forEach(function (b) { b.style.height = b.dataset.h + "px"; });
-      srcFills.concat(devFills, funFills).forEach(function (f) { f.el.style.width = f.pct + "%"; });
+      srcFills.concat(funFills).forEach(function (f) { f.el.style.width = f.pct + "%"; });
+      rankFills.forEach(function (el) { el.style.width = el.dataset.w + "%"; });
     }, 130);
   }
   runBtn.addEventListener("click", animateExtras);

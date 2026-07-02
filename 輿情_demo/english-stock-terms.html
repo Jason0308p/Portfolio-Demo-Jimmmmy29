@@ -22,6 +22,11 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,15,25,.94);backdrop-fil
 .nav-brand span{color:var(--accent)}
 .nav-links a{color:var(--text2);text-decoration:none;font-size:12.5px;padding:4px 10px;border-radius:6px}
 .nav-links a:hover{background:var(--card);color:var(--text)}
+.nav-home{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 12px;margin-right:4px;background:#3b82f6;color:#fff;font-size:12.5px;font-weight:700;border-radius:999px;text-decoration:none;white-space:nowrap;transition:background .15s}
+.nav-home:hover{background:#2563eb;color:#fff}
+.float-home{position:fixed;right:16px;bottom:16px;z-index:1000;display:inline-flex;align-items:center;gap:6px;background:#3b82f6;color:#fff;font-size:13px;font-weight:700;padding:9px 15px;border-radius:24px;border:1.5px solid rgba(255,255,255,.35);box-shadow:0 6px 20px rgba(0,0,0,.5);text-decoration:none;transition:background .15s}
+.float-home:hover{background:#2563eb}
+@media(max-width:640px){.float-home{padding:7px 12px;font-size:12px;bottom:calc(16px + env(safe-area-inset-bottom))}}
 
 .hero{padding:15px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#0f172a,#1a1638)}
 .hero h1{font-size:18px;font-weight:700;color:#fff;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
@@ -77,8 +82,12 @@ mark.u{color:var(--up)}mark.d{color:var(--dn)}mark.n{color:#ffd27a}
 
 <nav>
   <a class="nav-brand" href="index.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>真實英文<span>報導</span></a>
-  <div class="nav-links"><a href="index.html">← 回輿情日報</a></div>
+  <div style="display:flex;align-items:center;gap:4px">
+    <a href="../index.html" class="nav-home">← 作品集首頁</a>
+    <div class="nav-links"><a href="index.html">← 回輿情日報</a></div>
+  </div>
 </nav>
+<a href="../index.html" class="float-home">← 作品集首頁</a>
 
 <div class="hero">
   <h1>真實英文財經報導選輯 <span class="en">Real Market English</span></h1>

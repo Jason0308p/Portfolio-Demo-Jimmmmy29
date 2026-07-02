@@ -3,62 +3,118 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>商品上架 SEO 自動化 — 展示用 (MVP)</title>
-<meta name="description" content="爬蟲商品自動補圖、補敘述、生成 SEO/GEO 商品名與標籤，透過自建宜搭(Yida) MCP 寫回，並用 n8n 自動社群貼文與回收成效數據的電商上架自動化作品集展示。">
+<title>Shopify 商品上架與 SEO/GEO 自動化 — 展示用 (MVP)</title>
+<meta name="description" content="以 Shopify CLI 與 Admin API（GraphQL）驅動商品/集合批次管理、AI 生成 SEO/GEO 商品內容、頁面產生器與安全發布、部落格內容生成、搜尋意圖分類與加權再排序的電商自動化作品集展示；宜搭(Yida)表單作為下架流程下游整合點。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<a href="../index.html" title="返回作品集首頁" style="position:fixed;left:14px;bottom:14px;z-index:1000;display:inline-flex;align-items:center;gap:6px;background:#3b82f6;color:#fff;font-size:13px;font-weight:700;padding:9px 15px;border-radius:24px;box-shadow:0 4px 16px rgba(0,0,0,.45);text-decoration:none">← 作品集首頁</a>
+<a href="../index.html" title="返回作品集首頁" class="float-home">← 作品集首頁</a>
 
 <nav>
-  <div class="brand"><span class="dot"></span>商品上架<span>·SEO 自動化</span></div>
+  <div class="brand"><span class="dot"></span>Shopify 商品<span>·自動化</span></div>
   <div class="nav-right">
-    <span class="badge-demo">DEMO · 模擬資料</span>
+    <span class="badge-demo">DEMO</span>
     <a href="../index.html">← 作品集首頁</a>
   </div>
 </nav>
 
 <div class="wrap">
 
-  <div class="hero">
-    <h1>電商商品上架 SEO 自動化</h1>
-    <p>爬蟲抓回的陽春商品資料，自動<b>補圖、補敘述、生成 SEO/GEO 商品名與標籤</b>，透過<b>自建宜搭 (Yida) MCP</b>
-       寫回表單，再用 <b>n8n</b> 自動發社群貼文並回收成效。本頁為<b>純前端展示</b>，商品與數據皆為虛構。</p>
+  <div class="hero sec-card">
+    <h1>電商商品上架與 SEO/GEO 自動化（Shopify）</h1>
+    <p>以 <b>Shopify CLI 與 Admin API（GraphQL）</b>為核心，涵蓋<b>商品/集合批次管理、AI 生成 SEO/GEO 商品內容、頁面產生器與安全發布、部落格內容生成、搜尋意圖推薦與加權再排序</b>；
+       官方 <b>Shopify dev-mcp</b> 輔助開發時查詢 schema，<b>宜搭 (Yida)</b> 表單則作為下架流程下游同步的其中一個整合點。本頁為<b>純前端展示</b>。</p>
     <div class="tags">
-      <span class="tag cool">自建宜搭 (Yida) MCP Server</span>
-      <span class="tag">AI SEO / GEO 內容生成</span>
-      <span class="tag">爬蟲商品資料</span>
-      <span class="tag">自動補圖 / 補敘述</span>
-      <span class="tag">n8n 社群自動化</span>
-      <span class="tag">成效數據回收</span>
-      <span class="tag">批次 diff / preflight</span>
+      <span class="tag cool">Shopify CLI</span>
+      <span class="tag">Shopify Admin API (GraphQL)</span>
+      <span class="tag">Shopify dev-mcp</span>
+      <span class="tag">AI SEO/GEO 內容生成</span>
+      <span class="tag">批次自動化 (ThreadPoolExecutor)</span>
+      <span class="tag">頁面產生器 / 安全發布</span>
+      <span class="tag">搜尋意圖分類 / 加權再排序</span>
+      <span class="tag">JSON-LD 結構化資料</span>
+      <span class="tag">宜搭 (Yida) 表單同步</span>
       <span class="tag">Python / Node</span>
     </div>
   </div>
 
-  <!-- ===== 流程順序 ===== -->
-  <h2 class="sec">流程順序（載入時依序亮燈示意）</h2>
+  <!-- ===== 整合實況：Shopify × 宜搭(Yida) 三視窗展示 ===== -->
+  <section class="sec-card">
+  <h2 class="sec">🔗 Shopify × 宜搭(Yida) 雙向同步實況</h2>
+  <p class="sc-desc">下架商品時，AI 助手直接下 CLI 指令查詢並同步，後台看板即時反映狀態，宜搭端則收到同步結果通知——三端畫面同步更新。</p>
+  <div class="showcase-row">
+    <div class="mac-window sw-chat">
+      <div class="mac-bar"><span class="mac-dot r"></span><span class="mac-dot y"></span><span class="mac-dot g"></span>
+        <span class="mac-title">SHOPIFY-MCP · CLI</span><span class="mac-badge">● Agent</span></div>
+      <div class="mac-body">
+        <div class="sw-msg user">查詢本週已下架、但宜搭尚未同步狀態的商品</div>
+        <div class="sw-code">shopify store execute --query-file archive_check.graphql<br>&nbsp;&nbsp;--store example-shop.myshopify.com --allow-mutations</div>
+        <div class="sw-check-list">
+          <div class="sw-check-item"><span class="sw-ok">✓</span> 查詢完成<span class="sw-tag">3 筆待同步</span></div>
+          <div class="sw-check-item-sub">insulated-bottle-500ml：下架 → 宜搭未更新<br>→ 建議批次同步狀態＋原因代碼</div>
+        </div>
+        <div class="sw-msg bot"><b>宜搭同步助手</b><br>已找到 3 筆待同步商品，是否批次寫入宜搭表單？</div>
+        <div class="sw-cta">全部同步 →</div>
+      </div>
+    </div>
+    <div class="mac-window sw-dash">
+      <div class="mac-bar"><span class="mac-dot r"></span><span class="mac-dot y"></span><span class="mac-dot g"></span>
+        <span class="mac-url">example-shop.com/admin/products/archive</span><span class="mac-badge">v1</span></div>
+      <div class="mac-body sw-dash-body">
+        <div class="sw-dash-head">下架同步看板<button class="sw-newbtn">＋新增排程</button></div>
+        <table class="sw-table">
+          <thead><tr><th>商品編號</th><th>Shopify 狀態</th><th>宜搭同步</th></tr></thead>
+          <tbody>
+            <tr><td>bottle-500</td><td><span class="sw-pill sw-pill-red">已下架</span></td><td><span class="sw-pill sw-pill-green">已同步</span></td></tr>
+            <tr><td>tote-canvas</td><td><span class="sw-pill sw-pill-red">已下架</span></td><td><span class="sw-pill sw-pill-gold">待同步</span></td></tr>
+            <tr><td>power-10k</td><td><span class="sw-pill sw-pill-green">上架中</span></td><td><span class="sw-pill sw-pill-gray">—</span></td></tr>
+          </tbody>
+        </table>
+        <div class="sw-donut-row">
+          <div class="sw-donut" style="background:conic-gradient(var(--green) 0% 66%, var(--gold) 66% 100%)"><div class="sw-donut-c">3</div></div>
+          <div class="sw-donut-legend"><span><i style="background:var(--green)"></i>已同步 2</span><span><i style="background:var(--gold)"></i>待同步 1</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="mac-window sw-phone">
+      <div class="phone-bar"><span>09:41</span><span>●●● ▲ 🔋</span></div>
+      <div class="phone-head">宜搭同步小幫手</div>
+      <div class="phone-body">
+        <div class="sw-msg bot small">已完成商品下架同步，共更新 3 筆記錄<br>→ 查看更新記錄</div>
+        <div class="sw-quickbtn">把所有待同步記錄標為已完成</div>
+        <div class="sw-msg bot small">已批次更新 3 筆記錄<br>狀態：待同步 → 已完成 ✅</div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ===== 區塊2：上架與下架流程總覽 ===== -->
+  <section class="sec-card">
+  <h2 class="sec">🔁 上架與下架流程總覽（載入時依序亮燈）</h2>
   <div class="pipe" id="pipe">
-    <div class="node" data-k="scrape"><span class="step">1</span><div class="ic">🕷️</div><div class="nm">爬蟲商品</div><div class="sub">原始陽春資料</div></div>
-    <div class="node yida" data-k="read"><span class="step">2</span><div class="ic">📋</div><div class="nm">宜搭 J1 讀取</div><div class="sub">篩選待處理</div></div>
-    <div class="node" data-k="ai"><span class="step">3</span><div class="ic">🤖</div><div class="nm">AI 補圖/敘述/SEO</div><div class="sub">生成內容</div></div>
-    <div class="node yida" data-k="write"><span class="step">4</span><div class="ic">💾</div><div class="nm">寫回宜搭</div><div class="sub">J1 / J1A</div></div>
-    <div class="node social" data-k="post"><span class="step">5</span><div class="ic">📣</div><div class="nm">n8n 社群貼文</div><div class="sub">自動發佈</div></div>
-    <div class="node social" data-k="data"><span class="step">6</span><div class="ic">📈</div><div class="nm">回收成效</div><div class="sub">數據返回</div></div>
+    <div class="node" data-k="excel"><span class="step">1</span><div class="ic">📄</div><div class="nm">Excel 名單匯入</div><div class="sub">待處理商品清單</div></div>
+    <div class="node" data-k="read"><span class="step">2</span><div class="ic">⚡</div><div class="nm">Shopify 批次讀取</div><div class="sub">Admin GraphQL 平行查詢</div></div>
+    <div class="node" data-k="ai"><span class="step">3</span><div class="ic">🤖</div><div class="nm">AI 生成 SEO/GEO</div><div class="sub">商品名／敘述／標籤</div></div>
+    <div class="node" data-k="write"><span class="step">4</span><div class="ic">💾</div><div class="nm">Shopify 寫回</div><div class="sub">productUpdate</div></div>
+    <div class="node yida" data-k="yida"><span class="step">5</span><div class="ic">📋</div><div class="nm">宜搭同步（下游）</div><div class="sub">狀態＋原因代碼</div></div>
+    <div class="node social" data-k="post"><span class="step">6</span><div class="ic">📣</div><div class="nm">n8n 通知</div><div class="sub">社群成效回收</div></div>
   </div>
   <div class="runbar"><button id="runBtn">▶ 重播流程</button><span class="runhint">頁面載入會自動播一次；亦可手動重播</span></div>
+  </section>
 
-  <!-- ===== 前後對比 ===== -->
-  <h2 class="sec">AI 上架處理：原始 → 完成（模擬）</h2>
+  <!-- ===== 區塊3：AI 生成 SEO/GEO 商品文案 ===== -->
+  <section class="sec-card">
+  <h2 class="sec">✨ AI 生成 SEO/GEO 商品文案：Shopify 原始資料 → 優化上架</h2>
   <div class="picker" id="picker"></div>
   <div class="ba">
     <div class="pcard before">
-      <span class="ptag">原始爬蟲資料</span>
+      <span class="ptag">原始 Shopify 商品資料</span>
       <div class="pimg empty" id="bImg">無商品圖</div>
       <div class="pfield"><div class="k">商品名稱</div><div class="v" id="bName">—</div></div>
+      <div class="pfield"><div class="k">商品 Handle</div><div class="v" id="bHandle">—</div></div>
       <div class="pfield"><div class="k">商品敘述</div><div class="v empty" id="bDesc">（無，待補）</div></div>
       <div class="pfield"><div class="k">SEO 標籤</div><div class="v empty" id="bTags">（無）</div></div>
     </div>
@@ -66,19 +122,22 @@
       <span class="ptag">✓ AI 處理完成</span>
       <div class="pimg empty" id="aImg">尚未處理</div>
       <div class="pfield"><div class="k">AI 產品名稱（SEO）</div><div class="v" id="aName">—</div></div>
+      <div class="pfield"><div class="k">商品 Handle</div><div class="v" id="aHandle">—</div><span class="handle-badge" id="handleBadge">✓ Handle 變更，已建立 301 轉址</span></div>
       <div class="pfield"><div class="k">AI 產品敘述（列點 + GEO）</div><div class="v" id="aDesc">—</div></div>
       <div class="pfield"><div class="k">建議數量 / 價格級距（兩大關鍵）</div><div class="v" id="aPrice">—</div></div>
       <div class="pfield"><div class="k">AI 產品標籤</div><div class="ptags-row" id="aTags"></div></div>
+      <div class="pfield"><div class="k">結構化資料 / 同步狀態</div><div class="ptags-row" id="aMeta"></div></div>
     </div>
   </div>
   <div class="runbar">
     <button id="genBtn">✨ 執行 AI 上架處理</button>
     <button id="postBtn" class="alt" disabled>📣 發佈到社群並回收數據</button>
   </div>
+  </section>
 
   <!-- ===== 社群成效 ===== -->
-  <div class="social-out" id="socialOut">
-    <h2 class="sec" style="margin-top:4px">n8n 社群貼文與回收成效（模擬）</h2>
+  <div class="social-out sec-card" id="socialOut">
+    <h2 class="sec" style="margin-top:0">n8n 社群貼文與回收成效</h2>
     <div class="sp">
       <div class="sp-head"><div class="sp-av">🛍️</div><div class="sp-name">禮品官方<span>由 n8n 自動發佈 · 剛剛</span></div></div>
       <div class="sp-body" id="spBody"></div>
@@ -89,8 +148,189 @@
       <div class="metric"><div class="m-v" id="mShare">—</div><div class="m-k">分享</div></div>
       <div class="metric"><div class="m-v" id="mClick">—</div><div class="m-k">點擊</div></div>
     </div>
-    <p class="back-note">＊ 成效數字由 n8n 回收後寫回追蹤表（此處為虛構示意）。</p>
+    <p class="back-note">＊ 成效數字由 n8n 回收後寫回追蹤表。</p>
   </div>
+
+  <!-- ===== 區塊4：商品／分類批次管理 ===== -->
+  <section class="sec-card">
+  <h2 class="sec">📦 商品／分類批次管理</h2>
+  <div class="subgrid">
+    <div class="subcard">
+      <h3>批次下架效能對比</h3>
+      <p class="sc-desc">Excel 掉單／停產清單匯入 → <code>productUpdate(status: ARCHIVED)</code>，以 <b>ThreadPoolExecutor</b> 平行處理＋批次 <code>handle:a OR handle:b</code> 查詢取代逐筆查詢；下架同時同步宜搭表單狀態（下游整合，非獨立主線）。</p>
+      <div id="archiveSpeedChart" style="height:240px"></div>
+      <div class="progress-group">
+        <div class="progress-row"><div class="pr-label">循序處理（逐筆）</div><div class="bar"><div class="fill seq" id="seqFill"></div></div><div class="pr-val" id="seqVal">0.0 分</div></div>
+        <div class="progress-row"><div class="pr-label">平行處理（ThreadPoolExecutor）</div><div class="bar"><div class="fill par" id="parFill"></div></div><div class="pr-val" id="parVal">0.0 分</div></div>
+      </div>
+      <div class="runbar">
+        <button id="archiveBtn">▶ 模擬批次下架（81筆）</button>
+        <span class="speedup-badge" id="speedupBadge">⚡ 約9.5倍加速</span>
+      </div>
+    </div>
+    <div class="subcard">
+      <h3>Collection 縮圖生成 Pipeline</h3>
+      <p class="sc-desc">Prompt 生成 → AI 繪圖 → 暫存上傳 → 寫入集合 → 重新讀取驗證上線，全自動 pipeline。</p>
+      <div class="chip-flow" id="chipFlow">
+        <div class="cf-chip" data-k="prompt"><span class="cf-ic">📝</span>生成 Prompt</div>
+        <div class="cf-arrow">→</div>
+        <div class="cf-chip" data-k="draw"><span class="cf-ic">🎨</span>AI 繪圖</div>
+        <div class="cf-arrow">→</div>
+        <div class="cf-chip" data-k="upload"><span class="cf-ic">☁️</span>暫存上傳</div>
+        <div class="cf-arrow">→</div>
+        <div class="cf-chip" data-k="cwrite"><span class="cf-ic">💾</span>寫入集合</div>
+        <div class="cf-arrow">→</div>
+        <div class="cf-chip" data-k="verify"><span class="cf-ic">🔁</span>重新驗證上線</div>
+      </div>
+      <div class="cf-thumb-row">
+        <div class="cf-thumb-box">
+          <div class="cf-thumb empty" id="cfThumbBefore">尚無縮圖</div>
+          <div class="cf-thumb-label">集合原本沒有封面圖</div>
+        </div>
+        <div class="cf-thumb-arrow">→</div>
+        <div class="cf-thumb-box">
+          <div class="cf-thumb empty" id="cfThumbAfter">尚未生成</div>
+          <div class="cf-thumb-label">AI 生成縮圖（示意）</div>
+        </div>
+      </div>
+      <div class="runbar"><button id="cfBtn">▶ 模擬生成</button><span class="runhint" id="cfHint"></span></div>
+    </div>
+  </div>
+  </section>
+
+  <!-- ===== 區塊5：頁面產生器與安全發布 ===== -->
+  <section class="sec-card">
+  <h2 class="sec">🧱 頁面產生器與安全發布</h2>
+  <div class="pg-tabs" id="pgTabs">
+    <button class="pg-tab active" data-type="guide">📘 購買指南型</button>
+    <button class="pg-tab" data-type="landing">🏭 產業著陸頁型</button>
+  </div>
+  <p class="sc-desc" id="pgTypeDesc">面向「還在比較怎麼選」的訪客，結構為 Hero → 目錄 TOC → 選購重點 → FAQ → CTA，適合品類介紹頁與新品導購頁。</p>
+  <div class="mac-window pg-wire-window">
+    <div class="mac-bar"><span class="mac-dot r"></span><span class="mac-dot y"></span><span class="mac-dot g"></span>
+      <span class="mac-url" id="pgWireUrl">example-shop.com/pages/insulated-bottle-buying-guide</span></div>
+    <div class="pg-wire-body" id="pgWireBody"></div>
+  </div>
+  <div class="pill-row">
+    <span class="pill">Hero</span><span class="pill">目錄 TOC</span><span class="pill">FAQ</span><span class="pill">CTA</span><span class="pill">比較表</span><span class="pill">Sticky Bar</span>
+  </div>
+  <div class="pipe pipe-sm" id="pipe2">
+    <div class="node" data-k="pbackup"><span class="step">1</span><div class="ic">📑</div><div class="nm">備份現有內容</div></div>
+    <div class="node" data-k="pslice"><span class="step">2</span><div class="ic">✂️</div><div class="nm">產生精準切片 patch</div></div>
+    <div class="node" data-k="pverify"><span class="step">3</span><div class="ic">✅</div><div class="nm">驗證 patch</div></div>
+    <div class="node" data-k="pwrite"><span class="step">4</span><div class="ic">💾</div><div class="nm">pageUpdate 寫入</div></div>
+    <div class="node" data-k="preread"><span class="step">5</span><div class="ic">🔁</div><div class="nm">重新讀取驗證</div></div>
+  </div>
+  <div class="runbar"><button id="runBtn2">▶ 模擬安全發布</button></div>
+
+  <div class="pg-preview">
+    <div class="pg-preview-bar"><span class="pg-dot"></span><span class="pg-dot"></span><span class="pg-dot"></span><span class="pg-url">example-shop.com/pages/insulated-bottle-buying-guide</span></div>
+    <div class="pg-preview-body">
+      <h4>保溫瓶挑選完整指南</h4>
+      <p class="pg-line">如何挑選容量、保冷／保溫效果與瓶身材質，一次搞懂企業採購常見規格。</p>
+      <p class="pg-line">依需求場景（贈品／展會／員工福利）給出 3 種常見組合建議。</p>
+      <div class="pg-patch-block" id="pgPatchBlock">
+        <div class="pg-patch-empty" id="pgPatchEmpty">〔待寫入〕點上方按鈕模擬安全發布，將插入下方保冷效果實測表格</div>
+      </div>
+      <p class="pg-line">常見問題 FAQ：訂購流程、印刷方式、交期說明。</p>
+    </div>
+    <p class="back-note">只有標示<b style="color:var(--green)">＋新增</b>的區塊被切片寫入，其餘段落像素級未變動——這就是「patch 不整頁覆寫」的實際樣子。</p>
+  </div>
+  </section>
+
+  <!-- ===== 區塊6：部落格文章生成與文案規則 ===== -->
+  <section class="sec-card">
+  <h2 class="sec">📝 部落格文章生成與文案規則</h2>
+  <div class="topic-chips" id="topicChips">
+    <button class="tchip" data-topic="gift">企業送禮攻略</button>
+    <button class="tchip" data-topic="canvas">帆布袋永續趨勢</button>
+    <button class="tchip" data-topic="power">行動電源選購指南</button>
+  </div>
+  <div class="blog-out">
+    <div class="pfield"><div class="k">生成標題</div><div class="v" id="blogTitle">點選上方主題開始生成</div></div>
+    <div class="pfield"><div class="k">生成 Meta Description</div><div class="v" id="blogMeta">—</div></div>
+  </div>
+  <div class="rule-list" id="ruleList">
+    <div class="rule-item" id="ruleLen"><span class="rl-dot" id="ruleLenDot"></span><span class="rl-tx">字數控制在 70–80 全形字：<b id="ruleLenVal">—</b></span></div>
+    <div class="rule-item good"><span class="rl-dot"></span><span class="rl-tx">未捏造規格數字：規則過濾誇大／杜撰數值，內容 grounding 在既有商品資料。</span></div>
+    <div class="rule-item good"><span class="rl-dot"></span><span class="rl-tx">句式避免公式化重複：生成前比對近期輸出句型，降低模板感。</span></div>
+  </div>
+  </section>
+
+  <!-- ===== 區塊7：商品推薦：搜尋意圖分類器 ===== -->
+  <section class="sec-card">
+  <h2 class="sec">🎯 商品推薦：搜尋意圖分類器</h2>
+  <div class="intent-input-row">
+    <input type="text" id="intentInput" placeholder="輸入商品需求關鍵字，如：保溫杯、tote bag、行動電源…">
+    <button id="intentBtn">🔍 判斷意圖</button>
+  </div>
+  <div class="quick-chips" id="quickChips">
+    <button class="qchip" data-q="保溫杯">保溫杯</button>
+    <button class="qchip" data-q="tote bag">tote bag</button>
+    <button class="qchip" data-q="行動電源">行動電源</button>
+    <button class="qchip" data-q="禮盒">禮盒</button>
+    <button class="qchip" data-q="馬克杯">馬克杯</button>
+  </div>
+  <div class="intent-result" id="intentResult">
+    <p class="intent-empty" id="intentEmpty">輸入關鍵字或點擊上方快選，即時比對意圖分類。</p>
+  </div>
+  </section>
+
+  <!-- ===== 區塊8：搜尋過濾與加權再排序 ===== -->
+  <section class="sec-card">
+  <h2 class="sec">🔎 搜尋過濾與加權再排序</h2>
+  <div id="rerankWeightChart" style="height:200px"></div>
+  <div class="chart-note">加權配分：標題完全命中 +20／供應商或類型命中 +10／描述（Meta）命中 +3，依總分排序。</div>
+  <div class="search-row"><input type="text" id="searchInput" placeholder="搜尋商品，如：500ml、帆布袋、3C科技…"></div>
+  <div class="type-chips" id="typeChips"></div>
+  <div class="search-list" id="searchList"></div>
+  </section>
+
+  <!-- ===== 區塊9：SEO/GEO 結構化資料與 GEO 策略 ===== -->
+  <section class="sec-card">
+  <h2 class="sec">🧩 SEO/GEO 結構化資料與 GEO 策略</h2>
+  <div class="subgrid">
+    <div class="subcard">
+      <h3>JSON-LD 結構化資料覆蓋</h3>
+      <ul class="jsonld-list">
+        <li>✅ Organization</li>
+        <li>✅ WebSite</li>
+        <li>✅ Product</li>
+        <li>✅ Article</li>
+        <li>✅ FAQPage</li>
+        <li>✅ BreadcrumbList</li>
+        <li>🚫 不捏造 Review／AggregateRating（無真實評論資料時不產生假評分）</li>
+      </ul>
+      <details class="acc">
+        <summary><span class="ic">📄</span> 查看 JSON-LD 範例（Product，佔位資料）</summary>
+        <div class="abody">
+<pre><code>{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Sample Product",
+  "sku": "product-abc",
+  "url": "https://example-shop.com/products/product-abc",
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "TWD",
+    "price": "999",
+    "availability": "https://schema.org/InStock"
+  }
+}</code></pre>
+        </div>
+      </details>
+    </div>
+    <div class="subcard">
+      <h3>GEO（生成式搜尋優化）策略</h3>
+      <ul class="dlist-sm">
+        <li>內容結構化為可引用事實：條列規格、明確數字，方便 AI 摘要直接引用。</li>
+        <li>FAQ 內容搭配 FAQPage schema，提高被生成式問答引用的機率。</li>
+        <li>品牌實體資訊（名稱／網域／社群）保持一致，強化 AI 對品牌的辨識。</li>
+        <li>伺服器渲染 Liquid 模板，確保 AI 爬蟲可直接讀到完整內容，不依賴前端渲染。</li>
+      </ul>
+    </div>
+  </div>
+  </section>
 
   <!-- ===== 技術與設計說明 ===== -->
   <h2 class="sec">技術與設計說明</h2>
@@ -99,11 +339,11 @@
     <summary><span class="ic">✨</span> 設計重點<span class="cnt">5 項</span></summary>
     <div class="abody">
       <ul class="dlist">
-        <li><span class="ic">🔌</span><div class="tx"><h4>整合多個宜搭 API 成自建 MCP</h4><p>把宜搭多支表單 API（查詢／新增／更新 J1、J1A）整合封裝成自建 MCP 工具，讓 AI 以一致介面讀待處理商品並回寫結果，不必人工搬資料。</p></div></li>
-        <li><span class="ic">🛡️</span><div class="tx"><h4>AI 生成 grounding / 防幻覺</h4><p>生成內容嚴格 grounding 在原始商品資料與圖片，並用規則過濾「最好／第一」等誇大或杜撰規格的字詞，降低 AI 幻覺、確保內容可追溯。</p></div></li>
-        <li><span class="ic">🔍</span><div class="tx"><h4>SEO + GEO 文案策略</h4><p>名稱核心關鍵字前置、敘述用列點＋自然語言句式，兼顧搜尋引擎與生成式搜尋（GEO）。</p></div></li>
-        <li><span class="ic">⚙️</span><div class="tx"><h4>批次 diff + preflight</h4><p>先預檢擋掉缺資料/錯欄位，只更新真正有變動的欄位，API 失敗有限次重試。</p></div></li>
-        <li><span class="ic">🔁</span><div class="tx"><h4>n8n 串接社群與回收</h4><p>處理完成自動發社群貼文，再把觸及/互動等成效回收寫回追蹤，形成閉環。</p></div></li>
+        <li><span class="ic">🧩</span><div class="tx"><h4>用官方工具不重造輪子</h4><p>商品／頁面／部落格操作走 Shopify CLI＋官方 dev-mcp；宜搭端維持自建 MCP，兩邊各司其職，不把官方已提供的能力重新造一遍。</p></div></li>
+        <li><span class="ic">⚙️</span><div class="tx"><h4>批次效能設計</h4><p>用 ThreadPoolExecutor 平行處理搭配批次 GraphQL 查詢（<code>handle:a OR handle:b</code>），取代逐筆序列請求，大幅壓縮批次作業時間。</p></div></li>
+        <li><span class="ic">🛡️</span><div class="tx"><h4>安全發布：patch 不覆寫</h4><p>頁面更新流程為備份 → 切片 patch → 驗證 → 寫入 → 重新讀取驗證，避免整頁覆寫造成內容遺失或版型跑掉。</p></div></li>
+        <li><span class="ic">🔍</span><div class="tx"><h4>SEO＋GEO 雙軌內容策略</h4><p>JSON-LD 覆蓋主要型別（Product／Article／FAQPage 等），內容同時寫成可引用事實列點，兼顧傳統搜尋與生成式搜尋。</p></div></li>
+        <li><span class="ic">🔁</span><div class="tx"><h4>資料一致性與稽核</h4><p>寫入前重讀最新資料避免覆蓋他人變更，寫入後重讀驗證結果，留下可追溯紀錄。</p></div></li>
       </ul>
     </div>
   </details>
@@ -112,24 +352,24 @@
     <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項</span></summary>
     <div class="abody">
       <div class="didblock" style="border:none;padding:0;background:none">
-        <p class="lead">獨立完成的<b>電商上架自動化</b>：以自建宜搭 MCP 串接 AI，把爬蟲抓回的原始商品自動補齊圖文、SEO 與定價並上架，
-        大幅壓縮人工上架工時、加速新品曝光，並用 n8n 串起社群發佈與成效回收。</p>
+        <p class="lead">獨立完成的 <b>Shopify 商品自動化</b>：以 Shopify CLI＋Admin GraphQL 驅動商品／集合／頁面／部落格批次管理，官方 dev-mcp 輔助開發查詢，並把宜搭表單接為下架流程的下游同步，加上搜尋意圖分類與加權再排序提升商品可被找到的機率。</p>
         <ul class="did">
-          <li><div class="h"><span class="ic">🔌</span>整合多個宜搭 API 自建 MCP Server</div><p class="d">將宜搭 (Yida) <b>多支表單 API</b> 整合封裝成<b>自建 MCP server</b>，讓 AI 以一致介面讀取 J1 新品表單、回寫 J1 / J1A，支援 <b>insertOrUpdate</b> 與最新版本更新。</p></li>
-          <li><div class="h"><span class="ic">🤖</span>AI SEO / GEO 內容生成</div><p class="d">依爬蟲商品原始資料生成 <b>SEO 商品名、純文字敘述、HTML 敘述、標籤</b>，採關鍵字前置與 GEO 句式。</p></li>
-          <li><div class="h"><span class="ic">🖼️</span>自動補圖 / 補敘述</div><p class="d">針對缺圖缺敘述的爬蟲商品，自動補上商品圖與結構化敘述，讓陽春資料變成可上架內容。</p></li>
-          <li><div class="h"><span class="ic">⚙️</span>批次工具：diff / preflight / 重試</div><p class="d">把一次性腳本整理成<b>可配置、可預檢、只更新差異、可重試</b>的批次同步流程，並落地中繼 JSON / 報表 / 統計。</p></li>
-          <li><div class="h"><span class="ic">📣</span>n8n 社群自動化與成效回收</div><p class="d">用 <b>n8n</b> 把上架完成的商品自動發到社群，並把<b>觸及、互動、點擊</b>等成效回收寫回追蹤表。</p></li>
-          <li><div class="h"><span class="ic">🛡️</span>AI 生成防幻覺（grounding）與可追溯</div><p class="d">生成內容嚴格 <b>grounding</b> 在原始商品資料，規則過濾誇大／杜撰規格；每筆記錄使用模型與結果供<b>稽核追溯</b>。</p></li>
+          <li><div class="h"><span class="ic">🧰</span>Shopify CLI＋Admin GraphQL 批次工具</div><p class="d">用 Shopify CLI 執行 Admin GraphQL 查詢／異動（<code>--query-file</code>／<code>--variable-file</code>／<code>--allow-mutations</code>），並串官方 <b>dev-mcp</b> 輔助查詢 schema 與文件，加速開發除錯。</p></li>
+          <li><div class="h"><span class="ic">⚡</span>批次下架效能優化＋宜搭下游同步</div><p class="d">Excel 名單觸發批次 <code>productUpdate(status:ARCHIVED)</code>，序列處理改成 ThreadPoolExecutor 平行處理＋批次 handle 查詢，示意效能約 <b>15 分鐘 → 1.6 分鐘</b>，下架同時同步宜搭表單狀態。</p></li>
+          <li><div class="h"><span class="ic">🖼️</span>Collection 縮圖 AI 生成 Pipeline</div><p class="d">Prompt 生成 → AI 繪圖 → <code>stagedUploadsCreate</code> → <code>collectionUpdate</code> → 重新讀取驗證上線，全流程自動化不需人工上傳。</p></li>
+          <li><div class="h"><span class="ic">🧱</span>頁面產生器（兩套版型＋區塊庫＋安全發布）</div><p class="d">購買指南型／產業著陸頁型兩套版型，共用 Hero／TOC／FAQ／CTA／比較表／Sticky Bar 區塊庫，發布走備份→切片 patch→驗證→寫入→重新讀取驗證，不整頁覆寫。</p></li>
+          <li><div class="h"><span class="ic">📝</span>部落格文章與 SEO/GEO 內容規則</div><p class="d">生成文章標題與 <b>70–80 全形字</b> meta description，規則過濾不捏造規格數字、避免句式公式化重複。</p></li>
+          <li><div class="h"><span class="ic">🎯</span>搜尋與推薦：意圖分類＋加權再排序</div><p class="d">關鍵字比對意圖分類（保溫瓶／馬克杯／帆布提袋等約 8 類）；搜尋結果依<b>標題 +20／供應商或類型 +10／Meta +3</b> 加權重排序，並正規化半形／全形空白差異。</p></li>
         </ul>
-        <p class="foot">＊ 實際表單 id、欄位對照、生成 prompt 與商品資料屬營運 know-how，未公開於本展示，可於面談時說明。</p>
+        <p class="foot">＊ 實際商店網域、商品 handle、GraphQL schema 細節與生成 prompt 屬營運 know-how，未公開於本展示，可於面談時說明。</p>
       </div>
     </div>
   </details>
 
-  <footer>Jason ｜ jason0308p@gmail.com ｜ 本頁為展示用途，商品與數據為虛構範例，僅供參考。</footer>
+  <footer>Jason ｜ jason0308p@gmail.com ｜ 展示資料為範例，AI 與後端行為為前端模擬。</footer>
 </div>
 
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

@@ -10,9 +10,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0a0e17; --card:#111c30; --card2:#0e1830; --border:#1e2c44; --border2:#2c4061;
-  --text:#e6edf7; --text2:#9fb2cc; --text3:#6b809e; --accent:#22d3ee; --accent2:#3b82f6; --gold:#f59e0b;
-  --nav-bg:rgba(10,14,23,.82); --t:all .3s ease;
+  --bg:#0b1220; --card:#111c30; --card2:#0e1830; --border:#1e2c44; --border2:#2c4061;
+  --text:#e6edf7; --text2:#9fb2cc; --text3:#6b809e; --accent:#3b82f6; --accent2:#22d3ee; --gold:#f59e0b;
+  --nav-bg:rgba(11,18,32,.82); --t:all .3s ease;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -27,7 +27,27 @@ a{text-decoration:none;color:inherit}
 .nav-links{display:flex;list-style:none;gap:1.8rem}
 .nav-links a{font-size:.9rem;font-weight:500;color:var(--text2);transition:var(--t)}
 .nav-links a:hover{color:var(--accent)}
-@media(max-width:680px){.nav-links{gap:1rem;font-size:.8rem}.nav-links a{font-size:.8rem}}
+.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;background:none;border:1px solid var(--border2);border-radius:8px;cursor:pointer;padding:0}
+.nav-toggle span{display:block;width:20px;height:2px;margin:0 auto;background:var(--text);border-radius:2px;transition:var(--t)}
+.nav-toggle.active span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle.active span:nth-child(2){opacity:0}
+.nav-toggle.active span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998}
+@media(max-width:680px){
+  .nav-toggle{display:flex}
+  .nav-links{
+    position:fixed;top:0;right:0;height:100vh;width:min(74vw,300px);
+    background:var(--card);border-left:1px solid var(--border);
+    flex-direction:column;align-items:flex-start;gap:0;
+    padding:5.5rem 1.8rem 2rem;
+    transform:translateX(100%);transition:transform .3s ease;
+    z-index:999;box-shadow:-8px 0 30px rgba(0,0,0,.4);
+  }
+  .nav-links.open{transform:translateX(0)}
+  .nav-links li{width:100%}
+  .nav-links a{display:block;width:100%;padding:1rem 0;font-size:1rem;border-bottom:1px solid var(--border)}
+  .nav-overlay.open{display:block}
+}
 
 /* hero */
 .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 8%;position:relative;
@@ -40,7 +60,7 @@ a{text-decoration:none;color:inherit}
 .cta{display:flex;gap:1rem;flex-wrap:wrap}
 .btn{display:inline-block;padding:.85rem 1.8rem;border-radius:6px;font-weight:700;transition:var(--t);font-size:.95rem}
 .btn.primary{border:1px solid var(--accent);color:var(--accent)}
-.btn.primary:hover{background:rgba(34,211,238,.1);transform:translateY(-2px)}
+.btn.primary:hover{background:rgba(59,130,246,.1);transform:translateY(-2px)}
 .btn.secondary{color:var(--text2);border:1px solid var(--border2)}
 .btn.secondary:hover{color:var(--text);border-color:var(--text2)}
 .scroll-cue{position:absolute;bottom:1.6rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;opacity:.6;animation:bounce 2s infinite}
@@ -108,12 +128,16 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
 
 <nav class="navbar" id="nav">
   <div class="logo">Jason<span>.</span></div>
-  <ul class="nav-links">
+  <button class="nav-toggle" id="navToggle" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="navLinks">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="navLinks">
     <li><a href="#work">作品</a></li>
     <li><a href="#skills">技能</a></li>
     <li><a href="#about">關於</a></li>
     <li><a href="#contact">聯絡</a></li>
   </ul>
+  <div class="nav-overlay" id="navOverlay"></div>
 </nav>
 
 <!-- HERO -->
@@ -162,30 +186,22 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
 
       <a class="card reveal" href="product-seo-demo/index.html">
         <div class="ic">🛍️</div>
-        <h3>商品上架 SEO 自動化</h3>
-        <div class="d">爬蟲商品自動補圖、補敘述、生成 SEO/GEO 名稱與標籤，透過<b>整合多個宜搭 API 的自建 MCP</b> 寫回，再用 n8n 自動社群貼文並回收成效。</div>
-        <div class="tags"><span class="t">自建宜搭 MCP</span><span class="t">AI SEO/GEO</span><span class="t">自動補圖</span><span class="t">n8n 社群</span></div>
+        <h3>Shopify 商品上架 SEO/GEO 自動化</h3>
+        <div class="d">以 <b>Shopify CLI + Admin API</b> 為核心的電商自動化：商品/集合批次管理、AI 生成 SEO/GEO 內容、頁面產生器與安全發布、搜尋意圖推薦與加權再排序，宜搭(Yida) 為下架流程的下游同步。</div>
+        <div class="tags"><span class="t">Shopify CLI</span><span class="t">Shopify Admin API</span><span class="t">AI SEO/GEO</span><span class="t">搜尋加權再排序</span></div>
         <div class="go">進入展示 →</div>
       </a>
 
       <a class="card reveal" href="輿情_demo/index.html">
         <div class="ic">📈</div>
-        <h3>台股輿情分析儀表板</h3>
-        <div class="d"><b>自建 MCP（基於台灣官方 TWSE API）</b> + 多來源爬蟲 + AI 情緒分析的台股輿情儀表板：族群燈號、討論攀升、個股深度卡，強調 UI/UX。</div>
-        <div class="tags"><span class="t">自建 TWSE MCP</span><span class="t">多源爬蟲</span><span class="t">AI 情緒分析</span><span class="t">UI/UX</span></div>
-        <div class="go">進入展示 →</div>
-      </a>
-
-      <a class="card reveal" href="輿情_demo/2026-06-30_Full_version_from_private/index.html">
-        <div class="ic">🗞️</div>
-        <h3>台股輿情日報（Beta 版）</h3>
-        <div class="d">單日完整靜態日報：情緒變化、多因子選股表、法人籌碼、智能選股快選，以 ECharts 視覺化呈現的進階版。</div>
-        <div class="tags"><span class="t">ECharts</span><span class="t">多因子選股</span><span class="t">法人籌碼</span><span class="t">單日完整版</span></div>
+        <h3>台股輿情日報</h3>
+        <div class="d"><b>自建 MCP（基於台灣官方 TWSE API）</b> + 多來源爬蟲的單日完整輿情日報：族群燈號、討論度攀升、多因子選股與智能選股快選、法人籌碼動向，以 ECharts 呈現全市場熱議榜與國際輪動雷達。</div>
+        <div class="tags"><span class="t">自建 TWSE MCP</span><span class="t">多因子選股</span><span class="t">法人籌碼</span><span class="t">ECharts</span></div>
         <div class="go">進入展示 →</div>
       </a>
 
     </div>
-    <p class="demo-note reveal">＊ 以上皆為公開展示用的純前端靜態頁，資料為虛構脫敏、AI 與後端行為為模擬；真實程式碼、架構與 know-how 可於面談時說明。</p>
+    <p class="demo-note reveal">＊ 以上皆為公開展示用的純前端靜態頁；真實程式碼、架構與 know-how 可於面談時說明。</p>
   </div>
 </section>
 
@@ -194,12 +210,12 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
   <div class="container">
     <h2 class="sec-title reveal"><span class="num">02.</span> 技術技能</h2>
     <div class="skills-grid">
-      <div class="skill reveal"><div class="ic">🧠</div><h3>AI / 檢索式生成</h3><div class="row"><span class="k">RAG</span><span class="k">向量檢索</span><span class="k">Qdrant</span><span class="k">Embeddings</span><span class="k">Gemini / LLM</span><span class="k">MCP</span><span class="k">Prompt Engineering</span></div></div>
-      <div class="skill reveal"><div class="ic">🔌</div><h3>MCP / 串接整合</h3><div class="row"><span class="k">自建宜搭 (Yida) MCP</span><span class="k">自建 TWSE MCP</span><span class="k">官方 GA MCP</span><span class="k">LINE Messaging API</span><span class="k">Notion API</span><span class="k">Shopify API</span></div></div>
-      <div class="skill reveal"><div class="ic">⚙️</div><h3>自動化 / 資料處理</h3><div class="row"><span class="k">n8n</span><span class="k">Webhook</span><span class="k">Web Scraping</span><span class="k">資料正規化 / 清洗</span><span class="k">ETL / 同步</span><span class="k">排程</span></div></div>
+      <div class="skill reveal"><div class="ic">🧠</div><h3>AI / 檢索式生成</h3><div class="row"><span class="k">RAG</span><span class="k">向量檢索</span><span class="k">Qdrant</span><span class="k">Embeddings</span><span class="k">Gemini / LLM</span><span class="k">MCP</span><span class="k">AI grounding / 防幻覺</span></div></div>
+      <div class="skill reveal"><div class="ic">🔌</div><h3>MCP / 串接整合</h3><div class="row"><span class="k">自建宜搭 (Yida) MCP</span><span class="k">自建 TWSE MCP</span><span class="k">官方 GA MCP</span><span class="k">LINE Messaging API</span><span class="k">Notion API</span></div></div>
+      <div class="skill reveal"><div class="ic">⚙️</div><h3>自動化 / 資料處理</h3><div class="row"><span class="k">n8n</span><span class="k">Web Scraping</span><span class="k">資料正規化 / 清洗</span><span class="k">Webhook 簽章驗證</span><span class="k">訊息去抖動 (debounce)</span></div></div>
       <div class="skill reveal"><div class="ic">📊</div><h3>數據 / 視覺化</h3><div class="row"><span class="k">GA4 Data API</span><span class="k">GSC API</span><span class="k">GTM API</span><span class="k">資料視覺化</span><span class="k">ECharts</span><span class="k">SEO / GEO</span></div></div>
-      <div class="skill reveal"><div class="ic">💻</div><h3>開發語言 / 介面</h3><div class="row"><span class="k">Python</span><span class="k">JavaScript</span><span class="k">REST / GraphQL</span><span class="k">HTML / CSS</span><span class="k">RWD</span></div></div>
-      <div class="skill reveal"><div class="ic">🛡️</div><h3>工程實務</h3><div class="row"><span class="k">生產化部署</span><span class="k">增量同步</span><span class="k">API 配額管理</span><span class="k">自動化測試</span><span class="k">風險控管</span></div></div>
+      <div class="skill reveal"><div class="ic">💻</div><h3>開發語言 / 介面</h3><div class="row"><span class="k">Python</span><span class="k">JavaScript</span><span class="k">REST API</span><span class="k">HTML / CSS</span><span class="k">RWD</span></div></div>
+      <div class="skill reveal"><div class="ic">🛡️</div><h3>工程實務</h3><div class="row"><span class="k">API 配額管理與節流</span><span class="k">增量同步</span><span class="k">自動化測試</span><span class="k">跨資料模型對齊</span><span class="k">OAuth / Service Account</span></div></div>
     </div>
   </div>
 </section>
@@ -212,7 +228,7 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
       <p>我專注於把 <b>AI、資料與多平台串接</b> 落地成能真正解決問題的系統。習慣從<b>系統設計、外部服務整合到生產化維運</b>一手包辦——例如自建 MCP server 讓 AI 直接、可靠地取用資料，並兼顧成本、準確度與商業風險。</p>
       <p>擅長把重複的營運流程（客服、上架、數據分析、求職）<b>自動化</b>，並用清楚的視覺化把數據變成可行動的決策。</p>
       <div class="stats">
-        <div class="stat"><div class="n">6</div><div class="l">互動作品展示</div></div>
+        <div class="stat"><div class="n">5</div><div class="l">互動作品展示</div></div>
         <div class="stat"><div class="n">3</div><div class="l">自建 / 官方 MCP 整合</div></div>
         <div class="stat"><div class="n">5+</div><div class="l">平台 API 串接</div></div>
       </div>
@@ -235,12 +251,31 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
   </div>
 </section>
 
-<footer>© 2026 Jason ｜ AI × 數據 × 自動化 作品集 ｜ 展示資料皆為虛構脫敏範例</footer>
+<footer>© 2026 Jason ｜ AI × 數據 × 自動化 作品集 ｜ 展示資料為虛構脫敏範例，AI 與後端行為為前端模擬</footer>
 
 <script>
 // nav 陰影
 var nav = document.getElementById("nav");
 addEventListener("scroll", function () { nav.classList.toggle("scrolled", scrollY > 20); });
+// 手機版漢堡選單
+var navToggle = document.getElementById("navToggle");
+var navLinks = document.getElementById("navLinks");
+var navOverlay = document.getElementById("navOverlay");
+function closeNav() {
+  navLinks.classList.remove("open");
+  navOverlay.classList.remove("open");
+  navToggle.classList.remove("active");
+  navToggle.setAttribute("aria-expanded", "false");
+}
+function toggleNav() {
+  var isOpen = navLinks.classList.toggle("open");
+  navOverlay.classList.toggle("open", isOpen);
+  navToggle.classList.toggle("active", isOpen);
+  navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+}
+navToggle.addEventListener("click", toggleNav);
+navOverlay.addEventListener("click", closeNav);
+navLinks.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeNav); });
 // reveal on scroll
 var io = new IntersectionObserver(function (es) {
   es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } });

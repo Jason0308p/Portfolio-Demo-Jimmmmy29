@@ -10,12 +10,12 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<a href="../index.html" title="返回作品集首頁" style="position:fixed;left:14px;bottom:14px;z-index:1000;display:inline-flex;align-items:center;gap:6px;background:#3b82f6;color:#fff;font-size:13px;font-weight:700;padding:9px 15px;border-radius:24px;box-shadow:0 4px 16px rgba(0,0,0,.45);text-decoration:none">← 作品集首頁</a>
+<a href="../index.html" title="返回作品集首頁" class="float-home">← 作品集首頁</a>
 
 <nav>
   <div class="brand"><span class="dot"></span>LINE 智能客服<span>·RAG</span></div>
   <div class="nav-right">
-    <span class="badge-demo">DEMO · 模擬資料</span>
+    <span class="badge-demo">DEMO</span>
     <a href="../index.html">← 作品集首頁</a>
   </div>
 </nav>
@@ -25,7 +25,7 @@
   <div class="hero">
     <h1>B2B 禮品 LINE 智能客服機器人</h1>
     <p>串接 LINE、n8n、RAG 向量資料庫與 AI，客戶在 LINE 上詢問產品、價格、交期時自動分流並回覆，
-       並把詢問同步通知內部。本頁為<b>純前端互動展示</b>，資料與 AI 回應皆為模擬。</p>
+       並把詢問同步通知內部。本頁為<b>純前端互動展示</b>。</p>
     <div class="tags">
       <span class="tag">LINE Messaging API</span>
       <span class="tag">n8n</span>
@@ -39,7 +39,7 @@
   </div>
 
   <!-- ===== 處理流程順序 ===== -->
-  <h2 class="sec">處理流程順序（送出訊息後依序亮燈示意）</h2>
+  <h2 class="sec">處理流程順序（送出訊息後依序亮燈）</h2>
   <div class="pipe" id="pipe">
     <div class="node line" data-k="line"><span class="step">1</span><div class="ic">💬</div><div class="nm">LINE 用戶</div><div class="sub">收到訊息</div><div class="ms" data-ms="line"></div></div>
     <div class="node" data-k="n8n"><span class="step">2</span><div class="ic">🔀</div><div class="nm">n8n Webhook</div><div class="sub">去抖動·驗章</div><div class="ms" data-ms="n8n"></div></div>
@@ -55,7 +55,7 @@
   </div>
 
   <!-- ===== 互動聊天 ===== -->
-  <h2 class="sec">互動體驗（模擬對話）</h2>
+  <h2 class="sec">互動體驗</h2>
   <div class="chat-area">
     <div class="phone">
       <div class="phone-top"><span class="av">🤖</span>
@@ -75,7 +75,7 @@
         <div id="chips"></div>
       </div>
       <div class="panel">
-        <h3>本次處理流程（模擬耗時）</h3>
+        <h3>本次處理流程</h3>
         <div class="tl" id="timeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
       </div>
     </div>
@@ -141,7 +141,7 @@
   </details>
 
   <footer>
-    Jason ｜ jason0308p@gmail.com ｜ 本頁為展示用途，資料為虛構範例，僅供參考。
+    Jason ｜ jason0308p@gmail.com ｜ 展示資料為範例，AI 與後端行為為前端模擬。
   </footer>
 </div>
 

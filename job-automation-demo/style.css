@@ -1,4 +1,4 @@
-/* line-rag-demo — 展示用樣式（深色專業風，與作品集一致） */
+/* job-automation-demo — 展示用樣式（深色專業風，與作品集一致） */
 :root{
   --bg:#0b1220; --surface:#0f1a2e; --card:#13213a; --card2:#0e1830;
   --border:#22324f; --border2:#2c4061;
@@ -32,6 +32,24 @@ nav{
   font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--gold);
   border:1px solid var(--gold);border-radius:20px;padding:3px 10px;
 }
+.nav-right a{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--card2);border:1px solid var(--border);color:var(--text);
+  font-weight:700;font-size:12.5px;padding:8px 15px;border-radius:20px;
+  text-decoration:none;transition:.18s;
+}
+.nav-right a:hover{border-color:var(--accent);color:#fff;text-decoration:none}
+
+/* ---- 浮動返回作品集首頁按鈕 ---- */
+.float-home{
+  position:fixed;right:16px;bottom:16px;z-index:1000;
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--accent);color:#fff;font-size:13px;font-weight:700;
+  padding:10px 17px;border-radius:24px;text-decoration:none;
+  border:1.5px solid rgba(255,255,255,.35);
+  box-shadow:0 8px 26px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.35);
+}
+.float-home:hover{text-decoration:none;background:#4b8cf9}
 
 /* ---- layout ---- */
 .wrap{max-width:1100px;margin:0 auto;padding:28px 22px 60px}
@@ -216,7 +234,12 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .jc-reason{font-size:11.5px;color:var(--accent2);margin-top:6px}
 
 .gen-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;position:sticky;top:74px;height:fit-content}
-.ai-head{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.ai-head{display:flex;align-items:center;gap:9px;margin-bottom:12px;flex-wrap:wrap}
+.lang-toggle{display:flex;gap:4px;margin-left:auto;background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:3px}
+.lang-btn{background:transparent;border:none;color:var(--text2);font-size:11.5px;font-weight:700;
+  padding:5px 11px;border-radius:16px;cursor:pointer;font-family:inherit;transition:.15s}
+.lang-btn.active{background:var(--accent);color:#fff}
+.lang-btn:not(.active):hover{color:var(--text)}
 .av-ai{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
   font-size:17px;background:linear-gradient(135deg,#1d4ed8,#22d3ee);border:1px solid var(--border2)}
 .ai-name{font-size:13.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
@@ -231,14 +254,118 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .ai-actions button.alt{background:var(--card2);border:1px solid var(--border);color:var(--text)}
 .ai-actions button:disabled{opacity:.5;cursor:not-allowed}
 
+/* ===== Notion 同步頁面 mock（刻意用 Notion 本家的淺色卡片風格，即使全站是深色主題） ===== */
+.notion-caption{color:var(--text2);font-size:13px;max-width:760px;margin:-4px 0 16px;line-height:1.6}
+.notion-page{
+  max-width:820px;margin:8px 0 34px;border-radius:10px;overflow:hidden;
+  background:#ffffff;color:#2f3437;border:1px solid #e3e2de;
+  box-shadow:0 14px 40px rgba(0,0,0,.4);
+}
+.notion-cover{height:88px;background:linear-gradient(120deg,#fbe6cf 0%,#d9e9fb 60%,#e6d9fb 100%)}
+.notion-titlebar{display:flex;align-items:center;gap:14px;padding:18px 40px 4px}
+.notion-icon{font-size:38px;line-height:1}
+.notion-title{font-size:26px;font-weight:800;margin:0;color:#37352f}
+.notion-props{padding:8px 40px 14px;display:flex;flex-direction:column;gap:7px}
+.np-row{display:flex;align-items:center;gap:10px;font-size:13px;color:#787774}
+.np-icon{width:16px;text-align:center;flex-shrink:0}
+.np-label{width:64px;flex-shrink:0;color:#9b9a97}
+.np-pill{border-radius:4px;padding:2px 9px;font-weight:700;font-size:12.5px}
+.np-pill-blue{background:#d3e5fb;color:#0b5394}
+.np-tags{display:flex;gap:6px;flex-wrap:wrap}
+.np-tag{background:#eeeeec;border-radius:4px;padding:2px 9px;font-size:12px;color:#44433f}
+.np-val{color:#37352f}
+.notion-hr{border:none;border-top:1px solid #ececea;margin:0 40px}
+.notion-body{padding:14px 40px 36px;font-size:14.5px;line-height:1.7;color:#37352f}
+.notion-body h2{font-size:19px;font-weight:800;margin:22px 0 8px;color:#242220}
+.notion-body h3{font-size:15.5px;font-weight:700;margin:18px 0 8px;color:#242220}
+.notion-body ul{margin:6px 0;padding-left:22px}
+.notion-body ul ul{margin:4px 0}
+.notion-check{list-style:none;padding-left:0}
+.notion-check li{display:flex;align-items:center;gap:9px;padding:3px 0}
+.notion-check .cb{font-size:16px;color:#2ea043;flex-shrink:0}
+.notion-check li:not(.checked) .cb{color:#c3c1bd}
+.notion-check li.checked{color:#9b9a97;text-decoration:line-through}
+.notion-callout{
+  background:#fbf3db;border-left:3px solid #f5c94d;border-radius:4px;
+  padding:12px 14px;margin:14px 0;font-size:13.5px;color:#4a4237;
+}
+.notion-toggle{margin:14px 0;border-radius:4px}
+.notion-toggle>summary{cursor:pointer;list-style:none;font-weight:700;padding:4px 0;color:#37352f}
+.notion-toggle>summary::-webkit-details-marker{display:none}
+.notion-toggle-body{padding:6px 0 4px 18px;color:#55524c;font-size:13.5px}
+.notion-code{
+  background:#2f3437;color:#e6edf7;border-radius:6px;padding:14px 16px;
+  font-family:var(--mono);font-size:12.5px;overflow-x:auto;margin:12px 0;line-height:1.6;
+}
+.notion-code code{background:none;padding:0}
+
+/* ---- Notion callout 色彩變體（真實 Notion callout 依顏色分類；預設=金/提示色） ---- */
+.notion-callout.blue{background:color-mix(in srgb, var(--accent) 10%, #fff);border-left:3px solid var(--accent);color:#1c3a5e}
+.notion-callout.green{background:color-mix(in srgb, var(--green) 10%, #fff);border-left:3px solid var(--green);color:#14532d}
+.notion-callout.red{background:color-mix(in srgb, var(--red) 10%, #fff);border-left:3px solid var(--red);color:#5c1a1a}
+.notion-callout.gray{background:#f1f1ef;border-left:3px solid #b9b9b3;color:#44433f}
+
+/* ---- 色彩 pill（Grade / K-track / 投遞狀態 共用，套色沿用全站 CSS 變數） ---- */
+.pc-green{color:var(--green);background:color-mix(in srgb, var(--green) 15%, #fff);border:1px solid color-mix(in srgb, var(--green) 40%, #fff)}
+.pc-blue{color:var(--accent);background:color-mix(in srgb, var(--accent) 15%, #fff);border:1px solid color-mix(in srgb, var(--accent) 40%, #fff)}
+.pc-gold{color:var(--gold);background:color-mix(in srgb, var(--gold) 18%, #fff);border:1px solid color-mix(in srgb, var(--gold) 42%, #fff)}
+.pc-red{color:var(--red);background:color-mix(in srgb, var(--red) 15%, #fff);border:1px solid color-mix(in srgb, var(--red) 40%, #fff)}
+.pc-gray{color:var(--text3);background:color-mix(in srgb, var(--text3) 12%, #fff);border:1px solid color-mix(in srgb, var(--text3) 35%, #fff)}
+
+/* ---- Dashboard 摘要（callout 區塊堆疊） ---- */
+.notion-dash{max-width:820px;margin:8px 0 18px;display:flex;flex-direction:column;gap:8px}
+.notion-dash .notion-callout{margin:0}
+
+/* ---- 多平台職缺資料庫表格 ---- */
+.notion-table-wrap{
+  max-width:820px;margin:0 0 30px;border-radius:10px;overflow:hidden;
+  background:#ffffff;border:1px solid #e3e2de;box-shadow:0 14px 40px rgba(0,0,0,.4);
+}
+.nf-chips{display:flex;flex-wrap:wrap;gap:7px;padding:14px 18px 4px}
+.nf-chip{
+  background:#f1f1ef;border:1px solid #e3e2de;color:#55524c;font-size:12px;font-weight:700;
+  border-radius:20px;padding:5px 13px;cursor:pointer;font-family:inherit;transition:.15s;
+}
+.nf-chip:hover{border-color:color-mix(in srgb, var(--accent) 50%, #e3e2de)}
+.nf-chip.active{background:color-mix(in srgb, var(--accent) 14%, #fff);border-color:var(--accent);color:var(--accent)}
+.nt-scroll{overflow-x:auto;padding:10px 18px 4px}
+.notion-table{border-collapse:collapse;width:100%;min-width:760px;font-size:12.5px;color:#37352f}
+.notion-table thead th{
+  text-align:left;font-size:11px;font-weight:700;color:#9b9a97;text-transform:uppercase;
+  letter-spacing:.3px;padding:7px 10px;border-bottom:1px solid #e3e2de;white-space:nowrap;
+}
+.notion-table tbody td{padding:9px 10px;border-bottom:1px solid #ececea;white-space:nowrap}
+.notion-table tbody td.nt-kw{white-space:normal;min-width:150px;color:#55524c}
+.notion-table tbody tr{cursor:pointer;transition:.12s}
+.notion-table tbody tr:hover{background:#f7f7f5}
+.notion-table tbody tr.nt-sel{background:color-mix(in srgb, var(--accent) 8%, #fff)}
+.notion-table a{color:#0b5394;font-weight:600}
+.nt-pill{border-radius:4px;padding:2px 9px;font-weight:700;font-size:11.5px;white-space:nowrap}
+.nt-dim{color:#c3c1bd}
+.nt-badge{background:#eeeeec;border-radius:4px;padding:2px 9px;font-size:11.5px;color:#44433f;font-weight:600}
+.nt-hint{margin:0;padding:4px 18px 14px;font-size:11.5px;color:#9b9a97}
+
 /* ===== 手機 RWD 修正 ===== */
 @media (max-width:640px){
   html,body{overflow-x:hidden;max-width:100%}
   .wrap{padding-left:15px;padding-right:15px}
   nav{flex-wrap:wrap;row-gap:8px;padding:11px 14px}
   .brand{font-size:15px}
-  .nav-right{gap:10px;font-size:12px}
+  .nav-right{gap:8px;font-size:12px}
   .badge-demo{font-size:10px;padding:2px 8px}
+  .nav-right a{padding:9px 15px;font-size:12px;min-height:40px}
   .hero h1{font-size:23px;line-height:1.3;overflow-wrap:break-word}
   .hero p{font-size:13.5px}
+  .float-home{
+    padding:9px 14px;font-size:12px;right:12px;
+    bottom:calc(12px + env(safe-area-inset-bottom));
+  }
+  .notion-titlebar,.notion-props,.notion-body{padding-left:20px;padding-right:20px}
+  .notion-hr{margin:0 20px}
+  .notion-title{font-size:21px}
+  .lang-toggle{margin-left:0}
+  .notion-dash{margin-left:0;margin-right:0}
+  .nf-chips{padding-left:14px;padding-right:14px}
+  .nt-scroll{padding-left:14px;padding-right:14px}
+  .nt-hint{padding-left:14px;padding-right:14px}
 }

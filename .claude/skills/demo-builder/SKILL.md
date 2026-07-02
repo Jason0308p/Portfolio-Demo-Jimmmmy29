@@ -62,10 +62,9 @@ description: 把 n8n_project 底下的私有專案，轉成可公開展示的靜
   **自建 MCP Server (Model Context Protocol)**、OAuth/Service Account、AI 分析、資料視覺化、脫敏資料產生、Python。
 - **job-automation-demo**：多平台爬蟲 (104/1111)、web scraping、反爬處理、規則 + AI 評分、JD 解析、
   AI 生成 (CV/面試 QA)、Notion API、去重同步、pipeline 設計、Python。
-- **product-seo-demo（Claude_改J1上架商品名）**：自建宜搭 (Yida) MCP Server、AI SEO/GEO 內容生成、
-  爬蟲商品自動補圖/補敘述、批次 diff/preflight/重試、n8n 社群自動化、成效數據回收、Node/Python。
-- **shopify demo（若建）**：**Shopify Storefront Search API**、Storefront API (GraphQL)、Admin API (GraphQL)、
-  Shopify CLI、Liquid/Theme、MCP、商品/集合管理、SEO、301 redirect、資料自動化。
+- **product-seo-demo（Shopify_controll）**：**Shopify CLI**、Shopify Admin API (GraphQL)、官方 **Shopify dev-mcp**、
+  商品/集合批次管理 (ThreadPoolExecutor)、頁面產生器與安全發布、AI SEO/GEO 內容生成、搜尋意圖分類/加權再排序、
+  JSON-LD 結構化資料、宜搭 (Yida) 表單同步（下架流程下游整合）、Node/Python。
 - **輿情_demo**：自建 MCP、多來源爬蟲、RSS、AI 情緒分析、資料視覺化、UI/UX、深連結、Python。
 
 > 維護鐵律：之後任何專案新增用到的技術，**都要把關鍵字補進對應 demo 與此關鍵字庫**（[[feedback_sync_all_docs]] 精神）。
@@ -103,7 +102,17 @@ portfolio-demos/
 GitHub Pages 只能跑靜態，所以**任何後端（Python server / n8n / MCP / 向量庫）都要在前端用 JS 模擬**：
 - 真實 API 呼叫 → 改成讀內嵌假資料的本地函式
 - AI 回應 → 兩層：①手寫的「劇本式」漂亮回答（展示黃金路徑）②從假資料套模板的「動態式」回答（亂打也答得出）
-- 多平台串接（LINE/n8n/MCP/Qdrant）→ 用架構流程圖 + 節點依序亮燈動畫「視覺化模擬」，並誠實標註為示意
+- 多平台串接（LINE/n8n/MCP/Qdrant）→ 用架構流程圖 + 節點依序亮燈動畫「視覺化模擬」
+
+## 圖表要用真的圖表庫 + 真實資料結構，不要純 CSS div 湊視覺
+
+demo 是要展示「做得出真正能用的產品」，不是拼貼幾個色塊充數。畫圖表（長條、折線、漏斗、熱力圖、圓餅、直方圖…）一律用真的圖表庫（如 Plotly.js／ECharts，CDN 引入即可，不需要 build），不要手刻 `<div>` + inline width/height 湊視覺——尤其漏斗圖沒有梯形、熱力圖沒有真的網格，一眼就看得出是假的，反而扣分。
+
+圖表的軸線、資料形狀、hover 內容要照「這個技術真實情境下會長什麼樣子」去設計（可以參考原專案真實用的圖表類型與 schema），只把數字換成假的——不要憑空編一個不合理的軸或不存在的指標。同一頁如果有多個「熱力圖／色塊圖」，要讓它們用不同的視覺語言（例如一個是網格熱力圖、一個是表格數值上色），避免看起來像同一張圖複製貼上。
+
+## 免責聲明只集中寫一次，不要每段都重複
+
+**只在頁面 footer 放一行**誠實聲明（例：「展示資料為範例，AI 與後端行為為前端模擬」）即可。不要在 hero、每個圖表下方、每個 section 副標都重複寫「模擬/示意/虛構脫敏」——這樣讀起來像免責聲明範本湊字數，稀釋掉真正的技術內容，也造成閱讀負擔。README.md 裡可以保留完整版聲明（那是給看原始碼的人看的，不算頁面正文）。
 
 ### README 範本（每個 demo 一份）
 
@@ -167,6 +176,11 @@ Jason ｜ jason0308p@gmail.com
   賣點（只講方向）：訊息進來 → 分層檢索（精準→語意）→ AI 生成 → 回覆 + 通知；冷熱資料分流、報價保守防錯。
   改造 `test_chat_ui.html` 成前端模擬聊天 + LINE→n8n→RAG→AI→回覆/通知 流程動畫；
   細節（實際門檻、prompt、欄位、資料來源）一律不寫。
+- **product-seo-demo（Shopify_controll）**：Shopify 商品/集合/頁面/部落格自動化 + SEO/GEO + 搜尋推薦。
+  範圍：Shopify CLI + Admin API (GraphQL)、官方 Shopify dev-mcp、商品批次上下架、collection 縮圖生成、
+  page-builder 安全發布、blog 內容生成、搜尋意圖分類、加權再排序、JSON-LD 結構化資料；宜搭(Yida) 為下架流程的下游同步。
+  賣點（只講方向）：CLI 驅動的批次維運腳本 + 安全發布（patch 不覆寫）+ 搜尋/推薦排序邏輯；
+  細節（真實網域、client_id、GraphQL 變數、真實 SKU/handle）一律不寫，一律用佔位值。
 
 ## 發布前驗證（每次必跑，通過才可 commit / push）
 

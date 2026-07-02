@@ -11,12 +11,12 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<a href="../index.html" title="返回作品集首頁" style="position:fixed;left:14px;bottom:14px;z-index:1000;display:inline-flex;align-items:center;gap:6px;background:#3b82f6;color:#fff;font-size:13px;font-weight:700;padding:9px 15px;border-radius:24px;box-shadow:0 4px 16px rgba(0,0,0,.45);text-decoration:none">← 作品集首頁</a>
+<a href="../index.html" title="返回作品集首頁" class="float-home">← 作品集首頁</a>
 
 <nav>
   <div class="brand"><span class="dot"></span>AI 求職<span>·自動化 Pipeline</span></div>
   <div class="nav-right">
-    <span class="badge-demo">DEMO · 模擬資料</span>
+    <span class="badge-demo">DEMO</span>
     <a href="../index.html">← 作品集首頁</a>
   </div>
 </nav>
@@ -26,7 +26,7 @@
   <div class="hero">
     <h1>AI 自動化求職 Pipeline</h1>
     <p>多平台<b>職缺爬蟲</b> → 清洗合併 → <b>規則 + AI 評分</b> → 抓取 JD → <b>AI 生成 CV / 面試 QA</b> → 寫入 <b>Notion</b> 追蹤。
-       一條龍把找工作流程自動化。本頁為<b>純前端展示</b>，職缺、公司、薪資與履歷內容皆為虛構。</p>
+       一條龍把找工作流程自動化。</p>
     <div class="tags">
       <span class="tag">多平台爬蟲 (104 / 1111)</span>
       <span class="tag">Web Scraping</span>
@@ -40,7 +40,7 @@
   </div>
 
   <!-- ===== Pipeline 流程順序 ===== -->
-  <h2 class="sec">Pipeline 流程順序（載入時依序亮燈示意）</h2>
+  <h2 class="sec">Pipeline 流程順序（載入時依序亮燈）</h2>
   <div class="pipe" id="pipe">
     <div class="node scrape" data-k="scrape"><span class="step">1</span><div class="ic">🕷️</div><div class="nm">多平台爬蟲</div><div class="sub">104 / 1111</div></div>
     <div class="node" data-k="merge"><span class="step">2</span><div class="ic">🧹</div><div class="nm">清洗合併</div><div class="sub">跨平台正規化</div></div>
@@ -55,7 +55,7 @@
   </div>
 
   <!-- ===== 職缺看板 + AI 生成 ===== -->
-  <h2 class="sec">職缺看板 → 點職缺讓 AI 生成（模擬）</h2>
+  <h2 class="sec">職缺看板 → 點職缺讓 AI 生成</h2>
   <div class="board">
     <div>
       <div id="jobgroups"></div>
@@ -67,13 +67,53 @@
           <div class="ai-name">AI 求職助手<span class="badge-ai">AI</span></div>
           <div class="ai-st">● 依選中職缺的 JD 生成</div>
         </div>
+        <div class="lang-toggle" role="group" aria-label="輸出語言切換">
+          <button type="button" class="lang-btn active" data-lang="zh">中文</button>
+          <button type="button" class="lang-btn" data-lang="en">EN</button>
+        </div>
       </div>
-      <div class="ai-out" id="aiOut"><div class="ai-placeholder">← 從左側點一個職缺，再選下方按鈕，讓 AI 依該職缺逐字生成「客製 CV 重點」或「面試 QA」（純前端模擬）。</div></div>
+      <div class="ai-out" id="aiOut"><div class="ai-placeholder">← 從左側點一個職缺，再選下方按鈕，讓 AI 依該職缺逐字生成「客製 CV 重點」或「面試 QA」。</div></div>
       <div class="ai-actions">
         <button id="genCV">📝 生成客製 CV 重點</button>
         <button id="genQA" class="alt">💬 生成面試 QA</button>
       </div>
     </div>
+  </div>
+
+  <!-- ===== Notion 同步 — 多平台職缺資料庫 + AI 攻略頁 ===== -->
+  <h2 class="sec">📥 同步進 Notion — 多平台職缺資料庫與 AI 攻略頁</h2>
+  <p class="notion-caption">承接上方 Pipeline 第 6 步「寫入 Notion」：以下還原爬蟲抓回的多平台職缺寫入 Notion 資料庫後的樣子——可篩選的資料庫表格、即時從資料算出的 Dashboard 統計 callout，以及僅針對 Grade A 職缺自動產生的單一職缺「攻略頁」（用 callout／heading／bulleted list／divider 等真實 Notion block 組成，而不是把內容整坨貼上去）。</p>
+
+  <div class="notion-dash" id="notionDash"></div>
+
+  <div class="notion-table-wrap">
+    <div class="nf-chips" id="notionFilters"></div>
+    <div class="nt-scroll">
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>職缺名稱</th><th>公司</th><th>地區</th><th>Grade</th><th>K-track</th><th>投遞狀態</th><th>配對關鍵字</th><th>上架日期</th><th>平台</th>
+          </tr>
+        </thead>
+        <tbody id="notionTableBody"></tbody>
+      </table>
+    </div>
+    <p class="nt-hint">點一列 → 更新下方攻略頁；僅 Grade A 職缺會自動產生完整攻略。</p>
+  </div>
+
+  <div class="notion-page">
+    <div class="notion-cover"></div>
+    <div class="notion-titlebar">
+      <div class="notion-icon">🗂️</div>
+      <h1 class="notion-title" id="notionTitle">—</h1>
+    </div>
+    <div class="notion-props" id="notionProps">
+      <div class="np-row"><span class="np-icon">◐</span><span class="np-label">Status</span><span class="np-pill nt-pill np-status">—</span></div>
+      <div class="np-row"><span class="np-icon">#</span><span class="np-label">Tags</span><span class="np-tags"></span></div>
+      <div class="np-row"><span class="np-icon">📅</span><span class="np-label">上架</span><span class="np-val np-date-val">—</span></div>
+    </div>
+    <hr class="notion-hr">
+    <div class="notion-body" id="notionBody"></div>
   </div>
 
   <!-- ===== 技術與設計說明 ===== -->
@@ -111,7 +151,7 @@
     </div>
   </details>
 
-  <footer>Jason ｜ jason0308p@gmail.com ｜ 本頁為展示用途，職缺與資料為虛構範例，僅供參考。</footer>
+  <footer>Jason ｜ jason0308p@gmail.com ｜ 展示資料為範例，AI 與後端行為為前端模擬。</footer>
 </div>
 
 <script src="script.js"></script>

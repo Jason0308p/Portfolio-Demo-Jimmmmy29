@@ -17,7 +17,9 @@ python -m http.server 8000   # 開 http://localhost:8000
 
 - **Pipeline 流程動畫**：爬蟲 → 去重合併 → 評分 → 抓 JD → AI 生成 → Notion，依序亮燈
 - **職缺看板**：依 AI 評分 A / B / C 分組摺疊，點職缺看匹配理由
-- **AI 生成**：選一個職缺，逐字生成「客製 CV 重點」或「面試 QA」（模擬）
+- **AI 生成**：選一個職缺，逐字生成「客製 CV 重點」（7 條量化重點）或「面試 QA」（6 組行為 + 技術面問答），純前端範本 + 插值，非真實 LLM 呼叫
+- **中英文切換**：CV / QA 輸出可切換中文／英文版本，語言選擇會保留到下一次生成
+- **Notion 同步視覺化**：靜態還原多平台職缺寫入 Notion 資料庫後的樣子——可篩選的職缺資料庫表格、即時由資料算出的 Dashboard 統計 callout，以及僅 Grade A 職缺才會自動產生的 AI 攻略頁（痛點／符合點／優化方向／面試 QA，以 callout、heading、bulleted list、divider 等真實 Notion block 組成）
 - 深色專業介面、響應式
 
 ## 技術關鍵字

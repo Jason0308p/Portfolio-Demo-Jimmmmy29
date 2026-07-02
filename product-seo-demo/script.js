@@ -246,15 +246,17 @@
   var archiveBtn = document.getElementById("archiveBtn"), speedupBadge = document.getElementById("speedupBadge");
   var seqFill = document.getElementById("seqFill"), parFill = document.getElementById("parFill");
   var seqVal = document.getElementById("seqVal"), parVal = document.getElementById("parVal");
+  var ARCHIVE_MAX = 15.2; /* 兩條 bar 共用同一把尺，寬度才能真實反映分鐘數差異 */
   function animateBar(fillEl, valEl, target, duration, cb) {
     var start = null;
     function step(ts) {
       if (!start) start = ts;
       var t = Math.min(1, (ts - start) / duration);
-      fillEl.style.width = (t * 100) + "%";
-      valEl.textContent = (target * t).toFixed(1) + " 分";
+      var val = target * t;
+      fillEl.style.width = (val / ARCHIVE_MAX * 100) + "%";
+      valEl.textContent = val.toFixed(1) + " 分";
       if (t < 1) requestAnimationFrame(step);
-      else { fillEl.style.width = "100%"; valEl.textContent = target.toFixed(1) + " 分"; if (cb) cb(); }
+      else { fillEl.style.width = (target / ARCHIVE_MAX * 100) + "%"; valEl.textContent = target.toFixed(1) + " 分"; if (cb) cb(); }
     }
     requestAnimationFrame(step);
   }
@@ -265,7 +267,8 @@
     seqVal.textContent = "0.0 分"; parVal.textContent = "0.0 分";
     var done = 0;
     function checkDone() { done++; if (done === 2) { speedupBadge.classList.add("show"); archiveBtn.disabled = false; } }
-    /* 註：為兼顧展示節奏，動畫時長為壓縮示意（非真實 15.2 分鐘等比例等待），最終數值與加速倍率維持真實示意比例 */
+    /* 註：為兼顧展示節奏，動畫時長為壓縮示意（非真實 15.2 分鐘等比例等待），最終數值與加速倍率維持真實示意比例；
+       bar 寬度以 ARCHIVE_MAX（循序處理的 15.2 分）為共同基準，平行處理的 1.6 分只會填到約 10.5% 寬，長度差異才對得上數字差異 */
     animateBar(parFill, parVal, 1.6, 1300, checkDone);
     animateBar(seqFill, seqVal, 15.2, 4200, checkDone);
   });
@@ -499,6 +502,69 @@
     });
     Plotly.newPlot("rerankWeightChart", [trace], layout, PLY_CONFIG);
   })();
+
+  /* ---------- 優化前後效果對比（詞彙分類：同義詞／停用詞／單位正規化） ---------- */
+  var SQ_PRESETS = [
+    {
+      key: "bottle", label: "保溫瓶 500", query: "500ml",
+      before: 1024,
+      after: 14,
+      noise: [
+        "保鮮盒 500ml 密封分裝款（純數字 500ml 巧合命中，非保溫瓶）",
+        "暖手寶 USB 充電（「保溫」語意相近但非保溫容器）",
+        "零錢包 皮革 500 系列限定（純數字 500 巧合命中）"
+      ],
+      trace: ["保溫瓶 500", "移除停用詞「系列／限定」→ 保溫瓶 500", "單位正規化：500 → 500ml", "同義詞展開：保溫瓶 ≈ 保溫杯 ≈ tumbler", "最終比對條件：(保溫瓶｜保溫杯｜tumbler) AND 500ml"]
+    },
+    {
+      key: "tote", label: "帆布 提袋", query: "帆布",
+      before: 856,
+      after: 9,
+      noise: [
+        "帆布材質工作手套（材質詞「帆布」巧合命中，非提袋）",
+        "居家帆布收納籃（同材質字詞但用途不符）",
+        "帆布鞋墊耗材組（同材質字詞但非贈品類）"
+      ],
+      trace: ["帆布 提袋", "移除停用詞「的」→ 帆布 提袋", "同義詞展開：提袋 ≈ 托特包 ≈ tote bag", "最終比對條件：帆布 AND (提袋｜托特包｜tote bag)"]
+    },
+    {
+      key: "power", label: "行動電源 快充", query: "行動電源",
+      before: 612,
+      after: 21,
+      noise: [
+        "快充頭轉接充電線材（只命中「快充」，非行動電源本體）",
+        "電源延長線工業用（只命中「電源」關鍵字片段）",
+        "行動辦公文具套組（只命中「行動」關鍵字片段）"
+      ],
+      trace: ["行動電源 快充", "同義詞展開：行動電源 ≈ 充電寶 ≈ power bank", "停用詞過濾「頭／線／組」等零件詞，避免只命中局部字詞", "最終比對條件：(行動電源｜充電寶｜power bank) AND 快充"]
+    }
+  ];
+  var sqChipsWrap = document.getElementById("sqChips");
+  var sqBeforeCount = document.getElementById("sqBeforeCount");
+  var sqAfterCount = document.getElementById("sqAfterCount");
+  var sqNoiseList = document.getElementById("sqNoiseList");
+  var sqTrace = document.getElementById("sqTrace");
+  function renderSqPreset(p) {
+    sqBeforeCount.innerHTML = p.before.toLocaleString() + " <span>筆結果</span>";
+    sqAfterCount.innerHTML = p.after.toLocaleString() + " <span>筆精準結果</span>";
+    sqNoiseList.innerHTML = p.noise.map(function (n) { return "<li>" + escapeHtml(n) + "</li>"; }).join("");
+    sqTrace.innerHTML = p.trace.map(function (t, i) {
+      return '<span class="sq-step">' + escapeHtml(t) + "</span>" + (i < p.trace.length - 1 ? '<span class="sq-step-arrow">→</span>' : "");
+    }).join("");
+  }
+  SQ_PRESETS.forEach(function (p, i) {
+    var b = document.createElement("button");
+    b.className = "tchip" + (i === 0 ? " sel" : "");
+    b.textContent = p.label;
+    b.addEventListener("click", function () {
+      sqChipsWrap.querySelectorAll(".tchip").forEach(function (c) { c.classList.remove("sel"); });
+      b.classList.add("sel");
+      renderSqPreset(p);
+      searchInput.value = p.query; curQuery = p.query; renderSearchList();
+    });
+    sqChipsWrap.appendChild(b);
+  });
+  renderSqPreset(SQ_PRESETS[0]);
 
   var searchInput = document.getElementById("searchInput");
   var typeChipsWrap = document.getElementById("typeChips");

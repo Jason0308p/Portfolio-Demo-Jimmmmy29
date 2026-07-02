@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Shopify 商品上架與 SEO/GEO 自動化 — 展示用 (MVP)</title>
-<meta name="description" content="以 Shopify CLI 與 Admin API（GraphQL）驅動商品/集合批次管理、AI 生成 SEO/GEO 商品內容、頁面產生器與安全發布、部落格內容生成、搜尋意圖分類與加權再排序的電商自動化作品集展示；宜搭(Yida)表單作為下架流程下游整合點。">
+<meta name="description" content="以 Shopify CLI 與 Admin API（GraphQL）驅動商品/集合批次管理、AI 生成 SEO/GEO 商品內容、頁面產生器與安全發布、部落格內容生成、商品推薦意圖分類、搜尋詞彙優化與加權再排序的電商自動化作品集展示；宜搭(Yida)表單作為下架流程下游整合點。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@
 
   <div class="hero sec-card">
     <h1>電商商品上架與 SEO/GEO 自動化（Shopify）</h1>
-    <p>以 <b>Shopify CLI 與 Admin API（GraphQL）</b>為核心，涵蓋<b>商品/集合批次管理、AI 生成 SEO/GEO 商品內容、頁面產生器與安全發布、部落格內容生成、搜尋意圖推薦與加權再排序</b>；
+    <p>以 <b>Shopify CLI 與 Admin API（GraphQL）</b>為核心，涵蓋<b>商品/集合批次管理、AI 生成 SEO/GEO 商品內容、頁面產生器與安全發布、部落格內容生成、商品推薦意圖分類、搜尋詞彙優化與加權再排序</b>；
        官方 <b>Shopify dev-mcp</b> 輔助開發時查詢 schema，<b>宜搭 (Yida)</b> 表單則作為下架流程下游同步的其中一個整合點。本頁為<b>純前端展示</b>。</p>
     <div class="tags">
       <span class="tag cool">Shopify CLI</span>
@@ -34,7 +34,8 @@
       <span class="tag">AI SEO/GEO 內容生成</span>
       <span class="tag">批次自動化 (ThreadPoolExecutor)</span>
       <span class="tag">頁面產生器 / 安全發布</span>
-      <span class="tag">搜尋意圖分類 / 加權再排序</span>
+      <span class="tag">商品推薦 / 意圖分類</span>
+      <span class="tag">搜尋詞彙優化 / 加權再排序</span>
       <span class="tag">JSON-LD 結構化資料</span>
       <span class="tag">宜搭 (Yida) 表單同步</span>
       <span class="tag">Python / Node</span>
@@ -276,9 +277,49 @@
   </div>
   </section>
 
-  <!-- ===== 區塊8：搜尋過濾與加權再排序 ===== -->
+  <!-- ===== 區塊8：搜尋優化：詞彙分類與加權再排序 ===== -->
   <section class="sec-card">
-  <h2 class="sec">🔎 搜尋過濾與加權再排序</h2>
+  <h2 class="sec">🔎 搜尋優化：詞彙分類與加權再排序</h2>
+  <p class="sc-desc">原生 Shopify 搜尋是純字串比對，容易把「巧合命中」的雜訊也算進結果。我們加一層<b>詞彙分類規則</b>（同義詞庫／停用詞／單位正規化）先把查詢改寫乾淨，再用加權再排序把最相關的結果排到最前面。</p>
+
+  <div class="vocab-grid">
+    <div class="vocab-card">
+      <h4>🔤 同義詞庫</h4>
+      <div class="vocab-row"><span class="vocab-k">保溫瓶</span>≈<span class="vocab-v">保溫杯 / tumbler</span></div>
+      <div class="vocab-row"><span class="vocab-k">帆布袋</span>≈<span class="vocab-v">托特包 / tote bag</span></div>
+      <div class="vocab-row"><span class="vocab-k">行動電源</span>≈<span class="vocab-v">充電寶 / power bank</span></div>
+    </div>
+    <div class="vocab-card">
+      <h4>🚫 停用詞過濾</h4>
+      <div class="vocab-row"><span class="vocab-k">的／款／組／系列</span>→<span class="vocab-v">比對前先移除</span></div>
+      <div class="vocab-row"><span class="vocab-k">限定／熱銷／新品</span>→<span class="vocab-v">行銷詞不參與比對</span></div>
+    </div>
+    <div class="vocab-card">
+      <h4>📏 單位正規化</h4>
+      <div class="vocab-row"><span class="vocab-k">500 ML／500ml／500毫升</span>→<span class="vocab-v">統一成 500ml</span></div>
+      <div class="vocab-row"><span class="vocab-k">全形／半形空白</span>→<span class="vocab-v">統一去除</span></div>
+    </div>
+  </div>
+
+  <h3 class="sub-h">優化前後效果對比</h3>
+  <div class="sq-chips" id="sqChips"></div>
+  <div class="sq-compare" id="sqCompare">
+    <div class="sq-side sq-before">
+      <div class="sq-label">優化前｜原生字串比對</div>
+      <div class="sq-count" id="sqBeforeCount">—</div>
+      <div class="sq-noise-title">混入的雜訊範例：</div>
+      <ul class="sq-noise" id="sqNoiseList"></ul>
+    </div>
+    <div class="sq-arrow">→</div>
+    <div class="sq-side sq-after">
+      <div class="sq-label">優化後｜詞彙規則＋加權排序</div>
+      <div class="sq-count good" id="sqAfterCount">—</div>
+      <div class="sq-noise-title">只留下真正相關的商品</div>
+    </div>
+  </div>
+  <div class="sq-trace" id="sqTrace"></div>
+
+  <h3 class="sub-h">加權再排序規則（即時試搜）</h3>
   <div id="rerankWeightChart" style="height:200px"></div>
   <div class="chart-note">加權配分：標題完全命中 +20／供應商或類型命中 +10／描述（Meta）命中 +3，依總分排序。</div>
   <div class="search-row"><input type="text" id="searchInput" placeholder="搜尋商品，如：500ml、帆布袋、3C科技…"></div>
@@ -349,17 +390,18 @@
   </details>
 
   <details class="acc acc-lg" open>
-    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項</span></summary>
+    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">7 項</span></summary>
     <div class="abody">
       <div class="didblock" style="border:none;padding:0;background:none">
-        <p class="lead">獨立完成的 <b>Shopify 商品自動化</b>：以 Shopify CLI＋Admin GraphQL 驅動商品／集合／頁面／部落格批次管理，官方 dev-mcp 輔助開發查詢，並把宜搭表單接為下架流程的下游同步，加上搜尋意圖分類與加權再排序提升商品可被找到的機率。</p>
+        <p class="lead">獨立完成的 <b>Shopify 商品自動化</b>：以 Shopify CLI＋Admin GraphQL 驅動商品／集合／頁面／部落格批次管理，官方 dev-mcp 輔助開發查詢，並把宜搭表單接為下架流程的下游同步，加上商品推薦意圖分類與搜尋詞彙優化提升商品可被找到的機率。</p>
         <ul class="did">
           <li><div class="h"><span class="ic">🧰</span>Shopify CLI＋Admin GraphQL 批次工具</div><p class="d">用 Shopify CLI 執行 Admin GraphQL 查詢／異動（<code>--query-file</code>／<code>--variable-file</code>／<code>--allow-mutations</code>），並串官方 <b>dev-mcp</b> 輔助查詢 schema 與文件，加速開發除錯。</p></li>
           <li><div class="h"><span class="ic">⚡</span>批次下架效能優化＋宜搭下游同步</div><p class="d">Excel 名單觸發批次 <code>productUpdate(status:ARCHIVED)</code>，序列處理改成 ThreadPoolExecutor 平行處理＋批次 handle 查詢，示意效能約 <b>15 分鐘 → 1.6 分鐘</b>，下架同時同步宜搭表單狀態。</p></li>
           <li><div class="h"><span class="ic">🖼️</span>Collection 縮圖 AI 生成 Pipeline</div><p class="d">Prompt 生成 → AI 繪圖 → <code>stagedUploadsCreate</code> → <code>collectionUpdate</code> → 重新讀取驗證上線，全流程自動化不需人工上傳。</p></li>
           <li><div class="h"><span class="ic">🧱</span>頁面產生器（兩套版型＋區塊庫＋安全發布）</div><p class="d">購買指南型／產業著陸頁型兩套版型，共用 Hero／TOC／FAQ／CTA／比較表／Sticky Bar 區塊庫，發布走備份→切片 patch→驗證→寫入→重新讀取驗證，不整頁覆寫。</p></li>
           <li><div class="h"><span class="ic">📝</span>部落格文章與 SEO/GEO 內容規則</div><p class="d">生成文章標題與 <b>70–80 全形字</b> meta description，規則過濾不捏造規格數字、避免句式公式化重複。</p></li>
-          <li><div class="h"><span class="ic">🎯</span>搜尋與推薦：意圖分類＋加權再排序</div><p class="d">關鍵字比對意圖分類（保溫瓶／馬克杯／帆布提袋等約 8 類）；搜尋結果依<b>標題 +20／供應商或類型 +10／Meta +3</b> 加權重排序，並正規化半形／全形空白差異。</p></li>
+          <li><div class="h"><span class="ic">🎯</span>商品推薦：搜尋意圖分類器</div><p class="d">關鍵字比對意圖分類（保溫瓶／馬克杯／帆布提袋等約 8 類同義詞庫），輸入需求詞即可判斷最可能對應的商品分類與信心指數，用於原生搜尋結果上方的分類推薦。</p></li>
+          <li><div class="h"><span class="ic">🔎</span>搜尋詞彙優化＋加權再排序</div><p class="d">同義詞庫／停用詞／單位正規化先把查詢改寫乾淨，再依<b>標題 +20／供應商或類型 +10／Meta +3</b> 加權重排序；示意情境下可把原生字串比對的上千筆雜訊結果收斂到十餘筆精準結果。</p></li>
         </ul>
         <p class="foot">＊ 實際商店網域、商品 handle、GraphQL schema 細節與生成 prompt 屬營運 know-how，未公開於本展示，可於面談時說明。</p>
       </div>

@@ -63,7 +63,7 @@ description: 把 n8n_project 底下的私有專案，轉成可公開展示的靜
 - **job-automation-demo**：多平台爬蟲 (104/1111)、web scraping、反爬處理、規則 + AI 評分、JD 解析、
   AI 生成 (CV/面試 QA)、Notion API、去重同步、pipeline 設計、Python。
 - **product-seo-demo（Shopify_controll）**：**Shopify CLI**、Shopify Admin API (GraphQL)、官方 **Shopify dev-mcp**、
-  商品/集合批次管理 (ThreadPoolExecutor)、頁面產生器與安全發布、AI SEO/GEO 內容生成、搜尋意圖分類/加權再排序、
+  商品/集合批次管理 (ThreadPoolExecutor)、頁面產生器與安全發布、AI SEO/GEO 內容生成、搜尋詞彙分類/加權再排序、
   JSON-LD 結構化資料、宜搭 (Yida) 表單同步（下架流程下游整合）、Node/Python。
 - **輿情_demo**：自建 MCP、多來源爬蟲、RSS、AI 情緒分析、資料視覺化、UI/UX、深連結、Python。
 
@@ -176,10 +176,10 @@ Jason ｜ jason0308p@gmail.com
   賣點（只講方向）：訊息進來 → 分層檢索（精準→語意）→ AI 生成 → 回覆 + 通知；冷熱資料分流、報價保守防錯。
   改造 `test_chat_ui.html` 成前端模擬聊天 + LINE→n8n→RAG→AI→回覆/通知 流程動畫；
   細節（實際門檻、prompt、欄位、資料來源）一律不寫。
-- **product-seo-demo（Shopify_controll）**：Shopify 商品/集合/頁面/部落格自動化 + SEO/GEO + 搜尋推薦。
+- **product-seo-demo（Shopify_controll）**：Shopify 商品/集合/頁面/部落格自動化 + SEO/GEO + 搜尋優化。
   範圍：Shopify CLI + Admin API (GraphQL)、官方 Shopify dev-mcp、商品批次上下架、collection 縮圖生成、
-  page-builder 安全發布、blog 內容生成、搜尋意圖分類、加權再排序、JSON-LD 結構化資料；宜搭(Yida) 為下架流程的下游同步。
-  賣點（只講方向）：CLI 驅動的批次維運腳本 + 安全發布（patch 不覆寫）+ 搜尋/推薦排序邏輯；
+  page-builder 安全發布、blog 內容生成、搜尋詞彙分類、加權再排序、JSON-LD 結構化資料；宜搭(Yida) 為下架流程的下游同步。
+  賣點（只講方向）：CLI 驅動的批次維運腳本 + 安全發布（patch 不覆寫）+ 搜尋詞彙分類/加權排序邏輯；
   細節（真實網域、client_id、GraphQL 變數、真實 SKU/handle）一律不寫，一律用佔位值。
 
 ## 發布前驗證（每次必跑，通過才可 commit / push）

@@ -54,6 +54,50 @@
     <div class="node side" data-k="yida"><div class="ic">📋</div><div class="nm">宜搭表單</div><div class="sub">需人工報價時建單</div></div>
   </div>
 
+  <!-- ===== 冷熱資料判斷邏輯閘道 ===== -->
+  <h2 class="sec">冷熱資料判斷邏輯閘道</h2>
+  <div class="panel gate-panel">
+    <p class="gate-intro">每則訊息依序通過下面 4 道判斷閘門，<b>命中就立即分流、不再往下走</b>——真正決定的是「查<b>冷資料</b>本地索引」還是「查<b>熱資料</b>向量庫」。在上方送出聊天訊息後，這裡會即時亮起對應命中的分支。</p>
+    <div class="gate-tree" id="gateTree">
+      <div class="gate-in">📩 使用者訊息</div>
+      <div class="gate-row" data-row="code">
+        <div class="gate-q">Q1　含產品編號？<span class="gq-eg">例：GIFT-1001</span></div>
+        <div class="gate-arrow">是 →</div>
+        <div class="gate-leaf cold" data-leaf="code">❄️ 冷資料<small>本地編號索引精準命中，跳過向量搜尋</small></div>
+      </div>
+      <div class="gate-row" data-row="cat">
+        <div class="gate-q">Q2　含品類關鍵字？<span class="gq-eg">例：保溫杯、環保袋</span></div>
+        <div class="gate-arrow">是 →</div>
+        <div class="gate-leaf cold" data-leaf="cat">❄️ 冷資料<small>本地分類索引，回傳整類清單</small></div>
+      </div>
+      <div class="gate-row" data-row="fuzzy">
+        <div class="gate-q">Q3　需求模糊、無明確品項？<span class="gq-eg">例：送禮推薦、質感小禮</span></div>
+        <div class="gate-arrow">是 →</div>
+        <div class="gate-leaf hot" data-leaf="fuzzy">🔥 熱資料<small>向量語意檢索，即時算相似度</small></div>
+      </div>
+      <div class="gate-row" data-row="faq">
+        <div class="gate-q">Q4　命中 FAQ 關鍵字？<span class="gq-eg">例：運費、交期、發票</span></div>
+        <div class="gate-arrow">是 →</div>
+        <div class="gate-leaf cold" data-leaf="faq">❄️ 冷資料<small>FAQ 知識庫（批次同步）</small></div>
+      </div>
+      <div class="gate-row" data-row="fallback">
+        <div class="gate-q gate-fallback">以上皆未命中</div>
+        <div class="gate-arrow">→</div>
+        <div class="gate-leaf hot" data-leaf="fallback">🔥 熱資料<small>語意檢索 fallback，轉一般回答再由人工跟進</small></div>
+      </div>
+    </div>
+    <div class="coldhot-compare">
+      <div class="ch-card cold">
+        <h4>❄️ 冷資料</h4>
+        <p>變動少、可預先算好的資料：<b>商品編號／分類索引</b>與<b>FAQ 知識庫</b>。批次同步後建成記憶體快照，依檔案 <code>mtime</code>／<code>size</code> 判斷是否需要重建索引，查詢時直接讀記憶體，不需要即時運算。</p>
+      </div>
+      <div class="ch-card hot">
+        <h4>🔥 熱資料</h4>
+        <p>需要「即時理解語意」才回答得了的情境：<b>向量資料庫語意檢索</b>。只在編號／分類／FAQ 關鍵字都沒命中時才觸發，因為語意檢索的運算成本明顯高於本地索引查表，優先順序刻意放在最後。</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== 互動聊天 ===== -->
   <h2 class="sec">互動體驗</h2>
   <div class="chat-area">
@@ -98,7 +142,7 @@
   </details>
 
   <details class="acc acc-lg" open>
-    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項</span></summary>
+    <summary><span class="ic">🛠️</span> 專案實作項目<span class="cnt">6 項</span></summary>
     <div class="abody">
   <div class="didblock" style="border:none;padding:0;background:none">
     <p class="lead">獨立完成從<b>系統設計、多平台整合到生產化維運</b>的 B2B 智能客服：以 RAG 與分層檢索確保回覆準確、

@@ -31,7 +31,7 @@ python -m http.server 8000   # 開 http://localhost:8000
 `批次自動化 (ThreadPoolExecutor)` · `頁面產生器 / 安全發布` · `搜尋詞彙分類 / 加權再排序` ·
 `JSON-LD 結構化資料` · `宜搭 (Yida) 表單同步` · `Python / Node`
 
-## 在這個專案我實際做了什麼（高層說明）
+## 專案實作項目（高層說明）
 
 - 🧰 **Shopify CLI＋Admin GraphQL 批次工具**：以 Shopify CLI 執行 Admin GraphQL 查詢／異動，官方 dev-mcp 輔助查詢 schema 與文件
 - ⚡ **批次下架效能優化＋宜搭下游同步**：ThreadPoolExecutor 平行處理＋批次 handle 查詢取代逐筆查詢，示意效能約 15 分鐘 → 1.6 分鐘，下架同時同步宜搭表單狀態

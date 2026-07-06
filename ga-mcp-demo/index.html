@@ -95,8 +95,19 @@
   <!-- ===== 5. Session Duration Histogram ===== -->
   <h2 class="sec">工作階段時長分佈</h2>
   <div class="panel">
-    <div id="sessionDurChart" class="pchart pchart-md"></div>
-    <div class="chart-note">多數工作階段落在數十秒到數分鐘之間，右側長尾為深度瀏覽 / 高互動使用者。</div>
+    <div class="durcat-overview">
+      <h5>全站</h5>
+      <div id="sessionDurChart" class="pchart pchart-xs"></div>
+    </div>
+    <div class="durcat-cats">
+      <div class="durcat-cell"><h5>首頁</h5><div id="durCatHome" class="pchart pchart-xs"></div></div>
+      <div class="durcat-cell"><h5>商品頁</h5><div id="durCatProduct" class="pchart pchart-xs"></div></div>
+      <div class="durcat-cell"><h5>分類頁</h5><div id="durCatCollection" class="pchart pchart-xs"></div></div>
+      <div class="durcat-cell"><h5>內容頁</h5><div id="durCatPage" class="pchart pchart-xs"></div></div>
+      <div class="durcat-cell"><h5>部落格</h5><div id="durCatBlog" class="pchart pchart-xs"></div></div>
+    </div>
+    <div class="durcat-legend" id="durcatLegend"></div>
+    <div class="chart-note">全站多數工作階段落在數十秒到數分鐘之間，右側長尾為深度瀏覽 / 高互動使用者；拆解到頁面大類可看出部落格／商品頁停留明顯較長，首頁則多為快速跳轉。</div>
   </div>
 
   <!-- ===== 8. 關鍵字溫度圖 ===== -->
@@ -148,9 +159,6 @@
     <div class="gtm-stats">
       <div class="grp-tech">
         <b>容器組成範例：</b>29 個標籤 — 18 個 GA4 事件標籤・7 個轉換標籤・2 個基礎設定標籤，全數皆設有 Consent Mode v2 的 <code>consentSettings</code>。
-      </div>
-      <div class="note gtm-oauth-note">
-        <b>踩過的坑：</b>GA4 與 GTM 的 API／MCP 存取務必使用<b>各自獨立</b>的 OAuth Desktop 用戶端；共用同一組 Client ID 會讓兩邊的 refresh token 互相頂替失效，得個別重新走一次授權流程。
       </div>
     </div>
   </div>
@@ -204,7 +212,7 @@
   </details>
 
   <details class="acc acc-lg" open>
-    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">6 項</span></summary>
+    <summary><span class="ic">🛠️</span> 專案實作項目<span class="cnt">6 項</span></summary>
     <div class="abody">
   <div class="didblock" style="border:none;padding:0;background:none">
     <p class="lead">獨立完成的<b>行銷數據決策系統</b>：整合 GA4／GSC／GTM 三方數據，透過官方 GA MCP 讓 AI 直接取數並輸出可執行洞察，

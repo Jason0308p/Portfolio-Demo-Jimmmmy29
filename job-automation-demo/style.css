@@ -245,10 +245,24 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .ai-name{font-size:13.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
 .badge-ai{font-size:9px;font-weight:800;color:#04263a;background:var(--accent2);border-radius:4px;padding:0 4px;line-height:14px}
 .ai-st{font-size:10.5px;color:var(--green);margin-top:1px}
-.ai-out{font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;min-height:170px;
-  background:#091525;border:1px solid var(--border);border-radius:9px;padding:12px}
-.ai-placeholder{color:var(--text3)}
+.ai-out{font-size:13px;color:var(--text);line-height:1.7;min-height:170px;
+  background:#091525;border:1px solid var(--border);border-radius:9px;padding:14px}
+.ai-placeholder{color:var(--text3);white-space:pre-wrap}
 .ai-out .cursor{color:var(--accent2);font-weight:700}
+
+.reveal{opacity:0;transform:translateY(6px);transition:opacity .32s ease,transform .32s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+.gen-head{font-size:13.5px;font-weight:700;color:#fff;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.gen-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.gen-list li{position:relative;padding:8px 12px 8px 30px;background:var(--card2);border:1px solid var(--border);
+  border-left:3px solid var(--accent2);border-radius:8px;font-size:12.5px;color:var(--text2);line-height:1.6}
+.gen-list li::before{content:"";position:absolute;left:12px;top:15px;width:6px;height:6px;border-radius:50%;background:var(--accent2)}
+.gen-list li b{color:var(--text);font-weight:700}
+.gen-tail{margin-top:12px;padding:10px 13px;background:rgba(34,197,94,.08);border:1px solid #1e5233;
+  border-radius:8px;font-size:12.5px;color:#86efac;font-weight:600}
+.qa-pair{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;margin-bottom:8px}
+.qa-pair .qa-q{font-size:12.5px;font-weight:700;color:#fff;margin-bottom:5px}
+.qa-pair .qa-a{font-size:12.5px;color:var(--accent2);line-height:1.6}
 .ai-actions{display:flex;gap:9px;margin-top:11px;flex-wrap:wrap}
 .ai-actions button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer;font-size:12.5px;font-family:inherit}
 .ai-actions button.alt{background:var(--card2);border:1px solid var(--border);color:var(--text)}

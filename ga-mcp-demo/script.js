@@ -312,16 +312,16 @@
         type: "dropdown", direction: "down", x: 1, xanchor: "right", y: 1.28, yanchor: "top",
         bgcolor: COLORS.card2, bordercolor: COLORS.border2, font: { size: 11, color: COLORS.text2 },
         buttons: [
-          { label: "指標：Sessions", method: "restyle", args: [{ y: PT_SESSIONS }, [0, 1, 2, 3]] },
-          { label: "指標：Users", method: "restyle", args: [{ y: PT_USERS }, [0, 1, 2, 3]] },
-          { label: "指標：Pageviews", method: "restyle", args: [{ y: PT_PAGEVIEWS }, [0, 1, 2, 3]] }
+          { label: "指標：Sessions", method: "update", args: [{ y: PT_SESSIONS }, { "yaxis.title.text": "Sessions", "yaxis.autorange": true }, [0, 1, 2, 3]] },
+          { label: "指標：Users", method: "update", args: [{ y: PT_USERS }, { "yaxis.title.text": "Users", "yaxis.autorange": true }, [0, 1, 2, 3]] },
+          { label: "指標：Pageviews", method: "update", args: [{ y: PT_PAGEVIEWS }, { "yaxis.title.text": "Pageviews", "yaxis.autorange": true }, [0, 1, 2, 3]] }
         ]
       }]
     });
     Plotly.newPlot("pageTypeChart", traces, layout, PLY_CONFIG);
   })();
 
-  /* ================= 5. Session Duration Histogram ================= */
+  /* ================= 5. Session Duration Histogram（全站 + 頁面大類拆解）================= */
   (function () {
     function mulberry32(seed) {
       return function () {
@@ -331,27 +331,62 @@
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
       };
     }
-    var rng = mulberry32(20260630);
-    var durations = [];
-    for (var i = 0; i < 600; i++) {
-      var u1 = Math.max(1e-6, rng()), u2 = rng();
-      var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-      var mu = 4.15, sigma = 0.62;
-      var dur = Math.exp(mu + sigma * z);
-      durations.push(Math.min(1500, Math.round(dur)));
+    function genDurations(seed, n, mu, sigma, cap) {
+      var rng = mulberry32(seed), out = [];
+      for (var i = 0; i < n; i++) {
+        var u1 = Math.max(1e-6, rng()), u2 = rng();
+        var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+        out.push(Math.min(cap, Math.round(Math.exp(mu + sigma * z))));
+      }
+      return out;
     }
-    var trace = {
-      type: "histogram", x: durations,
+    var CATS = [
+      { key: "home", id: "durCatHome", name: "首頁", mu: 3.25, sigma: 0.5, cap: 900, color: COLORS.text2 },
+      { key: "product", id: "durCatProduct", name: "商品頁", mu: 4.1, sigma: 0.58, cap: 1500, color: COLORS.accent },
+      { key: "collection", id: "durCatCollection", name: "分類頁", mu: 3.85, sigma: 0.5, cap: 1200, color: COLORS.accent2 },
+      { key: "page", id: "durCatPage", name: "內容頁", mu: 3.7, sigma: 0.48, cap: 1000, color: COLORS.gold },
+      { key: "blog", id: "durCatBlog", name: "部落格", mu: 4.55, sigma: 0.6, cap: 1800, color: COLORS.purple }
+    ];
+    CATS.forEach(function (c, i) { c.durations = genDurations(20260630 + i * 97, 220, c.mu, c.sigma, c.cap); });
+    var allDurations = CATS.reduce(function (acc, c) { return acc.concat(c.durations); }, []);
+
+    function avg(arr) { return Math.round(arr.reduce(function (a, b) { return a + b; }, 0) / arr.length); }
+    function miniLayout(maxX) {
+      return mergeLayout({
+        margin: { t: 6, r: 10, b: 26, l: 30 }, showlegend: false,
+        xaxis: { range: [0, maxX], tickfont: { size: 9, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.05)" },
+        yaxis: { tickfont: { size: 9, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.06)" }
+      });
+    }
+
+    Plotly.newPlot("sessionDurChart", [{
+      type: "histogram", x: allDurations,
       marker: { color: "rgba(34,211,238,.55)", line: { color: COLORS.accent2, width: 1 } },
-      xbins: { start: 0, end: 1500, size: 40 },
-      hovertemplate: "時長區間 %{x}<br>使用者數 %{y}<extra></extra>"
-    };
-    var layout = mergeLayout({
-      margin: { t: 14, r: 20, b: 40, l: 48 }, showlegend: false,
-      xaxis: { title: { text: "工作階段時長（秒）", font: { size: 10, color: COLORS.text3 } }, tickfont: { size: 10, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.05)" },
-      yaxis: { title: { text: "使用者數", font: { size: 10, color: COLORS.text3 } }, tickfont: { size: 10, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.06)" }
+      xbins: { start: 0, end: 1800, size: 50 },
+      hovertemplate: "時長區間 %{x} 秒<br>工作階段數 %{y}<extra></extra>"
+    }], mergeLayout({
+      margin: { t: 6, r: 16, b: 30, l: 40 }, showlegend: false,
+      xaxis: { title: { text: "秒", font: { size: 9, color: COLORS.text3 } }, tickfont: { size: 9, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.05)" },
+      yaxis: { tickfont: { size: 9, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.06)" }
+    }), PLY_CONFIG);
+
+    CATS.forEach(function (c) {
+      Plotly.newPlot(c.id, [{
+        type: "histogram", x: c.durations,
+        marker: { color: c.color, opacity: .55, line: { color: c.color, width: 1 } },
+        xbins: { start: 0, end: c.cap, size: Math.round(c.cap / 24) },
+        hovertemplate: c.name + " %{x} 秒<br>%{y} 筆<extra></extra>"
+      }], miniLayout(c.cap), PLY_CONFIG);
     });
-    Plotly.newPlot("sessionDurChart", [trace], layout, PLY_CONFIG);
+
+    var legend = document.getElementById("durcatLegend");
+    var rows = [{ name: "全站平均", color: COLORS.accent2, val: avg(allDurations) }].concat(
+      CATS.map(function (c) { return { name: c.name, color: c.color, val: avg(c.durations) }; })
+    );
+    legend.innerHTML = rows.map(function (r) {
+      return '<div class="durcat-chip"><span class="durcat-dot" style="background:' + r.color + '"></span>' +
+        r.name + ' 平均 <span class="durcat-val">' + r.val + ' 秒</span></div>';
+    }).join("");
   })();
 
   /* ================= 8. 關鍵字表 + 欄位溫度圖上色 ================= */

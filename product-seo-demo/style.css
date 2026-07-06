@@ -214,19 +214,27 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .sc-desc{font-size:12.5px;color:var(--text2);margin:0 0 12px;line-height:1.6}
 .sc-desc code{font-family:var(--mono);font-size:11.5px;color:var(--accent2);background:var(--card2);border-radius:4px;padding:1px 5px}
 
-/* ---- 進度條 / 信心條共用元件 ---- */
-.progress-group{display:flex;flex-direction:column;gap:10px;margin-top:14px}
-.progress-row{display:flex;align-items:center;gap:10px}
-.pr-label{flex:0 0 168px;font-size:12px;color:var(--text2)}
-.bar{position:relative;flex:1;height:10px;background:var(--card2);border:1px solid var(--border);border-radius:6px;overflow:hidden}
-.bar .fill{height:100%;width:0%;border-radius:6px;transition:width .35s ease}
-.fill.seq{background:var(--gold)}
-.fill.par{background:var(--accent2)}
-.fill.conf{background:var(--accent)}
-.pr-val{flex:0 0 62px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--text)}
-.speedup-badge{display:none;font-size:12.5px;font-weight:700;color:var(--gold);
-  background:rgba(245,158,11,.1);border:1px solid #5a4620;border-radius:20px;padding:6px 13px}
-.speedup-badge.show{display:inline-block}
+/* ---- 批次下架：跨平台整合流程 chip 串 + 回饋報表 ---- */
+.archive-flow .cf-chip{flex-direction:column;align-items:flex-start;gap:2px;padding:7px 12px}
+.cf-plat{font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;opacity:.75}
+.cf-chip.cf-local.active,.cf-chip.cf-local.done{border-color:var(--accent2);box-shadow:0 0 0 1px var(--accent2)}
+.cf-chip.cf-shopify.active,.cf-chip.cf-shopify.done{border-color:var(--green);box-shadow:0 0 0 1px var(--green)}
+.cf-chip.cf-yida.active,.cf-chip.cf-yida.done{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+.archive-report{margin-top:14px}
+.ar-empty{padding:14px;text-align:center;font-size:11.5px;color:var(--text3);border:1.5px dashed var(--border2);border-radius:10px}
+.ar-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.ar-stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
+.ar-stat.good{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.06)}
+.ar-stat.warn{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.06)}
+.ar-v{font-size:19px;font-weight:800;color:#fff;font-family:var(--mono)}
+.ar-stat.good .ar-v{color:var(--green)}
+.ar-stat.warn .ar-v{color:var(--gold)}
+.ar-k{font-size:10px;color:var(--text3);margin-top:2px}
+.ar-log{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.ar-log-line{font-size:11px;font-family:var(--mono);padding:3px 0;color:var(--text2)}
+.ar-log-line.ok{color:#86efac}
+.ar-log-line.bad{color:#fca5a5}
+.ar-log-line b{color:var(--text)}
 
 /* ---- collection 縮圖 pipeline chip 串 ---- */
 .chip-flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:4px 0 2px}
@@ -250,6 +258,24 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .cf-thumb-badge{position:absolute;top:6px;right:6px;background:rgba(34,197,94,.92);color:#06240f;font-size:9.5px;
   font-weight:800;padding:2px 6px;border-radius:10px;letter-spacing:.3px}
 .cf-thumb-label{font-size:10.5px;color:var(--text3);margin-top:6px}
+
+/* ---- collection 推送到集合頁 + SEO/Schema/Alt 展示 ---- */
+.cf-page-window{margin-top:14px}
+.cf-page-body{min-height:118px}
+.cf-page-empty{padding:32px 16px;text-align:center;font-size:11.5px;color:var(--text3)}
+.cf-page-banner{padding:20px 16px;display:flex;align-items:center;gap:10px;color:#fff}
+.cf-page-banner-ic{font-size:24px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
+.cf-page-banner-nm{font-size:14px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.cf-page-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 12px 14px}
+.cf-page-sw{aspect-ratio:1;border-radius:8px;background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:16px}
+.cf-page-sw::before{content:"🖼️";opacity:.55}
+.cf-seo-panel{display:none;margin-top:12px}
+.cf-seo-panel.show{display:block}
+.cf-seo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cf-seo-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:13px 14px}
+.cf-seo-card h4{margin:0 0 7px;font-size:12px;color:var(--text3);font-weight:700}
+.cf-seo-card p{margin:0;font-size:12px;color:var(--text);line-height:1.65}
 
 /* ---- 區塊5：版型 tabs + 頁面線框預覽 ---- */
 .pg-tabs{display:flex;gap:8px;margin-bottom:8px}
@@ -295,6 +321,18 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .pipe-sm .nm{font-size:11.5px}
 .pipe-sm{gap:20px}
 
+/* ---- 區塊5：改版前後對比縮圖 ---- */
+.pg-diff-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:12px;margin-top:14px}
+.pg-diff-side{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.pg-diff-label{font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px}
+.pg-diff-thumb{display:flex;flex-direction:column;gap:7px}
+.pgd-line{height:7px;border-radius:4px;background:var(--border2)}
+.pgd-line.w95{width:95%}.pgd-line.w80{width:80%}.pgd-line.w70{width:70%}.pgd-line.w60{width:60%}.pgd-line.w50{width:50%}
+.pgd-gap{font-size:10px;color:var(--text3);font-style:italic;padding:4px 0}
+.pgd-new{font-size:10.5px;font-weight:800;color:#06240f;background:var(--green);border-radius:6px;padding:5px 8px;
+  box-shadow:0 3px 10px rgba(34,197,94,.35)}
+.pg-diff-arrow{display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--green);font-weight:800}
+
 /* ---- 區塊5：安全發布 — 頁面內容 before/after 預覽 ---- */
 .pg-preview{background:var(--card2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:14px}
 .pg-preview-bar{display:flex;align-items:center;gap:6px;padding:9px 12px;background:var(--card2);border-bottom:1px solid var(--border)}
@@ -310,9 +348,8 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .pg-patch-banner{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .pg-patch-badge{background:var(--green);color:#06240f;font-size:10.5px;font-weight:800;border-radius:6px;padding:3px 9px}
 .pg-patch-banner b{color:#fff;font-size:12.5px}
-.pg-patch-added table{width:100%;border-collapse:collapse;font-size:11.5px}
-.pg-patch-added th{text-align:left;color:#86efac;font-weight:700;padding:5px 8px;border-bottom:1px solid rgba(34,197,94,.35);font-size:10.5px}
-.pg-patch-added td{padding:6px 8px;color:#dcfce7;border-bottom:1px solid rgba(34,197,94,.15)}
+.pg-patch-note{margin-top:4px;font-size:11.5px;color:#dcfce7;text-align:center}
+.pg-patch-note b{color:#86efac}
 
 /* ---- 區塊6：部落格生成 ---- */
 .topic-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
@@ -328,24 +365,6 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .rule-item.warn .rl-dot{background:var(--gold)}
 .rule-item.bad .rl-dot{background:var(--red)}
 .rl-tx b{color:var(--text)}
-
-/* ---- 區塊7：搜尋意圖分類器 ---- */
-.intent-input-row{display:flex;gap:9px;margin-bottom:10px}
-.intent-input-row input{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;
-  padding:10px 13px;font-size:13px;color:var(--text);font-family:inherit}
-.intent-input-row input:focus{outline:none;border-color:var(--accent)}
-.intent-input-row button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:0 16px;
-  font-weight:700;cursor:pointer;font-size:13px;font-family:inherit}
-.quick-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.qchip{background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:6px 13px;
-  font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit}
-.qchip:hover{color:var(--text);border-color:var(--border2)}
-.intent-result{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px}
-.intent-empty{margin:0;font-size:12.5px;color:var(--text3)}
-.intent-card .ic-cat{font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px}
-.intent-card .ic-term{font-size:12.5px;color:var(--text2);margin-bottom:12px}
-.intent-card mark{background:rgba(245,158,11,.25);color:var(--gold);border-radius:3px;padding:0 3px}
-.intent-card .progress-row{margin-top:2px}
 
 /* ---- 區塊8：詞彙分類規則庫 ---- */
 .sub-h{font-size:13px;font-weight:700;color:var(--text2);margin:20px 0 10px;padding-top:16px;border-top:1px dashed var(--border)}
@@ -428,6 +447,23 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .sw-check-item-sub{font-size:10.3px;color:var(--text3);margin-top:5px;line-height:1.6}
 .sw-cta{text-align:center;background:var(--accent);color:#fff;font-size:11.5px;font-weight:700;border-radius:8px;padding:8px;cursor:default}
 
+/* ---- 商品頁面即時預覽（區塊3） ---- */
+.pp-window{margin-top:16px}
+.pp-body{min-height:150px}
+.pp-empty{padding:36px 16px;text-align:center;font-size:11.5px;color:var(--text3)}
+.pp-layout{display:grid;grid-template-columns:130px 1fr;gap:16px;padding:16px}
+.pp-media{aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,var(--card),var(--card2));
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+.pp-media-ic{font-size:40px}
+.pp-title{margin:0 0 6px;font-size:15px;color:#fff}
+.pp-price{font-size:14px;font-weight:800;color:var(--accent2);margin-bottom:10px}
+.pp-price span{font-size:11px;font-weight:600;color:var(--text3);margin-left:6px}
+.pp-bullets{margin:0 0 12px;padding-left:18px;font-size:11.5px;color:var(--text2);line-height:1.7}
+.pp-cta{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-weight:700;font-size:12.5px;cursor:default;opacity:.85}
+.pp-seo-strip{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 16px}
+.pp-seo-tag{font-size:10.5px;color:var(--green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);
+  border-radius:20px;padding:4px 10px}
+
 /* dashboard 面板 */
 .sw-dash-body{padding:12px}
 .sw-dash-head{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:700;color:#fff;margin-bottom:10px}
@@ -472,18 +508,20 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
   .sec-card{padding:16px 14px 18px;margin:16px 0;border-radius:14px}
 
   /* 新區塊（4-9）手機修正 */
-  .progress-row{flex-wrap:wrap}
-  .pr-label{flex:1 1 100%}
-  .pr-val{flex:0 0 auto}
   .runbar{gap:8px}
   .chip-flow{gap:6px}
   .cf-chip{font-size:11px;padding:5px 10px}
+  .ar-stats{grid-template-columns:repeat(2,1fr)}
   .pipe-sm .node{min-width:88px}
-  .intent-input-row{flex-direction:column}
-  .intent-input-row button{padding:10px 16px}
   .s-top{flex-wrap:wrap}
   .subgrid{gap:12px}
   .vocab-grid{grid-template-columns:1fr}
   .sq-compare{grid-template-columns:1fr}
   .sq-arrow{transform:rotate(90deg);padding:2px 0}
+  .cf-seo-grid{grid-template-columns:1fr}
+  .cf-page-grid{grid-template-columns:repeat(2,1fr)}
+  .pp-layout{grid-template-columns:1fr}
+  .pp-media{max-width:100px;margin:0 auto}
+  .pg-diff-row{grid-template-columns:1fr}
+  .pg-diff-arrow{transform:rotate(90deg);padding:2px 0}
 }

@@ -118,6 +118,8 @@
   var aDesc = document.getElementById("aDesc"), aTags = document.getElementById("aTags"), aPrice = document.getElementById("aPrice"), aMeta = document.getElementById("aMeta");
   var genBtn = document.getElementById("genBtn"), postBtn = document.getElementById("postBtn");
   var socialOut = document.getElementById("socialOut");
+  var ppUrl = document.getElementById("ppUrl"), ppBody = document.getElementById("ppBody");
+  var PP_EMPTY = '<div class="pp-empty">尚未生成，點擊上方「執行 AI 上架處理」後，這裡會即時顯示商品頁面實際上線的樣子</div>';
 
   function loadBefore(p) {
     cur = p; processed = false;
@@ -129,6 +131,8 @@
     aHandle.textContent = "—"; handleBadge.classList.remove("show");
     aDesc.innerHTML = "—"; aPrice.innerHTML = "—"; aTags.innerHTML = ""; aMeta.innerHTML = "";
     postBtn.disabled = true; socialOut.classList.remove("show");
+    ppUrl.textContent = "example-shop.com/products/" + p.handleBefore;
+    ppBody.innerHTML = PP_EMPTY;
     document.querySelectorAll(".pchip").forEach(function (c) { c.classList.toggle("sel", c.dataset.id === p.id); });
   }
 
@@ -144,6 +148,8 @@
   function runGen() {
     if (busy) return; busy = true; genBtn.disabled = true; postBtn.disabled = true;
     var p = cur;
+    ppUrl.textContent = "example-shop.com/products/" + p.handleBefore;
+    ppBody.innerHTML = '<div class="pp-empty">生成中，AI 正在為這個商品建立完整頁面…</div>';
     setTimeout(function () { aImg.className = "pimg full"; aImg.textContent = p.emoji; }, 350);
     setTimeout(function () {
       typeInto(aName, p.aName, function () {
@@ -166,12 +172,32 @@
           setTimeout(function () {
             var sc = document.createElement("span"); sc.className = "ptg sync"; sc.textContent = "✓ 已同步宜搭(Yida)狀態"; aMeta.appendChild(sc);
             busy = false; genBtn.disabled = false; postBtn.disabled = false; processed = true;
+            renderProductPage(p);
           }, 220);
         }, 120 * p.tags.length + 200);
       });
     }, 600);
   }
   genBtn.onclick = runGen;
+
+  function renderProductPage(p) {
+    ppUrl.textContent = "example-shop.com/products/" + p.handleAfter;
+    var metaDesc = p.geo.length > 120 ? p.geo.slice(0, 120) + "…" : p.geo;
+    ppBody.innerHTML =
+      '<div class="pp-layout">' +
+      '<div class="pp-media"><span class="pp-media-ic">' + p.emoji + '</span></div>' +
+      '<div class="pp-info">' +
+      '<h4 class="pp-title">' + escapeHtml(p.aName.split("｜")[0]) + '</h4>' +
+      '<div class="pp-price">NT$ ' + p.tiers[0].p + ' <span>/ 個｜最小訂購 ' + p.moq + ' 個</span></div>' +
+      '<ul class="pp-bullets">' + p.bullets.slice(0, 3).map(function (b) { return "<li>" + escapeHtml(b) + "</li>"; }).join("") + '</ul>' +
+      '<button class="pp-cta" disabled>加入購物車（示意）</button>' +
+      '</div></div>' +
+      '<div class="pp-seo-strip">' +
+      '<span class="pp-seo-tag">✓ Meta：' + escapeHtml(metaDesc) + '</span>' +
+      '<span class="pp-seo-tag">✓ 圖片 Alt：' + escapeHtml(p.aName.split("｜")[0]) + ' 商品實拍圖</span>' +
+      '<span class="pp-seo-tag">✓ Product JSON-LD</span>' +
+      '</div>';
+  }
 
   var spBody = document.getElementById("spBody");
   function runPost() {
@@ -223,72 +249,74 @@
   }
   runBtn.addEventListener("click", playFlow);
 
-  /* ================= 區塊4A：批次下架效能對比 ================= */
-  (function () {
-    var trace = {
-      type: "bar",
-      x: ["循序處理（逐筆）", "平行處理（ThreadPoolExecutor）"],
-      y: [15.2, 1.6],
-      text: ["15.2 分", "1.6 分"], textposition: "outside", textfont: { color: COLORS.text2, size: 11 },
-      marker: { color: [COLORS.gold, COLORS.accent2] },
-      hovertemplate: "%{x}：%{y} 分鐘<extra></extra>"
-    };
-    var layout = mergeLayout({
-      margin: { t: 40, r: 20, b: 44, l: 50 },
-      xaxis: { tickfont: { size: 11, color: COLORS.text2 } },
-      yaxis: { title: { text: "處理時間（分鐘）", font: { size: 10, color: COLORS.text3 } }, gridcolor: "rgba(255,255,255,.06)", tickfont: { size: 10, color: COLORS.text3 } },
-      showlegend: false,
-      annotations: [{ xref: "paper", yref: "paper", x: 0, y: 1.14, showarrow: false, align: "left", text: "約81筆商品批次，示意數字", font: { size: 10, color: COLORS.text3 } }]
-    });
-    Plotly.newPlot("archiveSpeedChart", [trace], layout, PLY_CONFIG);
-  })();
-
-  var archiveBtn = document.getElementById("archiveBtn"), speedupBadge = document.getElementById("speedupBadge");
-  var seqFill = document.getElementById("seqFill"), parFill = document.getElementById("parFill");
-  var seqVal = document.getElementById("seqVal"), parVal = document.getElementById("parVal");
-  var ARCHIVE_MAX = 15.2; /* 兩條 bar 共用同一把尺，寬度才能真實反映分鐘數差異 */
-  function animateBar(fillEl, valEl, target, duration, cb) {
-    var start = null;
-    function step(ts) {
-      if (!start) start = ts;
-      var t = Math.min(1, (ts - start) / duration);
-      var val = target * t;
-      fillEl.style.width = (val / ARCHIVE_MAX * 100) + "%";
-      valEl.textContent = val.toFixed(1) + " 分";
-      if (t < 1) requestAnimationFrame(step);
-      else { fillEl.style.width = (target / ARCHIVE_MAX * 100) + "%"; valEl.textContent = target.toFixed(1) + " 分"; if (cb) cb(); }
-    }
-    requestAnimationFrame(step);
+  /* ================= 區塊4A：批次下架跨平台整合流程 ================= */
+  var ARCHIVE_STEPS = ["a1", "a2", "a3", "a4", "a5"];
+  var archiveBtn = document.getElementById("archiveBtn");
+  var archiveReport = document.getElementById("archiveReport");
+  var ARCHIVE_EMPTY = '<div class="ar-empty" id="arEmpty">尚未執行，點上方按鈕模擬跨平台批次下架流程</div>';
+  var ARCHIVE_LOG_SAMPLES = [
+    { ok: true, handle: "bottle-500-legacy", note: "Shopify 下架成功 → 宜搭狀態已更新" },
+    { ok: true, handle: "canvas-bag-2025q2", note: "Shopify 下架成功 → 宜搭狀態已更新" },
+    { ok: false, handle: "powerbank-legacy-v1", note: "查無此 handle，已略過並記錄" }
+  ];
+  function setArchiveNode(k, st) { var n = document.querySelector('#archiveFlow .cf-chip[data-k="' + k + '"]'); if (n) { n.classList.remove("active", "done"); if (st) n.classList.add(st); } }
+  function playArchiveFlow() {
+    if (archiveBtn.disabled) return; archiveBtn.disabled = true;
+    document.querySelectorAll("#archiveFlow .cf-chip").forEach(function (n) { n.classList.remove("active", "done"); });
+    archiveReport.innerHTML = ARCHIVE_EMPTY;
+    var i = 0;
+    (function tick() {
+      if (i > 0) setArchiveNode(ARCHIVE_STEPS[i - 1], "done");
+      if (i < ARCHIVE_STEPS.length) { setArchiveNode(ARCHIVE_STEPS[i], "active"); i++; setTimeout(tick, 480); }
+      else {
+        archiveBtn.disabled = false;
+        archiveReport.innerHTML =
+          '<div class="ar-stats">' +
+          '<div class="ar-stat"><div class="ar-v">81</div><div class="ar-k">Excel 匯入筆數</div></div>' +
+          '<div class="ar-stat good"><div class="ar-v">79</div><div class="ar-k">Shopify 下架成功</div></div>' +
+          '<div class="ar-stat good"><div class="ar-v">79</div><div class="ar-k">宜搭已同步</div></div>' +
+          '<div class="ar-stat warn"><div class="ar-v">2</div><div class="ar-k">失敗／略過</div></div>' +
+          '</div>' +
+          '<div class="ar-log">' +
+          ARCHIVE_LOG_SAMPLES.map(function (l) {
+            return '<div class="ar-log-line ' + (l.ok ? "ok" : "bad") + '">' + (l.ok ? "✓" : "✗") + ' <b>' + escapeHtml(l.handle) + '</b> → ' + escapeHtml(l.note) + '</div>';
+          }).join("") +
+          '</div>';
+      }
+    })();
   }
-  archiveBtn.addEventListener("click", function () {
-    if (archiveBtn.disabled) return;
-    archiveBtn.disabled = true; speedupBadge.classList.remove("show");
-    seqFill.style.width = "0%"; parFill.style.width = "0%";
-    seqVal.textContent = "0.0 分"; parVal.textContent = "0.0 分";
-    var done = 0;
-    function checkDone() { done++; if (done === 2) { speedupBadge.classList.add("show"); archiveBtn.disabled = false; } }
-    /* 註：為兼顧展示節奏，動畫時長為壓縮示意（非真實 15.2 分鐘等比例等待），最終數值與加速倍率維持真實示意比例；
-       bar 寬度以 ARCHIVE_MAX（循序處理的 15.2 分）為共同基準，平行處理的 1.6 分只會填到約 10.5% 寬，長度差異才對得上數字差異 */
-    animateBar(parFill, parVal, 1.6, 1300, checkDone);
-    animateBar(seqFill, seqVal, 15.2, 4200, checkDone);
-  });
+  archiveBtn.addEventListener("click", playArchiveFlow);
 
   /* ================= 區塊4B：Collection 縮圖生成 Pipeline ================= */
   var CF_STEPS = ["prompt", "draw", "upload", "cwrite", "verify"];
   var cfBtn = document.getElementById("cfBtn"), cfHint = document.getElementById("cfHint");
   var cfThumbBefore = document.getElementById("cfThumbBefore"), cfThumbAfter = document.getElementById("cfThumbAfter");
   var CF_THUMBS = [
-    { icon: "🎁", name: "企業贈品精選", grad: "linear-gradient(135deg,#1d4ed8,#0891b2)" },
-    { icon: "🧵", name: "環保提袋系列", grad: "linear-gradient(135deg,#065f46,#22c55e)" },
-    { icon: "🔋", name: "科技配件禮盒", grad: "linear-gradient(135deg,#6d28d9,#a78bfa)" },
-    { icon: "☕", name: "辦公室小物", grad: "linear-gradient(135deg,#9a3412,#f59e0b)" }
+    { icon: "🎁", name: "企業贈品精選", grad: "linear-gradient(135deg,#1d4ed8,#0891b2)", handle: "corporate-gift-picks",
+      seoTitle: "企業贈品精選｜客製化禮贈品收藏 - Example Shop", seoMeta: "企業送禮、活動贈品、員工福利首選——保溫瓶、帆布袋、行動電源等熱門客製贈品，最小訂製量低，支援 LOGO 雷雕與印刷。",
+      alt: "企業贈品精選集合封面圖，展示保溫瓶、帆布袋與行動電源等熱門客製贈品組合" },
+    { icon: "🧵", name: "環保提袋系列", grad: "linear-gradient(135deg,#065f46,#22c55e)", handle: "eco-tote-series",
+      seoTitle: "環保提袋系列｜客製帆布托特包 - Example Shop", seoMeta: "12oz 厚磅純棉帆布托特包，可單面／雙面印刷企業圖樣，呼應 ESG 永續訴求，適合展會發放與會員禮。",
+      alt: "環保提袋系列集合封面圖，展示多款客製帆布托特包" },
+    { icon: "🔋", name: "科技配件禮盒", grad: "linear-gradient(135deg,#6d28d9,#a78bfa)", handle: "tech-gift-sets",
+      seoTitle: "科技配件禮盒｜客製行動電源與3C贈品 - Example Shop", seoMeta: "10000mAh PD 快充行動電源與熱門 3C 配件禮盒，鋁合金質感機身可雷雕 LOGO，適合科技業客戶禮與股東會贈品。",
+      alt: "科技配件禮盒集合封面圖，展示行動電源與3C周邊禮盒組合" },
+    { icon: "☕", name: "辦公室小物", grad: "linear-gradient(135deg,#9a3412,#f59e0b)", handle: "office-essentials",
+      seoTitle: "辦公室小物｜客製文具與桌面禮品 - Example Shop", seoMeta: "馬克杯、筆記本、桌面小物等辦公室實用贈品，小量客製、交期彈性，適合日常員工福利與訪客禮。",
+      alt: "辦公室小物集合封面圖，展示馬克杯與文具類桌面禮品" }
   ];
   var cfThumbIdx = 0;
+  var cfPageUrl = document.getElementById("cfPageUrl"), cfPageBody = document.getElementById("cfPageBody");
+  var cfSeoPanel = document.getElementById("cfSeoPanel");
+  var cfSeoTitle = document.getElementById("cfSeoTitle"), cfSeoMeta = document.getElementById("cfSeoMeta");
+  var cfSeoAlt = document.getElementById("cfSeoAlt"), cfSeoSchema = document.getElementById("cfSeoSchema");
   function setCF(k, st) { var n = document.querySelector('#chipFlow .cf-chip[data-k="' + k + '"]'); if (n) { n.classList.remove("active", "done"); if (st) n.classList.add(st); } }
   function playCF() {
     if (cfBtn.disabled) return; cfBtn.disabled = true; cfHint.textContent = "";
     document.querySelectorAll("#chipFlow .cf-chip").forEach(function (n) { n.classList.remove("active", "done"); });
     cfThumbAfter.className = "cf-thumb empty"; cfThumbAfter.innerHTML = "生成中…";
+    cfSeoPanel.classList.remove("show");
+    cfPageBody.innerHTML = '<div class="cf-page-empty">生成中，稍候將自動推送到集合頁…</div>';
     var i = 0;
     (function tick() {
       if (i > 0) setCF(CF_STEPS[i - 1], "done");
@@ -299,6 +327,17 @@
         cfThumbAfter.className = "cf-thumb"; cfThumbAfter.style.background = t.grad;
         cfThumbAfter.innerHTML = '<span class="cf-thumb-badge">✓ 已上線</span>' +
           '<span class="cf-thumb-ic">' + t.icon + '</span><span class="cf-thumb-nm">' + t.name + '</span>';
+        cfPageUrl.textContent = "example-shop.com/collections/" + t.handle;
+        cfPageBody.innerHTML =
+          '<div class="cf-page-banner" style="background:' + t.grad + '">' +
+          '<span class="cf-page-banner-ic">' + t.icon + '</span><span class="cf-page-banner-nm">' + escapeHtml(t.name) + '</span>' +
+          '</div>' +
+          '<div class="cf-page-grid"><div class="cf-page-sw"></div><div class="cf-page-sw"></div><div class="cf-page-sw"></div><div class="cf-page-sw"></div></div>';
+        cfSeoTitle.textContent = t.seoTitle;
+        cfSeoMeta.textContent = t.seoMeta;
+        cfSeoAlt.textContent = t.alt;
+        cfSeoSchema.textContent = "✓ CollectionPage + ItemList JSON-LD 已產出";
+        cfSeoPanel.classList.add("show");
       }
     })();
   }
@@ -351,20 +390,47 @@
   var STEPS2 = ["pbackup", "pslice", "pverify", "pwrite", "preread"];
   var runBtn2 = document.getElementById("runBtn2");
   var pgPatchBlock = document.getElementById("pgPatchBlock");
+  var pgDiffBlock = document.getElementById("pgDiffBlock");
   var PG_PATCH_EMPTY = '<div class="pg-patch-empty" id="pgPatchEmpty">〔待寫入〕點上方按鈕模擬安全發布，將插入下方保冷效果實測表格</div>';
   var PG_PATCH_ADDED = '<div class="pg-patch-added"><div class="pg-patch-added-inner">' +
     '<div class="pg-patch-banner"><span class="pg-patch-badge">＋ 新增區塊</span><b>保冷效果實測數據</b></div>' +
-    '<table><thead><tr><th>靜置時間</th><th>內容物溫度</th><th>保冷率</th></tr></thead><tbody>' +
-    '<tr><td>0 小時</td><td>4°C</td><td>100%</td></tr>' +
-    '<tr><td>6 小時</td><td>6°C</td><td>96%</td></tr>' +
-    '<tr><td>12 小時</td><td>8°C</td><td>91%</td></tr>' +
-    '<tr><td>24 小時</td><td>11°C</td><td>84%</td></tr>' +
-    '</tbody></table></div></div>';
+    '<div id="coolChart" class="pchart" style="height:180px"></div>' +
+    '<div class="pg-patch-note">靜置 <b>24 小時</b>仍維持 <b>84%</b> 保冷率（4°C → 11°C）</div>' +
+    '</div></div>';
+  var PGD_GAP = "（尚無保冷效果實測數據）";
+  var PGD_NEW = "＋ 保冷效果實測數據圖表";
+  function renderCoolChart() {
+    var hours = [0, 6, 12, 24], temp = [4, 6, 8, 11], retention = [100, 96, 91, 84];
+    var traces = [
+      {
+        type: "scatter", mode: "lines+markers", name: "保冷率",
+        x: hours, y: retention, yaxis: "y", fill: "tozeroy",
+        line: { color: COLORS.accent2, width: 2 }, marker: { size: 5, color: COLORS.accent2 },
+        fillcolor: "rgba(34,211,238,.12)",
+        hovertemplate: "靜置 %{x} 小時<br>保冷率 %{y}%<extra></extra>"
+      },
+      {
+        type: "scatter", mode: "lines+markers", name: "內容物溫度",
+        x: hours, y: temp, yaxis: "y2",
+        line: { color: COLORS.gold, width: 2, dash: "dot" }, marker: { size: 5, color: COLORS.gold },
+        hovertemplate: "靜置 %{x} 小時<br>溫度 %{y}°C<extra></extra>"
+      }
+    ];
+    var layout = mergeLayout({
+      margin: { t: 10, r: 34, b: 30, l: 34 }, showlegend: true,
+      legend: { orientation: "h", y: 1.2, font: { size: 9, color: COLORS.text3 } },
+      xaxis: { title: { text: "靜置時間（小時）", font: { size: 9, color: COLORS.text3 } }, tickvals: hours, tickfont: { size: 9, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.05)" },
+      yaxis: { title: { text: "保冷率 %", font: { size: 9, color: COLORS.accent2 } }, range: [0, 105], tickfont: { size: 9, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.06)" },
+      yaxis2: { title: { text: "°C", font: { size: 9, color: COLORS.gold } }, overlaying: "y", side: "right", range: [0, 20], tickfont: { size: 9, color: COLORS.text3 }, showgrid: false }
+    });
+    Plotly.newPlot("coolChart", traces, layout, PLY_CONFIG);
+  }
   function setNode2(k, st) { var n = document.querySelector('#pipe2 .node[data-k="' + k + '"]'); if (n) { n.classList.remove("active", "done"); if (st) n.classList.add(st); } }
   function playFlow2() {
     if (runBtn2.disabled) return; runBtn2.disabled = true;
     document.querySelectorAll("#pipe2 .node").forEach(function (n) { n.classList.remove("active", "done"); });
     pgPatchBlock.innerHTML = PG_PATCH_EMPTY;
+    pgDiffBlock.className = "pgd-gap"; pgDiffBlock.textContent = PGD_GAP;
     var i = 0;
     (function tick() {
       if (i > 0) setNode2(STEPS2[i - 1], "done");
@@ -372,6 +438,8 @@
       else {
         runBtn2.disabled = false;
         pgPatchBlock.innerHTML = PG_PATCH_ADDED;
+        pgDiffBlock.className = "pgd-new"; pgDiffBlock.textContent = PGD_NEW;
+        renderCoolChart();
       }
     })();
   }
@@ -419,62 +487,7 @@
     });
   });
 
-  /* ================= 區塊7：商品推薦：搜尋意圖分類器 ================= */
-  var INTENT_MAP = {
-    "保溫瓶水壺": ["保溫瓶", "保溫杯", "水壺", "隨行杯", "不鏽鋼杯", "tumbler", "bottle", "water bottle", "insulated bottle"],
-    "馬克杯": ["馬克杯", "咖啡杯", "陶瓷杯", "mug", "coffee mug", "ceramic mug"],
-    "帆布提袋": ["帆布袋", "托特包", "提袋", "環保袋", "tote", "tote bag", "canvas bag", "shopping bag"],
-    "禮盒組合": ["禮盒", "禮品組合", "套裝禮盒", "伴手禮", "gift box", "gift set", "bundle"],
-    "3C科技贈品": ["行動電源", "充電器", "隨身碟", "藍牙耳機", "滑鼠墊", "power bank", "charger", "usb", "earphone"],
-    "文具用品": ["筆記本", "原子筆", "文具", "便條紙", "notebook", "pen", "stationery"],
-    "服飾配件": ["帽子", "T恤", "圍巾", "襪子", "cap", "t-shirt", "scarf", "socks"],
-    "居家生活": ["抱枕", "毛毯", "居家用品", "收納盒", "cushion", "blanket", "home goods", "storage box"]
-  };
-  var intentInput = document.getElementById("intentInput"), intentBtn = document.getElementById("intentBtn");
-  var intentResult = document.getElementById("intentResult");
-  function normalizeIntent(s) { return (s || "").toLowerCase().replace(/　/g, " ").trim(); }
-  function classifyIntent(raw) {
-    var norm = normalizeIntent(raw);
-    if (!norm) return null;
-    var best = null, bestHits = 0, bestTerm = null;
-    for (var cat in INTENT_MAP) {
-      var hits = 0, term = null;
-      INTENT_MAP[cat].forEach(function (t) {
-        if (norm.indexOf(t.toLowerCase()) !== -1) { hits++; if (!term) term = t; }
-      });
-      if (hits > bestHits) { bestHits = hits; best = cat; bestTerm = term; }
-    }
-    if (bestHits === 0) return null;
-    return { category: best, hits: bestHits, term: bestTerm };
-  }
-  function highlightMatch(raw, term) {
-    if (!term) return escapeHtml(raw);
-    var idx = raw.toLowerCase().indexOf(term.toLowerCase());
-    if (idx === -1) return escapeHtml(raw);
-    return escapeHtml(raw.slice(0, idx)) + "<mark>" + escapeHtml(raw.slice(idx, idx + term.length)) + "</mark>" + escapeHtml(raw.slice(idx + term.length));
-  }
-  function renderIntentResult(raw) {
-    if (!raw || !raw.trim()) return;
-    var res = classifyIntent(raw);
-    if (!res) {
-      intentResult.innerHTML = '<p class="intent-empty">🙅 查無明確意圖，建議請使用者換個關鍵字，或改用分類頁瀏覽。</p>';
-      return;
-    }
-    var conf = Math.min(96, 55 + res.hits * 22);
-    intentResult.innerHTML =
-      '<div class="intent-card">' +
-      '<div class="ic-cat">✅ 判斷意圖分類：' + escapeHtml(res.category) + '</div>' +
-      '<div class="ic-term">命中關鍵字：' + highlightMatch(raw, res.term) + '</div>' +
-      '<div class="progress-row"><div class="pr-label">信心指數</div><div class="bar"><div class="fill conf" style="width:' + conf + '%"></div></div><div class="pr-val">' + conf + '%</div></div>' +
-      '</div>';
-  }
-  intentBtn.addEventListener("click", function () { renderIntentResult(intentInput.value); });
-  intentInput.addEventListener("keydown", function (e) { if (e.key === "Enter") renderIntentResult(intentInput.value); });
-  document.querySelectorAll("#quickChips .qchip").forEach(function (btn) {
-    btn.addEventListener("click", function () { intentInput.value = btn.dataset.q; renderIntentResult(btn.dataset.q); });
-  });
-
-  /* ================= 區塊8：搜尋過濾與加權再排序 ================= */
+  /* ================= 區塊7：搜尋過濾與加權再排序 ================= */
   var SEARCH_ITEMS = [
     { title: "客製保溫瓶 500ml｜304不鏽鋼真空保溫杯", vendor: "禮贈品工坊", type: "保溫瓶", metaSnippet: "304不鏽鋼雙層真空，保溫12小時，企業送禮首選。" },
     { title: "厚磅帆布托特包 12oz｜可印LOGO環保袋", vendor: "禮贈品工坊", type: "袋類", metaSnippet: "12oz厚磅純棉帆布，耐重耐用，ESG永續贈品。" },

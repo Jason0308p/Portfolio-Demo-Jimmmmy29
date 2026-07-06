@@ -127,6 +127,7 @@
     ];
     var reply = "", code = detectCode(text), cat = detectCategory(text),
         faq = detectFaq(text), fuzzy = isFuzzyGift(text);
+    var gateKey = code ? "code" : cat ? "cat" : fuzzy ? "fuzzy" : faq ? "faq" : "fallback";
 
     if (code) {
       steps.push({ k: "rag", ms: 4, label: "產品編號精準命中（讀冷資料、跳過向量搜尋）", side: "sheet" });
@@ -183,7 +184,7 @@
       reply = "感謝您的詢問！這題我先幫您記下並轉給專人，稍後為您回覆 🙋\n（您也可以換個說法，或提供產品編號／品項與數量）";
     }
     steps.push({ k: "reply", ms: 14, label: "回覆 LINE + 通知內部群組", side: null });
-    return { route: route, steps: steps, reply: reply };
+    return { route: route, steps: steps, reply: reply, gateKey: gateKey };
   }
 
   function findByCode(c) {
@@ -247,6 +248,11 @@
   function clearNodes() {
     document.querySelectorAll(".node").forEach(function (n) { n.classList.remove("active", "done"); });
     document.querySelectorAll(".ms").forEach(function (m) { m.textContent = ""; });
+    document.querySelectorAll(".gate-row").forEach(function (r) { r.classList.remove("gate-active"); });
+  }
+  function highlightGate(key) {
+    var row = document.querySelector('.gate-row[data-row="' + key + '"]');
+    if (row) row.classList.add("gate-active");
   }
   function setMs(k, ms) {
     var el = document.querySelector('.ms[data-ms="' + k + '"]');
@@ -315,6 +321,7 @@
       addMsg(plan.reply, "bot", plan.route);
       renderTimeline(plan.steps, total);
       setNode("reply", "done");
+      highlightGate(plan.gateKey);
       busy = false; sendBtn.disabled = false;
       inp.focus();
     }

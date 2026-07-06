@@ -108,59 +108,67 @@
   /* ---------- AI 生成內容（前端範本 + 插值，非真實 LLM 呼叫） ---------- */
   function cvText(j) {
     var kw = j.reason.replace(/^[^：]*：?/, "");
-    return "📝 客製 CV 重點 — " + j.title + "（" + j.co + "）\n\n" +
-      "・開場摘要句重寫：以「" + j.title + "」核心職責破題，第一句就點出可立即上手，避免泛用開場。\n" +
-      "・經歷排序調整：把與此職缺最相關的專案往前移，非相關經歷收進附錄或省略。\n" +
-      "・對齊 JD 關鍵字：" + kw + "，將對應關鍵字自然嵌入專案描述與技能區，而非硬塞列表。\n" +
-      "・量化成果框架：每條專案改寫成「動作 + 技術 + 可量化結果」（如效率提升 %、成本下降、處理規模），避免只寫職責敘述。\n" +
-      "・技能區重新分群：把此職缺高頻出現的技術（" + kw + "）移到技能清單最前面，弱相關技能歸類收尾。\n" +
-      "・專案亮點建議：挑一個規模／複雜度最接近此職缺的專案，展開成 2-3 行重點說明，其餘專案維持一行摘要。\n" +
-      "・常見地雷提醒：避免用與 JD 不一致的同義詞（如寫「資料處理」但 JD 明確寫「ETL」），優先沿用 JD 原詞以提高關鍵字比對命中率。\n\n" +
-      "🎯 一句版求職信開場：「我曾用相近技術解決過類似問題，能為貴司的 " + j.title + " 職務快速上手並貢獻成果。」";
+    return {
+      kind: "cv",
+      head: "📝 客製 CV 重點 — " + j.title + "（" + j.co + "）",
+      items: [
+        "<b>開場摘要句重寫：</b>以「" + j.title + "」核心職責破題，第一句就點出可立即上手，避免泛用開場。",
+        "<b>經歷排序調整：</b>把與此職缺最相關的專案往前移，非相關經歷收進附錄或省略。",
+        "<b>對齊 JD 關鍵字：</b>" + kw + "，將對應關鍵字自然嵌入專案描述與技能區，而非硬塞列表。",
+        "<b>量化成果框架：</b>每條專案改寫成「動作 + 技術 + 可量化結果」（如效率提升 %、成本下降、處理規模），避免只寫職責敘述。",
+        "<b>技能區重新分群：</b>把此職缺高頻出現的技術（" + kw + "）移到技能清單最前面，弱相關技能歸類收尾。",
+        "<b>專案亮點建議：</b>挑一個規模／複雜度最接近此職缺的專案，展開成 2-3 行重點說明，其餘專案維持一行摘要。",
+        "<b>常見地雷提醒：</b>避免用與 JD 不一致的同義詞（如寫「資料處理」但 JD 明確寫「ETL」），優先沿用 JD 原詞以提高關鍵字比對命中率。"
+      ],
+      tail: "🎯 一句版求職信開場：「我曾用相近技術解決過類似問題，能為貴司的 " + j.title + " 職務快速上手並貢獻成果。」"
+    };
   }
   function qaText(j) {
-    return "💬 面試 QA — " + j.title + "（" + j.co + "）\n\n" +
-      "Q1.（行為面）請簡述一個與此職務最相關的專案？\n" +
-      "→ 用 STAR 法：情境（S）先給背景與規模，任務（T）點出你的角色與目標，行動（A）具體到技術選型與決策，結果（R）附量化數字（時間／成本／規模改善）。\n\n" +
-      "Q2.（技術面）遇到資料或系統異常時你怎麼排查？\n" +
-      "→ 先定位（分辨資料問題或邏輯問題）、再驗證假設（用最小案例重現）、最後補上監控或測試避免再犯，強調「事後有沒有留下防範機制」比單次解法更重要。\n\n" +
-      "Q3.（行為面）為何想加入「" + j.co + "」？\n" +
-      "→ 連結該公司產品方向與自身技能重疊處，具體提到 JD 中吸引你的一兩個要點，避免只講「成長機會」這類空泛答案。\n\n" +
-      "Q4.（技術／職務面）針對「" + j.title + "」這個角色，你會如何規劃前 30-60-90 天？\n" +
-      "→ 分三階段：先熟悉現有系統與資料流（30 天），再挑一個小範圍問題實際貢獻（60 天），最後提出可衡量的改善提案（90 天）。\n\n" +
-      "Q5.（行為面）說一個你跟團隊意見不合、後來如何解決的經驗？\n" +
-      "→ 聚焦在「你如何用資料或小試驗說服對方」而非誰對誰錯，展現合作與溝通而非單純堅持己見。\n\n" +
-      "Q6.（技術面）你會怎麼評估自己做出的方案是否成功？\n" +
-      "→ 提前定義可量化的成功指標（如處理時間、錯誤率、使用者滿意度），並說明若指標沒達標你會怎麼調整。";
+    return {
+      kind: "qa",
+      head: "💬 面試 QA — " + j.title + "（" + j.co + "）",
+      pairs: [
+        { q: "Q1.（行為面）請簡述一個與此職務最相關的專案？", a: "用 STAR 法：情境（S）先給背景與規模，任務（T）點出你的角色與目標，行動（A）具體到技術選型與決策，結果（R）附量化數字（時間／成本／規模改善）。" },
+        { q: "Q2.（技術面）遇到資料或系統異常時你怎麼排查？", a: "先定位（分辨資料問題或邏輯問題）、再驗證假設（用最小案例重現）、最後補上監控或測試避免再犯，強調「事後有沒有留下防範機制」比單次解法更重要。" },
+        { q: "Q3.（行為面）為何想加入「" + j.co + "」？", a: "連結該公司產品方向與自身技能重疊處，具體提到 JD 中吸引你的一兩個要點，避免只講「成長機會」這類空泛答案。" },
+        { q: "Q4.（技術／職務面）針對「" + j.title + "」這個角色，你會如何規劃前 30-60-90 天？", a: "分三階段：先熟悉現有系統與資料流（30 天），再挑一個小範圍問題實際貢獻（60 天），最後提出可衡量的改善提案（90 天）。" },
+        { q: "Q5.（行為面）說一個你跟團隊意見不合、後來如何解決的經驗？", a: "聚焦在「你如何用資料或小試驗說服對方」而非誰對誰錯，展現合作與溝通而非單純堅持己見。" },
+        { q: "Q6.（技術面）你會怎麼評估自己做出的方案是否成功？", a: "提前定義可量化的成功指標（如處理時間、錯誤率、使用者滿意度），並說明若指標沒達標你會怎麼調整。" }
+      ]
+    };
   }
 
   /* ---------- AI 生成內容 — 英文版（結構與深度對齊中文版） ---------- */
   function cvText_en(j) {
     var kw = j.reason.replace(/^[^：]*：?/, "");
-    return "📝 Tailored CV Highlights — " + j.title + " (" + j.co + ")\n\n" +
-      "• Rewrite the opening summary line to lead with the core responsibilities of \"" + j.title + "\", signaling immediate readiness instead of a generic intro.\n" +
-      "• Reorder experience: move the most relevant project to the top; push unrelated roles to an appendix or drop them.\n" +
-      "• Align with JD keywords: " + kw + " — weave these terms naturally into project descriptions and the skills section rather than listing them bluntly.\n" +
-      "• Reframe achievements with a quantified structure: \"action + technology + measurable result\" (efficiency gain %, cost reduction, scale handled) instead of plain duty statements.\n" +
-      "• Regroup the skills section: move the technologies this role emphasizes (" + kw + ") to the front; group weaker-fit skills at the end.\n" +
-      "• Pick one project to expand: choose the project closest in scale/complexity to this role and expand it to 2-3 lines, keeping others as one-liners.\n" +
-      "• Common mistake to avoid: don't swap in synonyms that drift from the JD wording (e.g. \"data processing\" when the JD says \"ETL\") — reuse the JD's own terms to improve keyword matching.\n\n" +
-      "🎯 One-line cover letter opener: \"I've solved similar problems with comparable technology before, and can ramp up quickly to contribute to your " + j.title + " role.\"";
+    return {
+      kind: "cv",
+      head: "📝 Tailored CV Highlights — " + j.title + " (" + j.co + ")",
+      items: [
+        "<b>Rewrite the opening summary line</b> to lead with the core responsibilities of \"" + j.title + "\", signaling immediate readiness instead of a generic intro.",
+        "<b>Reorder experience:</b> move the most relevant project to the top; push unrelated roles to an appendix or drop them.",
+        "<b>Align with JD keywords:</b> " + kw + " — weave these terms naturally into project descriptions and the skills section rather than listing them bluntly.",
+        "<b>Reframe achievements</b> with a quantified structure: \"action + technology + measurable result\" (efficiency gain %, cost reduction, scale handled) instead of plain duty statements.",
+        "<b>Regroup the skills section:</b> move the technologies this role emphasizes (" + kw + ") to the front; group weaker-fit skills at the end.",
+        "<b>Pick one project to expand:</b> choose the project closest in scale/complexity to this role and expand it to 2-3 lines, keeping others as one-liners.",
+        "<b>Common mistake to avoid:</b> don't swap in synonyms that drift from the JD wording (e.g. \"data processing\" when the JD says \"ETL\") — reuse the JD's own terms to improve keyword matching."
+      ],
+      tail: "🎯 One-line cover letter opener: \"I've solved similar problems with comparable technology before, and can ramp up quickly to contribute to your " + j.title + " role.\""
+    };
   }
   function qaText_en(j) {
-    return "💬 Interview Q&A — " + j.title + " (" + j.co + ")\n\n" +
-      "Q1. (behavioral) Walk me through a project most relevant to this role.\n" +
-      "→ Use the STAR method: Situation gives scope/context, Task frames your role and goal, Action gets specific about technical choices and decisions, Result includes a quantified number (time saved, cost, scale improved).\n\n" +
-      "Q2. (technical) How do you debug a data or system anomaly?\n" +
-      "→ Localize first (data issue vs. logic issue), validate the hypothesis with a minimal reproducible case, then add monitoring or tests to prevent recurrence — emphasize the follow-up safeguard, not just the one-time fix.\n\n" +
-      "Q3. (behavioral) Why do you want to join \"" + j.co + "\"?\n" +
-      "→ Connect the company's product direction to your own skill set, citing one or two specifics from the JD that genuinely drew you in — avoid vague answers like \"growth opportunity.\"\n\n" +
-      "Q4. (technical / role-specific) How would you plan your first 30-60-90 days as a \"" + j.title + "\"?\n" +
-      "→ Three phases: understand the existing system and data flow (30 days), contribute to a small well-scoped problem (60 days), then propose a measurable improvement (90 days).\n\n" +
-      "Q5. (behavioral) Describe a time you disagreed with your team and how it was resolved.\n" +
-      "→ Focus on how you used data or a small experiment to persuade the other side, not on who was \"right\" — this shows collaboration over stubbornness.\n\n" +
-      "Q6. (technical) How do you evaluate whether a solution you built actually succeeded?\n" +
-      "→ Define measurable success metrics up front (processing time, error rate, user satisfaction), and explain how you'd adjust course if the metrics fall short.";
+    return {
+      kind: "qa",
+      head: "💬 Interview Q&A — " + j.title + " (" + j.co + ")",
+      pairs: [
+        { q: "Q1. (behavioral) Walk me through a project most relevant to this role.", a: "Use the STAR method: Situation gives scope/context, Task frames your role and goal, Action gets specific about technical choices and decisions, Result includes a quantified number (time saved, cost, scale improved)." },
+        { q: "Q2. (technical) How do you debug a data or system anomaly?", a: "Localize first (data issue vs. logic issue), validate the hypothesis with a minimal reproducible case, then add monitoring or tests to prevent recurrence — emphasize the follow-up safeguard, not just the one-time fix." },
+        { q: "Q3. (behavioral) Why do you want to join \"" + j.co + "\"?", a: "Connect the company's product direction to your own skill set, citing one or two specifics from the JD that genuinely drew you in — avoid vague answers like \"growth opportunity.\"" },
+        { q: "Q4. (technical / role-specific) How would you plan your first 30-60-90 days as a \"" + j.title + "\"?", a: "Three phases: understand the existing system and data flow (30 days), contribute to a small well-scoped problem (60 days), then propose a measurable improvement (90 days)." },
+        { q: "Q5. (behavioral) Describe a time you disagreed with your team and how it was resolved.", a: "Focus on how you used data or a small experiment to persuade the other side, not on who was \"right\" — this shows collaboration over stubbornness." },
+        { q: "Q6. (technical) How do you evaluate whether a solution you built actually succeeded?", a: "Define measurable success metrics up front (processing time, error rate, user satisfaction), and explain how you'd adjust course if the metrics fall short." }
+      ]
+    };
   }
 
   /* ---------- 渲染職缺看板（依評分分組摺疊） ---------- */
@@ -217,17 +225,49 @@
   var genCV = document.getElementById("genCV");
   var genQA = document.getElementById("genQA");
   var typing = false;
-  function typeOut(text) {
+  function typeOut(data) {
     if (typing) return; typing = true; genCV.disabled = true; genQA.disabled = true;
-    aiOut.textContent = ""; var i = 0;
-    (function step() {
-      if (i <= text.length) {
-        aiOut.textContent = text.slice(0, i);
-        var cur = document.createElement("span"); cur.className = "cursor"; cur.textContent = "▌";
-        aiOut.appendChild(cur);
-        i += 2; setTimeout(step, 10);
-      } else { aiOut.textContent = text; typing = false; genCV.disabled = false; genQA.disabled = false; }
-    })();
+    aiOut.innerHTML = "";
+
+    var head = document.createElement("div");
+    head.className = "gen-head reveal"; head.textContent = data.head;
+    aiOut.appendChild(head);
+
+    var rows = data.kind === "qa"
+      ? data.pairs.map(function (p) {
+          var row = document.createElement("div"); row.className = "qa-pair reveal";
+          row.innerHTML = '<div class="qa-q">' + p.q + '</div><div class="qa-a">→ ' + p.a + '</div>';
+          return row;
+        })
+      : data.items.map(function (it) {
+          var li = document.createElement("li"); li.className = "reveal"; li.innerHTML = it;
+          return li;
+        });
+
+    var list = null;
+    if (data.kind !== "qa") { list = document.createElement("ul"); list.className = "gen-list"; aiOut.appendChild(list); }
+
+    var tail = null;
+    if (data.kind === "cv") { tail = document.createElement("div"); tail.className = "gen-tail reveal"; tail.textContent = data.tail; }
+
+    var i = 0;
+    function revealNext() {
+      requestAnimationFrame(function () { head.classList.add("in"); });
+      if (i < rows.length) {
+        var row = rows[i];
+        if (list) list.appendChild(row); else aiOut.appendChild(row);
+        requestAnimationFrame(function () { row.classList.add("in"); });
+        i++; setTimeout(revealNext, 260);
+      } else if (tail && !tail.parentNode) {
+        aiOut.appendChild(tail);
+        requestAnimationFrame(function () { tail.classList.add("in"); });
+        setTimeout(finishTyping, 260);
+      } else {
+        finishTyping();
+      }
+    }
+    function finishTyping() { typing = false; genCV.disabled = false; genQA.disabled = false; }
+    revealNext();
   }
   function needSel() {
     aiOut.innerHTML = '<div class="ai-placeholder">請先從左側點選一個職缺 🙋</div>';

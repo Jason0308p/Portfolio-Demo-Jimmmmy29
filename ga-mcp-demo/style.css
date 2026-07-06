@@ -212,10 +212,25 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .pchart-sm{height:280px}
 .pchart-md{height:320px}
 .pchart-lg{height:360px}
+.pchart-xs{height:190px}
 .pchart-row{display:flex;gap:16px;flex-wrap:wrap}
 .pchart-row .pchart-half{flex:1 1 280px;min-width:260px}
 .pchart-h4{margin:0 0 8px;font-size:12.5px;font-weight:700;color:var(--text2);text-align:center}
 .chart-note{font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6}
+
+.durcat-overview{margin-bottom:16px}
+.durcat-cats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.durcat-cell h5{margin:0 0 6px;font-size:11px;font-weight:700;color:var(--text2);text-align:center}
+.durcat-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.durcat-chip{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text2);background:var(--card2);border:1px solid var(--border);border-radius:999px;padding:5px 11px}
+.durcat-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.durcat-val{color:var(--text);font-weight:700;font-family:var(--mono)}
+@media(max-width:820px){
+  .durcat-cats{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:520px){
+  .durcat-cats{grid-template-columns:repeat(2,1fr)}
+}
 
 .kwt{width:100%;border-collapse:collapse;font-size:12.5px;min-width:460px}
 .kwt th{text-align:right;color:var(--text3);font-weight:600;font-size:11px;padding:6px 10px;border-bottom:1px solid var(--border)}
@@ -245,9 +260,8 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .diff-row.del{border-left-color:var(--red)} .diff-row.del .op{color:var(--red)}
 .diff-row .nm{color:var(--text)}
 .diff-row .note{color:var(--text3);font-size:11px;margin-left:auto;white-space:nowrap}
-.gtm-api-note,.gtm-oauth-note{margin:14px 0 0}
-.gtm-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-@media(max-width:820px){.gtm-stats{grid-template-columns:1fr}}
+.gtm-api-note{margin:14px 0 0}
+.gtm-stats{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
 code{font-family:var(--mono);background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:.92em;color:var(--accent2)}
 
 /* ===== 手機 RWD 修正 ===== */
@@ -267,4 +281,5 @@ code{font-family:var(--mono);background:var(--card2);border:1px solid var(--bord
   }
   .pchart-lg{height:300px}
   .pchart-md{height:280px}
+  .pchart-grid6{height:460px}
 }

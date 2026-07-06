@@ -27,7 +27,7 @@ python -m http.server 8000   # 開 http://localhost:8000
 `多平台爬蟲 (104 / 1111)` · `Web Scraping` · `反爬處理` · `規則 + AI 評分` · `JD 解析` ·
 `AI 生成 (CV / 面試 QA)` · `LLM` · `Notion API` · `去重同步` · `Pipeline 設計` · `Python`
 
-## 在這個專案我實際做了什麼（高層說明）
+## 專案實作項目（高層說明）
 
 - 🕷️ **多來源爬蟲 pipeline**：104 / 1111 等多平台，處理 Cloudflare cookie、參數差異與分頁，輸出統一格式
 - ⭐ **規則 + AI 雙層評分**：純規則秒級評分（無需 API）＋ AI 對高分職缺加值，分 A / B / C

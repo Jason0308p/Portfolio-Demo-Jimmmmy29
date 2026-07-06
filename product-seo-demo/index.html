@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Shopify 商品上架與 SEO/GEO 自動化 — 展示用 (MVP)</title>
-<meta name="description" content="以 Shopify CLI 與 Admin API（GraphQL）驅動商品/集合批次管理、AI 生成 SEO/GEO 商品內容、頁面產生器與安全發布、部落格內容生成、商品推薦意圖分類、搜尋詞彙優化與加權再排序的電商自動化作品集展示；宜搭(Yida)表單作為下架流程下游整合點。">
+<meta name="description" content="以 Shopify CLI 與 Admin API（GraphQL）驅動商品/集合批次管理、AI 生成 SEO/GEO 商品內容、頁面產生器與安全發布、部落格內容生成、搜尋詞彙優化與加權再排序的電商自動化作品集展示；宜搭(Yida)表單作為下架流程下游整合點。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@
 
   <div class="hero sec-card">
     <h1>電商商品上架與 SEO/GEO 自動化（Shopify）</h1>
-    <p>以 <b>Shopify CLI 與 Admin API（GraphQL）</b>為核心，涵蓋<b>商品/集合批次管理、AI 生成 SEO/GEO 商品內容、頁面產生器與安全發布、部落格內容生成、商品推薦意圖分類、搜尋詞彙優化與加權再排序</b>；
+    <p>以 <b>Shopify CLI 與 Admin API（GraphQL）</b>為核心，涵蓋<b>商品/集合批次管理、AI 生成 SEO/GEO 商品內容、頁面產生器與安全發布、部落格內容生成、搜尋詞彙優化與加權再排序</b>；
        官方 <b>Shopify dev-mcp</b> 輔助開發時查詢 schema，<b>宜搭 (Yida)</b> 表單則作為下架流程下游同步的其中一個整合點。本頁為<b>純前端展示</b>。</p>
     <div class="tags">
       <span class="tag cool">Shopify CLI</span>
@@ -34,7 +34,6 @@
       <span class="tag">AI SEO/GEO 內容生成</span>
       <span class="tag">批次自動化 (ThreadPoolExecutor)</span>
       <span class="tag">頁面產生器 / 安全發布</span>
-      <span class="tag">商品推薦 / 意圖分類</span>
       <span class="tag">搜尋詞彙優化 / 加權再排序</span>
       <span class="tag">JSON-LD 結構化資料</span>
       <span class="tag">宜搭 (Yida) 表單同步</span>
@@ -134,11 +133,19 @@
     <button id="genBtn">✨ 執行 AI 上架處理</button>
     <button id="postBtn" class="alt" disabled>📣 發佈到社群並回收數據</button>
   </div>
-  </section>
 
-  <!-- ===== 社群成效 ===== -->
-  <div class="social-out sec-card" id="socialOut">
-    <h2 class="sec" style="margin-top:0">n8n 社群貼文與回收成效</h2>
+  <h3 class="sub-h">商品頁面即時預覽：從無到有生成上線</h3>
+  <div class="mac-window pp-window">
+    <div class="mac-bar"><span class="mac-dot r"></span><span class="mac-dot y"></span><span class="mac-dot g"></span>
+      <span class="mac-url" id="ppUrl">example-shop.com/products/…</span></div>
+    <div class="pp-body" id="ppBody">
+      <div class="pp-empty">尚未生成，點擊上方「執行 AI 上架處理」後，這裡會即時顯示商品頁面實際上線的樣子</div>
+    </div>
+  </div>
+
+  <!-- ===== 社群成效（沿用 AI 上架流程的產出，收在同一張卡片內） ===== -->
+  <div class="social-out" id="socialOut">
+    <h3 class="sub-h">n8n 社群貼文與回收成效</h3>
     <div class="sp">
       <div class="sp-head"><div class="sp-av">🛍️</div><div class="sp-name">禮品官方<span>由 n8n 自動發佈 · 剛剛</span></div></div>
       <div class="sp-body" id="spBody"></div>
@@ -151,22 +158,29 @@
     </div>
     <p class="back-note">＊ 成效數字由 n8n 回收後寫回追蹤表。</p>
   </div>
+  </section>
 
   <!-- ===== 區塊4：商品／分類批次管理 ===== -->
   <section class="sec-card">
   <h2 class="sec">📦 商品／分類批次管理</h2>
   <div class="subgrid">
     <div class="subcard">
-      <h3>批次下架效能對比</h3>
-      <p class="sc-desc">Excel 掉單／停產清單匯入 → <code>productUpdate(status: ARCHIVED)</code>，以 <b>ThreadPoolExecutor</b> 平行處理＋批次 <code>handle:a OR handle:b</code> 查詢取代逐筆查詢；下架同時同步宜搭表單狀態（下游整合，非獨立主線）。</p>
-      <div id="archiveSpeedChart" style="height:240px"></div>
-      <div class="progress-group">
-        <div class="progress-row"><div class="pr-label">循序處理（逐筆）</div><div class="bar"><div class="fill seq" id="seqFill"></div></div><div class="pr-val" id="seqVal">0.0 分</div></div>
-        <div class="progress-row"><div class="pr-label">平行處理（ThreadPoolExecutor）</div><div class="bar"><div class="fill par" id="parFill"></div></div><div class="pr-val" id="parVal">0.0 分</div></div>
+      <h3>批次下架：跨平台整合流程</h3>
+      <p class="sc-desc">Excel 掉單／停產清單（本地）匯入 → <b>Shopify</b> 批次查詢＋<code>productUpdate(status: ARCHIVED)</code>（以 ThreadPoolExecutor 平行處理＋批次 <code>handle:a OR handle:b</code> 查詢取代逐筆）→ 同步<b>宜搭(Yida)</b>表單狀態 → 寫回本地回饋報表，橫跨三個系統的整合鏈路。</p>
+      <div class="chip-flow archive-flow" id="archiveFlow">
+        <div class="cf-chip cf-local" data-k="a1"><span class="cf-ic">📄</span>Excel 清單匯入<span class="cf-plat">本地</span></div>
+        <div class="cf-arrow">→</div>
+        <div class="cf-chip cf-shopify" data-k="a2"><span class="cf-ic">🔍</span>批次查詢商品<span class="cf-plat">Shopify</span></div>
+        <div class="cf-arrow">→</div>
+        <div class="cf-chip cf-shopify" data-k="a3"><span class="cf-ic">🗑️</span>下架 ARCHIVED<span class="cf-plat">Shopify</span></div>
+        <div class="cf-arrow">→</div>
+        <div class="cf-chip cf-yida" data-k="a4"><span class="cf-ic">📋</span>同步表單狀態<span class="cf-plat">宜搭</span></div>
+        <div class="cf-arrow">→</div>
+        <div class="cf-chip cf-local" data-k="a5"><span class="cf-ic">📊</span>產出回饋報表<span class="cf-plat">本地</span></div>
       </div>
-      <div class="runbar">
-        <button id="archiveBtn">▶ 模擬批次下架（81筆）</button>
-        <span class="speedup-badge" id="speedupBadge">⚡ 約9.5倍加速</span>
+      <div class="runbar"><button id="archiveBtn">▶ 模擬批次下架（81筆）</button></div>
+      <div class="archive-report" id="archiveReport">
+        <div class="ar-empty" id="arEmpty">尚未執行，點上方按鈕模擬跨平台批次下架流程</div>
       </div>
     </div>
     <div class="subcard">
@@ -195,6 +209,22 @@
         </div>
       </div>
       <div class="runbar"><button id="cfBtn">▶ 模擬生成</button><span class="runhint" id="cfHint"></span></div>
+
+      <div class="mac-window cf-page-window">
+        <div class="mac-bar"><span class="mac-dot r"></span><span class="mac-dot y"></span><span class="mac-dot g"></span>
+          <span class="mac-url" id="cfPageUrl">example-shop.com/collections/…</span></div>
+        <div class="cf-page-body" id="cfPageBody">
+          <div class="cf-page-empty">尚未推送到集合頁，點上方「模擬生成」查看實際上線畫面</div>
+        </div>
+      </div>
+      <div class="cf-seo-panel" id="cfSeoPanel">
+        <div class="cf-seo-grid">
+          <div class="cf-seo-card"><h4>🏷️ Collection Title (SEO)</h4><p id="cfSeoTitle">—</p></div>
+          <div class="cf-seo-card"><h4>📝 Meta Description</h4><p id="cfSeoMeta">—</p></div>
+          <div class="cf-seo-card"><h4>🖼️ 圖片 Alt Text</h4><p id="cfSeoAlt">—</p></div>
+          <div class="cf-seo-card"><h4>🧩 Schema</h4><p id="cfSeoSchema">—</p></div>
+        </div>
+      </div>
     </div>
   </div>
   </section>
@@ -202,6 +232,8 @@
   <!-- ===== 區塊5：頁面產生器與安全發布 ===== -->
   <section class="sec-card">
   <h2 class="sec">🧱 頁面產生器與安全發布</h2>
+
+  <h3 class="sub-h" style="margin-top:0;padding-top:0;border-top:none">① 頁面模板預覽</h3>
   <div class="pg-tabs" id="pgTabs">
     <button class="pg-tab active" data-type="guide">📘 購買指南型</button>
     <button class="pg-tab" data-type="landing">🏭 產業著陸頁型</button>
@@ -212,6 +244,9 @@
       <span class="mac-url" id="pgWireUrl">example-shop.com/pages/insulated-bottle-buying-guide</span></div>
     <div class="pg-wire-body" id="pgWireBody"></div>
   </div>
+
+  <h3 class="sub-h">② 安全發布 Pipeline</h3>
+  <p class="sc-desc">上方模板由下列模組拼接而成；寫入前一律先備份現有內容、只對有變動的模組產生精準切片 patch 並驗證，通過才寫入，不整頁覆寫。</p>
   <div class="pill-row">
     <span class="pill">Hero</span><span class="pill">目錄 TOC</span><span class="pill">FAQ</span><span class="pill">CTA</span><span class="pill">比較表</span><span class="pill">Sticky Bar</span>
   </div>
@@ -224,6 +259,35 @@
   </div>
   <div class="runbar"><button id="runBtn2">▶ 模擬安全發布</button></div>
 
+  <h3 class="sub-h">③ 改版前後對比：網站畫面實際變化</h3>
+  <div class="pg-diff-row">
+    <div class="pg-diff-side">
+      <div class="pg-diff-label">修改前</div>
+      <div class="pg-diff-thumb">
+        <div class="pgd-line w70"></div>
+        <div class="pgd-line w95"></div>
+        <div class="pgd-line w60"></div>
+        <div class="pgd-gap">（尚無保冷效果實測數據）</div>
+        <div class="pgd-line w80"></div>
+        <div class="pgd-line w50"></div>
+      </div>
+    </div>
+    <div class="pg-diff-arrow">→</div>
+    <div class="pg-diff-side">
+      <div class="pg-diff-label">修改後</div>
+      <div class="pg-diff-thumb" id="pgDiffAfter">
+        <div class="pgd-line w70"></div>
+        <div class="pgd-line w95"></div>
+        <div class="pgd-line w60"></div>
+        <div class="pgd-gap" id="pgDiffBlock">（尚無保冷效果實測數據）</div>
+        <div class="pgd-line w80"></div>
+        <div class="pgd-line w50"></div>
+      </div>
+    </div>
+  </div>
+  <p class="back-note">點上方「模擬安全發布」，右側「修改後」縮圖會即時反映自動化寫入的新內容。</p>
+
+  <h3 class="sub-h">④ 發布結果：即時頁面預覽</h3>
   <div class="pg-preview">
     <div class="pg-preview-bar"><span class="pg-dot"></span><span class="pg-dot"></span><span class="pg-dot"></span><span class="pg-url">example-shop.com/pages/insulated-bottle-buying-guide</span></div>
     <div class="pg-preview-body">
@@ -258,26 +322,7 @@
   </div>
   </section>
 
-  <!-- ===== 區塊7：商品推薦：搜尋意圖分類器 ===== -->
-  <section class="sec-card">
-  <h2 class="sec">🎯 商品推薦：搜尋意圖分類器</h2>
-  <div class="intent-input-row">
-    <input type="text" id="intentInput" placeholder="輸入商品需求關鍵字，如：保溫杯、tote bag、行動電源…">
-    <button id="intentBtn">🔍 判斷意圖</button>
-  </div>
-  <div class="quick-chips" id="quickChips">
-    <button class="qchip" data-q="保溫杯">保溫杯</button>
-    <button class="qchip" data-q="tote bag">tote bag</button>
-    <button class="qchip" data-q="行動電源">行動電源</button>
-    <button class="qchip" data-q="禮盒">禮盒</button>
-    <button class="qchip" data-q="馬克杯">馬克杯</button>
-  </div>
-  <div class="intent-result" id="intentResult">
-    <p class="intent-empty" id="intentEmpty">輸入關鍵字或點擊上方快選，即時比對意圖分類。</p>
-  </div>
-  </section>
-
-  <!-- ===== 區塊8：搜尋優化：詞彙分類與加權再排序 ===== -->
+  <!-- ===== 區塊7：搜尋優化：詞彙分類與加權再排序 ===== -->
   <section class="sec-card">
   <h2 class="sec">🔎 搜尋優化：詞彙分類與加權再排序</h2>
   <p class="sc-desc">原生 Shopify 搜尋是純字串比對，容易把「巧合命中」的雜訊也算進結果。我們加一層<b>詞彙分類規則</b>（同義詞庫／停用詞／單位正規化）先把查詢改寫乾淨，再用加權再排序把最相關的結果排到最前面。</p>
@@ -327,7 +372,7 @@
   <div class="search-list" id="searchList"></div>
   </section>
 
-  <!-- ===== 區塊9：SEO/GEO 結構化資料與 GEO 策略 ===== -->
+  <!-- ===== 區塊8：SEO/GEO 結構化資料與 GEO 策略 ===== -->
   <section class="sec-card">
   <h2 class="sec">🧩 SEO/GEO 結構化資料與 GEO 策略</h2>
   <div class="subgrid">
@@ -390,17 +435,16 @@
   </details>
 
   <details class="acc acc-lg" open>
-    <summary><span class="ic">🛠️</span> 在這個專案我實際做了什麼<span class="cnt">7 項</span></summary>
+    <summary><span class="ic">🛠️</span> 專案實作項目<span class="cnt">6 項</span></summary>
     <div class="abody">
       <div class="didblock" style="border:none;padding:0;background:none">
-        <p class="lead">獨立完成的 <b>Shopify 商品自動化</b>：以 Shopify CLI＋Admin GraphQL 驅動商品／集合／頁面／部落格批次管理，官方 dev-mcp 輔助開發查詢，並把宜搭表單接為下架流程的下游同步，加上商品推薦意圖分類與搜尋詞彙優化提升商品可被找到的機率。</p>
+        <p class="lead">獨立完成的 <b>Shopify 商品自動化</b>：以 Shopify CLI＋Admin GraphQL 驅動商品／集合／頁面／部落格批次管理，官方 dev-mcp 輔助開發查詢，並把宜搭表單接為下架流程的下游同步，加上搜尋詞彙優化提升商品可被找到的機率。</p>
         <ul class="did">
           <li><div class="h"><span class="ic">🧰</span>Shopify CLI＋Admin GraphQL 批次工具</div><p class="d">用 Shopify CLI 執行 Admin GraphQL 查詢／異動（<code>--query-file</code>／<code>--variable-file</code>／<code>--allow-mutations</code>），並串官方 <b>dev-mcp</b> 輔助查詢 schema 與文件，加速開發除錯。</p></li>
           <li><div class="h"><span class="ic">⚡</span>批次下架效能優化＋宜搭下游同步</div><p class="d">Excel 名單觸發批次 <code>productUpdate(status:ARCHIVED)</code>，序列處理改成 ThreadPoolExecutor 平行處理＋批次 handle 查詢，示意效能約 <b>15 分鐘 → 1.6 分鐘</b>，下架同時同步宜搭表單狀態。</p></li>
           <li><div class="h"><span class="ic">🖼️</span>Collection 縮圖 AI 生成 Pipeline</div><p class="d">Prompt 生成 → AI 繪圖 → <code>stagedUploadsCreate</code> → <code>collectionUpdate</code> → 重新讀取驗證上線，全流程自動化不需人工上傳。</p></li>
           <li><div class="h"><span class="ic">🧱</span>頁面產生器（兩套版型＋區塊庫＋安全發布）</div><p class="d">購買指南型／產業著陸頁型兩套版型，共用 Hero／TOC／FAQ／CTA／比較表／Sticky Bar 區塊庫，發布走備份→切片 patch→驗證→寫入→重新讀取驗證，不整頁覆寫。</p></li>
           <li><div class="h"><span class="ic">📝</span>部落格文章與 SEO/GEO 內容規則</div><p class="d">生成文章標題與 <b>70–80 全形字</b> meta description，規則過濾不捏造規格數字、避免句式公式化重複。</p></li>
-          <li><div class="h"><span class="ic">🎯</span>商品推薦：搜尋意圖分類器</div><p class="d">關鍵字比對意圖分類（保溫瓶／馬克杯／帆布提袋等約 8 類同義詞庫），輸入需求詞即可判斷最可能對應的商品分類與信心指數，用於原生搜尋結果上方的分類推薦。</p></li>
           <li><div class="h"><span class="ic">🔎</span>搜尋詞彙優化＋加權再排序</div><p class="d">同義詞庫／停用詞／單位正規化先把查詢改寫乾淨，再依<b>標題 +20／供應商或類型 +10／Meta +3</b> 加權重排序；示意情境下可把原生字串比對的上千筆雜訊結果收斂到十餘筆精準結果。</p></li>
         </ul>
         <p class="foot">＊ 實際商店網域、商品 handle、GraphQL schema 細節與生成 prompt 屬營運 know-how，未公開於本展示，可於面談時說明。</p>

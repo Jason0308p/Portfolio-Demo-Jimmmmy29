@@ -31,7 +31,7 @@ python -m http.server 8000   # 開 http://localhost:8000
 `官方 GA MCP (Google)` · `GSC / GTM API 整合` · `GTM 版本控制 / 變更管理` · `Plotly.js` ·
 `AI 分析 / LLM` · `API 配額管理` · `GA4 抽樣處理` · `跨資料模型對齊` · `資料視覺化` · `Python`
 
-## 在這個專案我實際做了什麼（高層說明）
+## 專案實作項目（高層說明）
 
 - 🔌 **官方 GA MCP + GSC / GTM API**：以 Google 官方 GA MCP 取 GA4 數據，整合 GSC / GTM API，讓 AI 以一致介面取數
 - 🚦 **API 配額管理**：對 GA4 / GSC API 做請求節流、分頁、快取與退避重試，避免撞 429、確保大量取數穩定

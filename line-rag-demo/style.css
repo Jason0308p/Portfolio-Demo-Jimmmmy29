@@ -349,3 +349,102 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
   .cgq{font-size:9.5px}
   .cgleaf{font-size:9px}
 }
+
+/* 深色介面專用捲軸：保留可發現性，但不讓系統預設灰色捲軸搶走視覺焦點。 */
+.msgs,.ca-timeline .tl{
+  scrollbar-width:thin;
+  scrollbar-color:rgba(113,148,195,.52) transparent;
+}
+.msgs::-webkit-scrollbar,.ca-timeline .tl::-webkit-scrollbar{width:8px;height:8px}
+.msgs::-webkit-scrollbar-track,.ca-timeline .tl::-webkit-scrollbar-track{background:transparent}
+.msgs::-webkit-scrollbar-thumb,.ca-timeline .tl::-webkit-scrollbar-thumb{
+  background:rgba(113,148,195,.32);
+  border:2px solid transparent;
+  background-clip:padding-box;
+  border-radius:999px;
+}
+.msgs:hover::-webkit-scrollbar-thumb,.ca-timeline .tl:hover::-webkit-scrollbar-thumb{background-color:rgba(113,148,195,.7)}
+.msgs::-webkit-scrollbar-corner,.ca-timeline .tl::-webkit-scrollbar-corner{background:transparent}
+
+/* ===== 互動展示重整：對話優先，RAG 軌跡作為可讀的佐證 ===== */
+/* 桌機只保留兩個同層主角：LINE 對話與本次 AI 處理軌跡。
+   範例問題改為下一列，避免把三種資訊硬擠在同一行。 */
+.chat-area{
+  grid-template-columns:minmax(520px,1.45fr) minmax(360px,.55fr);
+  grid-template-rows:auto auto;
+  gap:18px;
+  align-items:stretch;
+}
+.phone{grid-column:1;grid-row:1;height:610px}
+.compact-anim{grid-column:2;grid-row:1;min-height:610px;gap:10px}
+.side-panel{grid-column:1 / -1;grid-row:2}
+
+/* 讓右欄看起來像一個持續更新的 console，而不是三張零碎小卡 */
+.compact-anim .ca-block{padding:15px}
+.compact-anim .ca-block h3{font-size:11px;margin-bottom:11px;color:var(--text2)}
+.cnode.node{padding:8px 10px;gap:9px}
+.cnode .cnm{font-size:12px}
+.caux{flex-direction:row;flex-wrap:wrap;gap:6px}
+.caux .cnode.node.side{flex:1 1 31%;padding:6px 8px;text-align:center}
+.ca-timeline{flex:1;display:flex;flex-direction:column}
+.ca-timeline .tl{flex:1;display:flex;flex-direction:column;justify-content:center}
+.tl .row{padding:5px 0}
+
+/* 寬螢幕把「流程」與「判斷」並列：右欄不再因連續直排而比聊天窗高一大截。 */
+@media (min-width:1001px){
+  .compact-anim{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-content:start;
+    gap:10px;
+  }
+  .compact-anim .ca-block{height:auto;align-self:start}
+  .compact-anim .ca-hint,.compact-anim .ca-timeline{grid-column:1 / -1}
+  .ca-timeline{flex:none;display:block;max-height:174px;overflow:hidden}
+  .ca-timeline .tl{display:block;max-height:116px;overflow-y:auto;padding-right:4px}
+  .tl .row{padding:4px 0}
+  .caux{flex-direction:row;flex-wrap:wrap}
+  .caux .cnode.node.side{width:auto;flex:1 1 auto;text-align:center;font-size:9px;white-space:nowrap}
+}
+
+/* 範例問題是開始體驗的入口：改成水平可掃讀的 quick replies */
+.side-panel .panel{padding:15px 16px}
+.side-panel .panel h3{font-size:12px;color:var(--text2);margin-bottom:12px}
+#chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+#chips .acc{margin:0}
+#chips .acc>summary{min-height:54px;padding:9px 10px;font-size:12px;line-height:1.35}
+#chips .acc .abody{padding:9px}
+#chips .grp-tech{display:none}
+#chips .chips{gap:6px}
+#chips .chip{padding:8px 9px;font-size:12px}
+
+/* 1000px 以下採完整上下流：先聊天、再看 AI 怎麼回答、最後選新問題 */
+@media (max-width:1000px){
+  .chat-area{grid-template-columns:1fr;grid-template-rows:auto;gap:16px}
+  .phone{grid-column:1;grid-row:auto;height:540px;order:1}
+  .compact-anim{grid-column:1;grid-row:auto;min-height:0;order:2}
+  .side-panel{grid-column:1;grid-row:auto;order:3}
+  #chips{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* 手機不再把聊天與流程壓成微型卡片；維持可點擊、可閱讀的尺寸。 */
+@media (max-width:640px){
+  .nav-right a{display:none}
+  .hero p{display:block;font-size:13px;line-height:1.55}
+  .phone{height:500px;border-radius:14px}
+  .phone-top{padding:11px 14px}
+  .msgs{padding:14px;gap:12px}
+  .msg{font-size:13px}
+  .compact-anim{flex-direction:column;gap:10px}
+  .compact-anim .ca-block{padding:13px}
+  .cpipe{flex-direction:column;gap:6px}
+  .cnode.node{padding:8px 9px}
+  .cnode .cnm{font-size:11.5px}
+  .caux{flex-direction:column}
+  .caux .cnode.node.side{width:100%;text-align:left}
+  .ca-hint{display:block;font-size:11px;padding:0 3px}
+  .ca-timeline .tl{justify-content:flex-start}
+  #chips{grid-template-columns:1fr}
+  #chips .acc>summary{min-height:48px;font-size:12.5px}
+  #chips .chip{font-size:12.5px}
+}

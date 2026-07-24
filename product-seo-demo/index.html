@@ -95,12 +95,12 @@
   <section class="sec-card">
   <h2 class="sec">🔁 上架與下架流程總覽（載入時依序亮燈）</h2>
   <div class="pipe" id="pipe">
-    <div class="node" data-k="excel"><span class="step">1</span><div class="ic">📄</div><div class="nm">Excel 名單匯入</div><div class="sub">待處理商品清單</div></div>
-    <div class="node" data-k="read"><span class="step">2</span><div class="ic">⚡</div><div class="nm">Shopify 批次讀取</div><div class="sub">Admin GraphQL 平行查詢</div></div>
-    <div class="node" data-k="ai"><span class="step">3</span><div class="ic">🤖</div><div class="nm">AI 生成 SEO/GEO</div><div class="sub">商品名／敘述／標籤</div></div>
-    <div class="node" data-k="write"><span class="step">4</span><div class="ic">💾</div><div class="nm">Shopify 寫回</div><div class="sub">productUpdate</div></div>
-    <div class="node yida" data-k="yida"><span class="step">5</span><div class="ic">📋</div><div class="nm">宜搭同步（下游）</div><div class="sub">狀態＋原因代碼</div></div>
-    <div class="node social" data-k="post"><span class="step">6</span><div class="ic">📣</div><div class="nm">n8n 通知</div><div class="sub">社群成效回收</div></div>
+    <div class="node" data-k="excel"><span class="step">1</span><div class="ic">📄</div><div class="body"><div class="nm">Excel 名單匯入</div><div class="sub">待處理商品清單</div></div></div>
+    <div class="node" data-k="read"><span class="step">2</span><div class="ic">⚡</div><div class="body"><div class="nm">Shopify 批次讀取</div><div class="sub">Admin GraphQL 平行查詢</div></div></div>
+    <div class="node" data-k="ai"><span class="step">3</span><div class="ic">🤖</div><div class="body"><div class="nm">AI 生成 SEO/GEO</div><div class="sub">商品名／敘述／標籤</div></div></div>
+    <div class="node" data-k="write"><span class="step">4</span><div class="ic">💾</div><div class="body"><div class="nm">Shopify 寫回</div><div class="sub">productUpdate</div></div></div>
+    <div class="node yida" data-k="yida"><span class="step">5</span><div class="ic">📋</div><div class="body"><div class="nm">宜搭同步（下游）</div><div class="sub">狀態＋原因代碼</div></div></div>
+    <div class="node social" data-k="post"><span class="step">6</span><div class="ic">📣</div><div class="body"><div class="nm">n8n 通知</div><div class="sub">社群成效回收</div></div></div>
   </div>
   <div class="runbar"><button id="runBtn">▶ 重播流程</button><span class="runhint">頁面載入會自動播一次；亦可手動重播</span></div>
   </section>
@@ -251,11 +251,11 @@
     <span class="pill">Hero</span><span class="pill">目錄 TOC</span><span class="pill">FAQ</span><span class="pill">CTA</span><span class="pill">比較表</span><span class="pill">Sticky Bar</span>
   </div>
   <div class="pipe pipe-sm" id="pipe2">
-    <div class="node" data-k="pbackup"><span class="step">1</span><div class="ic">📑</div><div class="nm">備份現有內容</div></div>
-    <div class="node" data-k="pslice"><span class="step">2</span><div class="ic">✂️</div><div class="nm">產生精準切片 patch</div></div>
-    <div class="node" data-k="pverify"><span class="step">3</span><div class="ic">✅</div><div class="nm">驗證 patch</div></div>
-    <div class="node" data-k="pwrite"><span class="step">4</span><div class="ic">💾</div><div class="nm">pageUpdate 寫入</div></div>
-    <div class="node" data-k="preread"><span class="step">5</span><div class="ic">🔁</div><div class="nm">重新讀取驗證</div></div>
+    <div class="node" data-k="pbackup"><span class="step">1</span><div class="ic">📑</div><div class="body"><div class="nm">備份現有內容</div></div></div>
+    <div class="node" data-k="pslice"><span class="step">2</span><div class="ic">✂️</div><div class="body"><div class="nm">產生精準切片 patch</div></div></div>
+    <div class="node" data-k="pverify"><span class="step">3</span><div class="ic">✅</div><div class="body"><div class="nm">驗證 patch</div></div></div>
+    <div class="node" data-k="pwrite"><span class="step">4</span><div class="ic">💾</div><div class="body"><div class="nm">pageUpdate 寫入</div></div></div>
+    <div class="node" data-k="preread"><span class="step">5</span><div class="ic">🔁</div><div class="body"><div class="nm">重新讀取驗證</div></div></div>
   </div>
   <div class="runbar"><button id="runBtn2">▶ 模擬安全發布</button></div>
 

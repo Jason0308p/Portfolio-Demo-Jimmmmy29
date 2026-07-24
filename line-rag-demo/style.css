@@ -141,9 +141,24 @@ h2.sec::before{content:"";width:4px;height:16px;background:var(--accent);border-
 .ch-card.hot{background:rgba(245,158,11,.06);border:1px solid #5a4620}
 .ch-card.hot h4{color:var(--gold)}
 
-/* ---- chat ---- */
-.chat-area{display:grid;grid-template-columns:1fr 300px;gap:16px}
-@media(max-width:820px){.chat-area{grid-template-columns:1fr}}
+/* ---- chat ----
+   桌機三欄：聊天視窗 / 範例問題（聊天輔助，緊鄰聊天窗）/ 即時處理狀態（動畫＋流程紀錄，同一群組）
+   中寬：範例欄與處理狀態欄併成右側一欄
+   手機：單欄堆疊，順序＝聊天＋範例（互動群組）→ 處理狀態（回饋群組），同群組內容不被拆散    */
+.chat-area{
+  display:grid;grid-template-columns:1fr 200px 260px;gap:16px;align-items:start;
+}
+@media(max-width:1000px){
+  .chat-area{grid-template-columns:1fr 260px}
+  .side-panel{grid-column:2;grid-row:1}
+  .compact-anim{grid-column:2;grid-row:2}
+}
+@media(max-width:820px){
+  .chat-area{grid-template-columns:1fr}
+  .phone{order:1;height:460px}
+  .side-panel{order:2;grid-column:1;grid-row:auto}
+  .compact-anim{order:3;grid-column:1;grid-row:auto}
+}
 .phone{
   background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;
   display:flex;flex-direction:column;height:560px;
@@ -183,6 +198,62 @@ h2.sec::before{content:"";width:4px;height:16px;background:var(--accent);border-
 
 .side-panel{display:flex;flex-direction:column;gap:14px}
 .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+
+/* ---- 精簡動畫（與聊天窗並排，送出訊息後即時同步亮燈） ---- */
+.compact-anim{display:flex;flex-direction:column;gap:12px}
+.ca-block{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
+.ca-block h3{margin:0 0 10px;font-size:11px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.6px}
+.ca-hint{margin:0;font-size:10.5px;color:var(--text3);line-height:1.5;padding:0 2px}
+.ca-timeline{margin:0}
+
+/* 精簡版流程節點：直向排列的小步驟條 */
+.cpipe{display:flex;flex-direction:column;gap:5px}
+.cnode.node{
+  opacity:.45;background:var(--card2);border:1px solid var(--border);border-radius:8px;
+  padding:5px 8px;display:flex;align-items:center;gap:7px;transition:.3s;position:static;
+  min-width:0;flex:none;text-align:left;
+}
+.cnode .cstep{
+  flex-shrink:0;font-size:9px;font-weight:800;font-family:var(--mono);color:#fff;
+  background:var(--accent);border-radius:50%;width:15px;height:15px;line-height:15px;text-align:center;
+}
+.cnode.line .cstep{background:var(--line);color:#04331a}
+.cnode .cic{flex-shrink:0;font-size:13px;line-height:1}
+.cnode .cnm{font-size:11.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cnode.node.active{opacity:1;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 4px 14px rgba(59,130,246,.25)}
+.cnode.node.done{opacity:.85;border-color:var(--border2)}
+.cnode.node.line.active{border-color:var(--line);box-shadow:0 0 0 1px var(--line),0 4px 14px rgba(6,199,85,.22)}
+
+.caux{display:flex;flex-direction:column;gap:5px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)}
+.caux .cnode.node.side{
+  font-size:10.5px;font-weight:600;color:var(--text2);padding:4px 8px;opacity:.4;
+  border-radius:7px;display:block;text-align:left;
+}
+.caux .cnode.node.side.ping{opacity:1;border-color:var(--purple);box-shadow:0 0 0 1px var(--purple);color:var(--text)}
+
+/* 精簡版冷熱閘道：一行一個 gate-row，等命中才亮 */
+.cgate{display:flex;flex-direction:column;gap:5px}
+.cgate-row.gate-row{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:5px 9px;
+  grid-template-columns:none;transition:.3s;
+}
+.cgq{font-size:11px;font-weight:600;color:var(--text2)}
+.cgleaf{font-size:10.5px;font-weight:700;opacity:.5;transition:.3s}
+.cgleaf.cold{color:var(--accent2)}
+.cgleaf.hot{color:var(--gold)}
+.cgate-row.gate-row.gate-active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.cgate-row.gate-row.gate-active .cgq{color:var(--text)}
+.cgate-row.gate-row.gate-active .cgleaf{opacity:1}
+
+/* ---- 技術說明摺疊區裡的詳細動畫版 ---- */
+.detail-note{margin:0 0 16px;font-size:12.5px;color:var(--text2);line-height:1.6;
+  background:rgba(59,130,246,.06);border:1px solid #1e3a5f;border-radius:9px;padding:10px 13px}
+.detail-note b{color:var(--accent2)}
+.detail-h{margin:0 0 10px;font-size:13px;font-weight:700;color:var(--text)}
+.acc-lg .abody .pipe{margin-bottom:4px}
+.acc-lg .abody .gate-panel{margin-top:8px}
 .panel h3{margin:0 0 10px;font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px}
 .grp-tech{font-size:11.5px;line-height:1.5;color:var(--text2);background:rgba(59,130,246,.07);
   border:1px solid #1e3a5f;border-radius:8px;padding:7px 10px;margin-bottom:9px}
@@ -253,4 +324,28 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
   .gate-row{grid-template-columns:1fr;gap:6px}
   .gate-arrow{display:none}
   .coldhot-compare{grid-template-columns:1fr}
+
+  /* 精簡動畫：手機上緊接聊天視窗下方，兩個 block 並排以節省高度 */
+  nav{padding:7px 14px}
+  .wrap{padding-top:16px}
+  .hero{margin:0 0 8px}
+  .hero h1{font-size:18px;line-height:1.25}
+  .hero p{display:none}
+  .tags{margin-top:6px;gap:5px}
+  .tag{padding:2px 8px;font-size:10.5px}
+  h2.sec{margin:10px 0 7px;font-size:13px}
+  .phone{height:210px}
+  .compact-anim{flex-direction:row;flex-wrap:wrap;gap:6px}
+  .ca-block{flex:1 1 150px;padding:7px}
+  .ca-block h3{margin:0 0 5px;font-size:9.5px}
+  .ca-hint{display:none}
+  .cpipe{flex-direction:row;flex-wrap:wrap;gap:3px}
+  .cnode.node{flex:1 1 auto;padding:3px 5px;gap:4px}
+  .cnode .cnm{font-size:9.5px}
+  .cnode .cstep{width:12px;height:12px;line-height:12px;font-size:7.5px}
+  .caux{flex-direction:row;flex-wrap:wrap;margin-top:5px;padding-top:5px;gap:4px}
+  .caux .cnode.node.side{flex:1 1 auto;padding:3px 6px;font-size:9.5px}
+  .cgate-row.gate-row{padding:3px 7px}
+  .cgq{font-size:9.5px}
+  .cgleaf{font-size:9px}
 }

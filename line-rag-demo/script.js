@@ -235,15 +235,22 @@
     return row;
   }
 
+  // 注意：同一個 data-k / data-row 現在會同時存在「精簡版（聊天旁）」與
+  // 「詳細版（技術說明摺疊區）」兩份 DOM，因此一律用 querySelectorAll + 迴圈，
+  // 讓兩邊的動畫同步亮燈，不能只抓第一個符合的元素。
   function setNode(k, state) {
-    var sel = document.querySelector('.node[data-k="' + k + '"]');
-    if (!sel) return;
-    sel.classList.remove("active", "done");
-    if (state) sel.classList.add(state);
+    var sels = document.querySelectorAll('.node[data-k="' + k + '"]');
+    sels.forEach(function (sel) {
+      sel.classList.remove("active", "done");
+      if (state) sel.classList.add(state);
+    });
   }
   function pingSide(k) {
-    var sel = document.querySelector('.node.side[data-k="' + k + '"]');
-    if (sel) { sel.classList.add("ping"); setTimeout(function () { sel.classList.remove("ping"); }, 1400); }
+    var sels = document.querySelectorAll('.node.side[data-k="' + k + '"]');
+    sels.forEach(function (sel) {
+      sel.classList.add("ping");
+      setTimeout(function () { sel.classList.remove("ping"); }, 1400);
+    });
   }
   function clearNodes() {
     document.querySelectorAll(".node").forEach(function (n) { n.classList.remove("active", "done"); });
@@ -251,12 +258,12 @@
     document.querySelectorAll(".gate-row").forEach(function (r) { r.classList.remove("gate-active"); });
   }
   function highlightGate(key) {
-    var row = document.querySelector('.gate-row[data-row="' + key + '"]');
-    if (row) row.classList.add("gate-active");
+    var rows = document.querySelectorAll('.gate-row[data-row="' + key + '"]');
+    rows.forEach(function (row) { row.classList.add("gate-active"); });
   }
   function setMs(k, ms) {
-    var el = document.querySelector('.ms[data-ms="' + k + '"]');
-    if (el) el.textContent = ms + "ms";
+    var els = document.querySelectorAll('.ms[data-ms="' + k + '"]');
+    els.forEach(function (el) { el.textContent = ms + "ms"; });
   }
 
   function renderTimeline(steps, total) {

@@ -292,8 +292,27 @@
       [600, 620, 590, 640, 680, 660, 630, 690, 720, 700, 730, 750, 770, 790],
       [420, 450, 410, 470, 520, 500, 460, 540, 580, 560, 600, 630, 660, 700]
     ];
-    var PT_USERS = PT_SESSIONS.map(function (arr) { return arr.map(function (v) { return Math.round(v * 0.84); }); });
-    var PT_PAGEVIEWS = PT_SESSIONS.map(function (arr) { return arr.map(function (v) { return Math.round(v * 1.42); }); });
+    /* Users/Pageviews 不是單純等比例縮放 Sessions：每個頁面類型有不同的「新舊訪客比」與「每工作階段瀏覽頁數」，
+       且比例會隨時間微幅漂移（貼近真實 GA 數據），這樣切換指標時線形會真的不一樣，不會只是縮放同一條線。 */
+    var PT_USER_RATIO_BASE = [0.82, 0.88, 0.90, 0.70]; // 商品頁回訪多／部落格多新訪客
+    var PT_USER_RATIO_DRIFT = [-0.04, 0.02, -0.01, 0.10]; // 14 天內比例的總漂移量
+    var PT_PV_RATIO_BASE = [1.35, 1.15, 1.20, 2.60]; // 部落格單次工作階段常連續看多篇
+    var PT_PV_RATIO_DRIFT = [0.10, -0.05, 0.05, 0.90]; // 部落格瀏覽深度隨內容量成長明顯上升
+
+    var PT_USERS = PT_SESSIONS.map(function (arr, i) {
+      return arr.map(function (v, d) {
+        var t = d / (arr.length - 1);
+        var ratio = PT_USER_RATIO_BASE[i] + PT_USER_RATIO_DRIFT[i] * t;
+        return Math.round(v * ratio);
+      });
+    });
+    var PT_PAGEVIEWS = PT_SESSIONS.map(function (arr, i) {
+      return arr.map(function (v, d) {
+        var t = d / (arr.length - 1);
+        var ratio = PT_PV_RATIO_BASE[i] + PT_PV_RATIO_DRIFT[i] * t;
+        return Math.round(v * ratio);
+      });
+    });
 
     var traces = PT_NAMES.map(function (nm, i) {
       return {

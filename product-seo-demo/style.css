@@ -74,36 +74,38 @@ h2.sec{font-size:15px;font-weight:700;color:var(--text);margin:34px 0 14px;
   display:flex;align-items:center;gap:9px}
 h2.sec::before{content:"";width:4px;height:16px;background:var(--accent);border-radius:2px}
 
-/* ---- pipeline ---- */
+/* ---- pipeline（垂直時間軸：icon 圓在左，內容在右，向下箭頭串接） ---- */
 .pipe{
-  display:flex;align-items:stretch;gap:26px;overflow-x:auto;padding:6px 4px 14px;
+  display:flex;flex-direction:column;gap:30px;padding:10px 4px 16px;
+  max-width:520px;margin:0 auto;
 }
 .node{
-  flex:1 0 0;min-width:122px;position:relative;
+  position:relative;display:flex;align-items:flex-start;gap:14px;
   background:var(--card2);border:1px solid var(--border);border-radius:10px;
-  padding:12px 10px;text-align:center;transition:.35s;opacity:.5;
+  padding:12px 14px;text-align:left;transition:.35s;opacity:.5;
 }
-.node .step{position:absolute;top:-9px;left:10px;font-size:10px;font-weight:800;
-  font-family:var(--mono);color:#fff;background:var(--accent);border-radius:20px;
-  width:18px;height:18px;line-height:18px;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.node .step{position:static;flex:0 0 auto;font-size:11px;font-weight:800;
+  font-family:var(--mono);color:#fff;background:var(--accent);border-radius:50%;
+  width:22px;height:22px;line-height:22px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4)}
 .node.line .step{background:var(--line);color:#04331a}
-.node .ic{font-size:20px;line-height:1}
-.node .nm{font-size:12.5px;font-weight:700;margin-top:6px;color:var(--text)}
+.node .ic{font-size:20px;line-height:1;flex:0 0 auto;margin-top:1px}
+.node .body{display:flex;flex-direction:column;min-width:0}
+.node .nm{font-size:12.5px;font-weight:700;color:var(--text)}
 .node .sub{font-size:10.5px;color:var(--text3);margin-top:2px;min-height:13px}
 .node .ms{font-size:10px;color:var(--accent2);font-family:var(--mono);margin-top:5px;min-height:13px;opacity:0}
-/* node 之間的箭頭 */
+/* node 之間的向下箭頭：對齊在 step 圓圈中心正下方，整條線＋箭頭都落在 gap 內，不壓到下一個 node */
 .node:not(:last-child)::after{
-  content:"";position:absolute;right:-24px;top:50%;transform:translateY(-50%);
-  width:22px;height:2px;background:var(--border2);z-index:2;
+  content:"";position:absolute;left:25px;top:100%;transform:translateX(-50%);
+  width:2px;height:19px;background:var(--border2);z-index:2;
 }
 .node:not(:last-child)::before{
-  content:"";position:absolute;right:-24px;top:50%;transform:translateY(-50%) translateX(14px);
-  width:0;height:0;border-left:7px solid var(--border2);
-  border-top:5px solid transparent;border-bottom:5px solid transparent;z-index:3;
+  content:"";position:absolute;left:25px;top:calc(100% + 19px);transform:translateX(-50%);
+  width:0;height:0;border-top:7px solid var(--border2);
+  border-left:5px solid transparent;border-right:5px solid transparent;z-index:3;
 }
-.node.done:not(:last-child)::after,.node.active:not(:last-child)::after{background:var(--accent2);height:2px;box-shadow:0 0 8px var(--accent2)}
-.node.done:not(:last-child)::before,.node.active:not(:last-child)::before{border-left-color:var(--accent2)}
-.node.active{opacity:1;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 6px 22px rgba(59,130,246,.25);transform:translateY(-2px)}
+.node.done:not(:last-child)::after,.node.active:not(:last-child)::after{background:var(--accent2);width:2px;box-shadow:0 0 8px var(--accent2)}
+.node.done:not(:last-child)::before,.node.active:not(:last-child)::before{border-top-color:var(--accent2)}
+.node.active{opacity:1;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 6px 22px rgba(59,130,246,.25);transform:translateX(2px)}
 .node.active .ms{opacity:1}
 .node.done{opacity:1;border-color:var(--border2)}
 .node.line.active{border-color:var(--line);box-shadow:0 0 0 1px var(--line),0 6px 22px rgba(6,199,85,.22)}
@@ -316,10 +318,12 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .pill{font-size:12px;font-weight:600;color:var(--text2);background:var(--card2);
   border:1px solid var(--border);border-radius:20px;padding:5px 13px}
 
-/* ---- 區塊5：小型版流程圖 ---- */
-.pipe-sm .node{min-width:100px;padding:9px 8px}
+/* ---- 區塊5：小型版流程圖（垂直，同款時間軸，間距略緊湊） ---- */
+.pipe-sm .node{padding:10px 12px}
 .pipe-sm .nm{font-size:11.5px}
-.pipe-sm{gap:20px}
+.pipe-sm{gap:24px;max-width:440px}
+.pipe-sm .node:not(:last-child)::after{height:13px}
+.pipe-sm .node:not(:last-child)::before{top:calc(100% + 13px)}
 
 /* ---- 區塊5：改版前後對比縮圖 ---- */
 .pg-diff-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:12px;margin-top:14px}
@@ -512,7 +516,9 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
   .chip-flow{gap:6px}
   .cf-chip{font-size:11px;padding:5px 10px}
   .ar-stats{grid-template-columns:repeat(2,1fr)}
-  .pipe-sm .node{min-width:88px}
+  .pipe{max-width:100%}
+  .pipe-sm{max-width:100%}
+  .node{padding:10px 12px;gap:11px}
   .s-top{flex-wrap:wrap}
   .subgrid{gap:12px}
   .vocab-grid{grid-template-columns:1fr}

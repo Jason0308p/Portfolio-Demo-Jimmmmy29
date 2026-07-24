@@ -171,6 +171,146 @@
     };
   }
 
+  /* ---------- 基礎 CV 資料（虛構人物，跨 8 個職缺共用，由 tailorCv() 依職缺客製化） ---------- */
+  var BASE_CV = {
+    name: "陳○謙", nameEn: "Chris Chen",
+    title: "資料 / 自動化工程師", titleEn: "Data & Automation Engineer",
+    contact: "hello@example-demo.tw ｜ 090x-xxx-xxx ｜ 台北市", contactEn: "hello@example-demo.tw · 090x-xxx-xxx · Taipei, Taiwan",
+    summary: "5 年資料工程與流程自動化經驗，擅長 ETL 管線設計、n8n / Python 自動化、RAG／LLM 應用整合。曾主導跨平台資料整合專案，將重複性人工流程系統化，兼顧開發速度與維運穩定性。",
+    summaryEn: "5 years of experience in data engineering and workflow automation, specializing in ETL pipeline design, n8n/Python automation, and RAG/LLM application integration. Led cross-platform data integration projects that turned repetitive manual workflows into reliable automated systems.",
+    experience: [
+      {
+        id: "etl", co: "晶宇科技", coEn: "Crystalyn Tech", role: "資料工程師", roleEn: "Data Engineer", period: "2023.03–2026.06", periodEn: "Mar 2023 – Jun 2026",
+        bullets: [
+          "重構核心 ETL pipeline，將錯誤發現機制從被動查報表改為主動告警，平均問題發現時間從數小時縮短至 15 分鐘內",
+          "設計跨來源資料正規化流程（欄位對齊、去重、對帳），整合 3+ 上游系統的異質資料格式",
+          "將原本需 3 小時的批次任務改寫為增量處理，執行時間壓縮至 40 分鐘內"
+        ],
+        bulletsEn: [
+          "Refactored the core ETL pipeline from passive report-checking to proactive alerting, cutting average issue-detection time from hours to under 15 minutes",
+          "Designed a cross-source data normalization flow (field alignment, dedup, reconciliation) integrating 3+ heterogeneous upstream systems",
+          "Rewrote a 3-hour batch job into incremental processing, reducing runtime to under 40 minutes"
+        ]
+      },
+      {
+        id: "rag", co: "泰科系統", coEn: "TycoSys", role: "AI 應用工程師", roleEn: "AI Application Engineer", period: "2021.07–2023.02", periodEn: "Jul 2021 – Feb 2023",
+        bullets: [
+          "建置 RAG 問答系統，透過改善 chunking 與向量索引策略，明顯提升檢索命中率與回答準確度",
+          "設計多模型編排架構（主模型＋備援模型自動切換），提升服務穩定性，降低單點故障風險",
+          "建立 prompt 版本管理與 A/B 比較流程，將「改 prompt 靠肉眼」轉為有量化基準的迭代流程"
+        ],
+        bulletsEn: [
+          "Built a RAG Q&A system; improved chunking and vector index strategy to measurably raise retrieval hit rate and answer accuracy",
+          "Designed a multi-model orchestration architecture (primary + automatic failover) to improve service stability and reduce single points of failure",
+          "Established prompt version control and A/B comparison workflow, turning ad-hoc prompt tweaking into a measurable iteration process"
+        ]
+      },
+      {
+        id: "automation", co: "立群智能", coEn: "Ligroup Intelligence", role: "自動化工程師", roleEn: "Automation Engineer", period: "2019.09–2021.06", periodEn: "Sep 2019 – Jun 2021",
+        bullets: [
+          "以 n8n／Python 打造多支流程自動化腳本，取代原本手動複製貼上的跨系統資料搬移作業",
+          "開發網頁爬蟲與排程任務，處理反爬機制（cookie/rate limit）並輸出結構化資料",
+          "與非技術團隊協作釐清需求，將模糊的人工流程轉譯為可維運的自動化系統"
+        ],
+        bulletsEn: [
+          "Built multiple automation scripts with n8n/Python, replacing manual copy-paste data transfer across systems",
+          "Developed web scrapers and scheduled jobs, handling anti-bot mechanisms (cookies/rate limits) and producing structured data output",
+          "Collaborated with non-technical teams to clarify requirements, translating ad-hoc manual processes into maintainable automated systems"
+        ]
+      }
+    ],
+    skillGroups: [
+      { label: "程式語言", labelEn: "Languages", items: ["Python", "SQL", "JavaScript"] },
+      { label: "資料 / ETL", labelEn: "Data / ETL", items: ["ETL Pipeline", "資料正規化", "BigQuery"] },
+      { label: "自動化 / 整合", labelEn: "Automation / Integration", items: ["n8n", "爬蟲", "API 整合", "RPA"] },
+      { label: "AI / LLM", labelEn: "AI / LLM", items: ["RAG", "向量資料庫", "LLM 應用", "多模型編排"] },
+      { label: "行銷 / CRM", labelEn: "Marketing / CRM", items: ["MarTech", "CRM 串接", "行銷自動化"] }
+    ],
+    education: "國立中興大學｜資訊管理學系 學士",
+    educationEn: "National Chung Hsing University — B.S. in Information Management"
+  };
+
+  /* 依 job.keywords 找出最相關的一段經歷，放到最前面；找不到就用第一段 */
+  function pickTopExperience(j) {
+    var kw = (j.keywords || "").toLowerCase();
+    if (/rag|llm|向量|ai/.test(kw)) return "rag";
+    if (/n8n|爬蟲|自動化|rpa|流程/.test(kw)) return "automation";
+    return "etl";
+  }
+  /* 依 job.keywords 排出技能分群順序：JD 命中的群組往前排，其餘保留原順序 */
+  function rankSkillGroups(j, en) {
+    var kw = (j.keywords || "").toLowerCase();
+    var groups = BASE_CV.skillGroups.slice();
+    function scoreOf(g) {
+      var hit = 0;
+      g.items.forEach(function (it) { if (kw.indexOf(it.toLowerCase()) !== -1) hit++; });
+      if (g.label === "AI / LLM" && /rag|llm|ai|向量/.test(kw)) hit += 2;
+      if (g.label === "自動化 / 整合" && /n8n|爬蟲|自動化|rpa/.test(kw)) hit += 2;
+      if (g.label === "資料 / ETL" && /etl|資料|雲端|資料庫|api|後端/.test(kw)) hit += 2;
+      if (g.label === "行銷 / CRM" && /martech|crm|行銷|廣告/.test(kw)) hit += 2;
+      return hit;
+    }
+    groups.forEach(function (g) { g._score = scoreOf(g); });
+    groups.sort(function (a, b) { return b._score - a._score; });
+    return groups;
+  }
+
+  /* ---------- 依職缺客製化完整 CV（模板 + 插值，非真實 AI 呼叫） ---------- */
+  function tailorCv(j, en) {
+    var topId = pickTopExperience(j);
+    var exp = BASE_CV.experience.slice().sort(function (a, b) {
+      return (a.id === topId ? -1 : 0) - (b.id === topId ? -1 : 0);
+    });
+    var skillGroups = rankSkillGroups(j, en);
+    var summary = en
+      ? "Targeting the \"" + j.title + "\" role at " + j.co + " — " + BASE_CV.summaryEn
+      : "針對「" + j.title + "」（" + j.co + "）職缺客製 — " + BASE_CV.summary;
+    return {
+      name: en ? BASE_CV.nameEn : BASE_CV.name,
+      title: en ? j.title + " Candidate" : j.title + " 應徵者",
+      contact: en ? BASE_CV.contactEn : BASE_CV.contact,
+      summary: summary,
+      experience: exp,
+      skillGroups: skillGroups,
+      education: en ? BASE_CV.educationEn : BASE_CV.education,
+      topId: topId
+    };
+  }
+
+  function renderCvDoc(j, en) {
+    var cv = tailorCv(j, en);
+    var doc = document.createElement("div");
+    doc.className = "cv-doc reveal";
+    var expHtml = cv.experience.map(function (e) {
+      var bl = en ? e.bulletsEn : e.bullets;
+      var top = e.id === cv.topId;
+      return '<div class="cv-exp-item' + (top ? " cv-exp-top" : "") + '">' +
+        '<div class="cv-exp-head"><span class="cv-exp-role">' + (en ? e.roleEn : e.role) + (top ? '<span class="cv-top-tag">' + (en ? "Most Relevant" : "最相關") + '</span>' : '') + '</span>' +
+        '<span class="cv-exp-period">' + (en ? e.periodEn : e.period) + '</span></div>' +
+        '<div class="cv-exp-co">' + (en ? e.coEn : e.co) + '</div>' +
+        '<ul class="cv-exp-bullets">' + bl.map(function (b) { return "<li>" + b + "</li>"; }).join("") + '</ul>' +
+        '</div>';
+    }).join("");
+    var skillsHtml = cv.skillGroups.map(function (g, gi) {
+      var label = en ? g.labelEn : g.label;
+      return '<div class="cv-skill-group' + (gi === 0 ? " cv-skill-top" : "") + '">' +
+        '<span class="cv-skill-label">' + label + '</span>' +
+        '<span class="cv-skill-items">' + g.items.join(" · ") + '</span></div>';
+    }).join("");
+    doc.innerHTML =
+      '<div class="cv-doc-badge">' + (en ? "TAILORED CV — auto-generated below, based on the advice above" : "客製化完整 CV — 依上方建議自動套用") + '</div>' +
+      '<div class="cv-header">' +
+        '<div class="cv-name">' + cv.name + '</div>' +
+        '<div class="cv-role">' + cv.title + '</div>' +
+        '<div class="cv-contact">' + cv.contact + '</div>' +
+      '</div>' +
+      '<div class="cv-section"><h4>' + (en ? "Summary" : "自我簡介") + '</h4><p class="cv-summary">' + cv.summary + '</p></div>' +
+      '<div class="cv-section"><h4>' + (en ? "Experience" : "工作經歷") + '</h4>' + expHtml + '</div>' +
+      '<div class="cv-section"><h4>' + (en ? "Skills" : "技能") + '</h4><div class="cv-skills">' + skillsHtml + '</div></div>' +
+      '<div class="cv-section"><h4>' + (en ? "Education" : "學歷") + '</h4><p class="cv-edu">' + cv.education + '</p></div>';
+    return doc;
+  }
+
   /* ---------- 渲染職缺看板（依評分分組摺疊） ---------- */
   var wrap = document.getElementById("jobgroups");
   var selected = null;
@@ -215,7 +355,7 @@
       lang = l;
       langBtns.forEach(function (b) { b.classList.toggle("active", b === btn); });
       if (selected && lastGen) {
-        typeOut(lastGen === "cv" ? currentCvText(selected) : currentQaText(selected));
+        typeOut(lastGen === "cv" ? currentCvText(selected) : currentQaText(selected), lastGen === "cv" ? selected : undefined);
       }
     });
   });
@@ -225,7 +365,7 @@
   var genCV = document.getElementById("genCV");
   var genQA = document.getElementById("genQA");
   var typing = false;
-  function typeOut(data) {
+  function typeOut(data, j) {
     if (typing) return; typing = true; genCV.disabled = true; genQA.disabled = true;
     aiOut.innerHTML = "";
 
@@ -250,6 +390,8 @@
     var tail = null;
     if (data.kind === "cv") { tail = document.createElement("div"); tail.className = "gen-tail reveal"; tail.textContent = data.tail; }
 
+    var cvDoc = (data.kind === "cv" && j) ? renderCvDoc(j, lang === "en") : null;
+
     var i = 0;
     function revealNext() {
       requestAnimationFrame(function () { head.classList.add("in"); });
@@ -261,7 +403,11 @@
       } else if (tail && !tail.parentNode) {
         aiOut.appendChild(tail);
         requestAnimationFrame(function () { tail.classList.add("in"); });
-        setTimeout(finishTyping, 260);
+        setTimeout(revealNext, 260);
+      } else if (cvDoc && !cvDoc.parentNode) {
+        aiOut.appendChild(cvDoc);
+        requestAnimationFrame(function () { cvDoc.classList.add("in"); });
+        setTimeout(finishTyping, 320);
       } else {
         finishTyping();
       }
@@ -272,7 +418,7 @@
   function needSel() {
     aiOut.innerHTML = '<div class="ai-placeholder">請先從左側點選一個職缺 🙋</div>';
   }
-  genCV.onclick = function () { if (!selected) return needSel(); lastGen = "cv"; typeOut(currentCvText(selected)); };
+  genCV.onclick = function () { if (!selected) return needSel(); lastGen = "cv"; typeOut(currentCvText(selected), selected); };
   genQA.onclick = function () { if (!selected) return needSel(); lastGen = "qa"; typeOut(currentQaText(selected)); };
 
   /* ---------- Notion 同步面板：多平台職缺資料庫 + Dashboard + AI 攻略頁 ---------- */

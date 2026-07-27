@@ -246,6 +246,8 @@ h2.sec::before{content:"";width:4px;height:16px;background:var(--accent);border-
 .cgate-row.gate-row.gate-active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .cgate-row.gate-row.gate-active .cgq{color:var(--text)}
 .cgate-row.gate-row.gate-active .cgleaf{opacity:1}
+.cgate.has-result .cgate-row{display:none}
+.cgate.has-result .cgate-row.gate-active{display:flex}
 
 /* ---- 技術說明摺疊區裡的詳細動畫版 ---- */
 .detail-note{margin:0 0 16px;font-size:12.5px;color:var(--text2);line-height:1.6;
@@ -365,6 +367,25 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 }
 .msgs:hover::-webkit-scrollbar-thumb,.ca-timeline .tl:hover::-webkit-scrollbar-thumb{background-color:rgba(113,148,195,.7)}
 .msgs::-webkit-scrollbar-corner,.ca-timeline .tl::-webkit-scrollbar-corner{background:transparent}
+
+/* 快速理解本次回覆的依據；細節仍保留在下方時間軸。 */
+.trace-summary{grid-column:1 / -1;display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:linear-gradient(90deg,rgba(59,130,246,.15),rgba(34,211,238,.05));border:1px solid #24466f;border-radius:10px}
+.trace-status{font-size:12px;font-weight:800;color:var(--accent2);white-space:nowrap}
+.trace-detail{font-size:11.5px;color:var(--text2)}
+
+/* 對話裡提供低摩擦的起點，手機首屏不再只剩空白訊息區。 */
+.quick-replies{display:flex;flex-wrap:wrap;gap:7px;padding:0 0 2px 41px}
+.quick-replies button{border:1px solid #2b5779;border-radius:16px;background:#102640;color:var(--accent2);padding:6px 9px;
+  font:600 11px/1.25 inherit;cursor:pointer;text-align:left;transition:.16s}
+.quick-replies button:hover{border-color:var(--line);background:#12324a;color:#fff}
+
+@media(max-width:640px){
+  .tags .tag:nth-child(n+4){display:none}
+  .tags::after{content:"＋5 個技術";font-size:10.5px;font-weight:600;color:var(--text3);padding:2px 4px}
+  .quick-replies{padding-left:0;display:grid;grid-template-columns:1fr;gap:6px}
+  .quick-replies button{width:100%;font-size:11.5px;padding:8px 10px}
+}
 
 /* 手機：流程要在對話時持續可見；詳細資料改由底部抽屜承接。 */
 .mobile-trace,.mobile-trace-sheet{display:none}

@@ -56,7 +56,7 @@
         </button>
       </div>
       <div class="compose">
-        <input id="inp" placeholder="輸入問題，或點下方/右側範例…" autocomplete="off">
+        <input id="inp" placeholder="輸入問題，或點下方範例開始體驗…" autocomplete="off">
         <button id="send">送出</button>
       </div>
     </div>
@@ -71,6 +71,10 @@
 
     <!-- 即時處理狀態：精簡動畫 + 本次流程紀錄，同一群組，送出訊息後同步亮燈/更新 -->
     <div class="compact-anim">
+      <div class="trace-summary" id="traceSummary" aria-live="polite">
+        <span class="trace-status">等待提問</span>
+        <span class="trace-detail">送出問題後，這裡會顯示本次資料路徑與回覆時間。</span>
+      </div>
       <div class="ca-block">
         <h3>處理流程</h3>
         <div class="cpipe" id="cpipe">
@@ -104,13 +108,6 @@
       </div>
     </div>
   </div>
-
-  <section class="mobile-trace-sheet" id="mobileTraceSheet" aria-hidden="true" aria-label="本次 AI 處理流程">
-    <div class="mts-panel">
-      <div class="mts-head"><div><strong>本次 AI 處理流程</strong><span id="mobileTraceOutcome">等待送出問題</span></div><button id="mobileTraceClose" type="button" aria-label="關閉處理流程">×</button></div>
-      <div class="tl" id="mobileTimeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
-    </div>
-  </section>
 
   <section class="mobile-trace-sheet" id="mobileTraceSheet" aria-hidden="true" aria-label="本次 AI 處理流程">
     <div class="mts-panel">

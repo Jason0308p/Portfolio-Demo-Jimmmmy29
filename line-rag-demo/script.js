@@ -197,6 +197,7 @@
   var inp = document.getElementById("inp");
   var sendBtn = document.getElementById("send");
   var timeline = document.getElementById("timeline");
+  var traceSummary = document.getElementById("traceSummary");
   var mobileTrace = document.getElementById("mobileTrace");
   var mobileTraceState = document.getElementById("mobileTraceState");
   var mobileTraceDetail = document.getElementById("mobileTraceDetail");
@@ -280,10 +281,17 @@
     document.querySelectorAll(".node").forEach(function (n) { n.classList.remove("active", "done"); });
     document.querySelectorAll(".ms").forEach(function (m) { m.textContent = ""; });
     document.querySelectorAll(".gate-row").forEach(function (r) { r.classList.remove("gate-active"); });
+    document.getElementById("cgateTree").classList.remove("has-result");
   }
   function highlightGate(key) {
     var rows = document.querySelectorAll('.gate-row[data-row="' + key + '"]');
     rows.forEach(function (row) { row.classList.add("gate-active"); });
+    document.getElementById("cgateTree").classList.add("has-result");
+  }
+  function updateTraceSummary(plan, total) {
+    var source = (plan.gateKey === "fuzzy" || plan.gateKey === "fallback") ? "熱資料／語意檢索" : "冷資料／精準索引";
+    traceSummary.innerHTML = '<span class="trace-status">' + (ROUTE_LABEL[plan.route] || plan.route) + '</span>' +
+      '<span class="trace-detail">' + source + '　·　' + total + 'ms 完成</span>';
   }
   function setMs(k, ms) {
     var els = document.querySelectorAll('.ms[data-ms="' + k + '"]');
@@ -357,6 +365,7 @@
       renderTimeline(plan.steps, total);
       setNode("reply", "done");
       highlightGate(plan.gateKey);
+      updateTraceSummary(plan, total);
       var outcome = {
         code: "商品編號精準命中 · 冷資料",
         cat: "品類索引命中 · 冷資料",
@@ -405,11 +414,25 @@
     chips.appendChild(det);
   });
 
+  function addQuickReplies() {
+    var row = document.createElement("div");
+    row.className = "quick-replies";
+    ["GIFT-1001 的最小訂購量？", "寄送要運費嗎？", "想送客戶有質感的禮物，有推薦嗎"].forEach(function (question) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.textContent = question;
+      button.onclick = function () { run(question); };
+      row.appendChild(button);
+    });
+    msgs.appendChild(row);
+  }
+
   sendBtn.onclick = function () { run(inp.value); };
   inp.addEventListener("keydown", function (e) { if (e.key === "Enter") run(inp.value); });
 
   /* ---------- 開場 ---------- */
   setTimeout(function () {
-    addMsg("您好！我是禮品小幫手 🎁\n可以幫您查產品、報價、交期與常見問題。\n試著問問看，或點右側範例 👉", "bot");
+    addMsg("您好！我是禮品小幫手 🎁\n可以幫您查產品、報價、交期與常見問題。\n選一個問題，或直接輸入您的需求。", "bot");
+    addQuickReplies();
   }, 300);
 })();

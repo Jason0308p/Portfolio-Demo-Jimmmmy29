@@ -366,6 +366,31 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .msgs:hover::-webkit-scrollbar-thumb,.ca-timeline .tl:hover::-webkit-scrollbar-thumb{background-color:rgba(113,148,195,.7)}
 .msgs::-webkit-scrollbar-corner,.ca-timeline .tl::-webkit-scrollbar-corner{background:transparent}
 
+/* 手機：流程要在對話時持續可見；詳細資料改由底部抽屜承接。 */
+.mobile-trace,.mobile-trace-sheet{display:none}
+.mobile-trace[hidden]{display:none!important}
+@media (max-width:640px){
+  .phone{height:530px}
+  .compact-anim{display:none}
+  .mobile-trace{display:block;background:#10213a;border-top:1px solid var(--border);padding:7px 10px}
+  .mobile-trace-summary{width:100%;display:grid;grid-template-columns:8px minmax(0,1fr) auto auto;align-items:center;gap:8px;
+    border:0;border-radius:9px;background:#142846;color:var(--text);padding:8px 10px;text-align:left;font:inherit;cursor:pointer}
+  .mt-dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 4px rgba(34,211,238,.12);animation:tracePulse 1.25s infinite}
+  .mt-copy{display:flex;min-width:0;flex-direction:column;line-height:1.2}
+  .mt-copy b{font-size:11.5px}.mt-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);font-size:10px;margin-top:3px}
+  .mt-progress{font:700 10px var(--mono);color:var(--accent2);white-space:nowrap}.mt-more{color:var(--text3);font-size:10px;white-space:nowrap}
+  .mobile-trace.is-complete .mt-dot{background:var(--line);box-shadow:0 0 0 4px rgba(6,199,85,.12);animation:none}
+  .mobile-trace-sheet{display:block;position:fixed;z-index:200;inset:0 0 0 0;pointer-events:none;background:rgba(3,9,19,0);transition:background .24s}
+  .mobile-trace-sheet .mts-panel{position:absolute;bottom:0;left:0;right:0;max-height:72vh;overflow:auto;background:#101d33;border:1px solid var(--border2);border-bottom:0;border-radius:18px 18px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));transform:translateY(103%);transition:transform .26s ease;box-shadow:0 -16px 40px rgba(0,0,0,.35)}
+  .mobile-trace-sheet.is-open{pointer-events:auto;background:rgba(3,9,19,.56)}
+  .mobile-trace-sheet.is-open .mts-panel{transform:translateY(0)}
+  .mts-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:10px;margin-bottom:8px;border-bottom:1px solid var(--border)}
+  .mts-head strong{display:block;font-size:14px}.mts-head span{display:block;color:var(--text2);font-size:11px;margin-top:3px}.mts-head button{width:30px;height:30px;border:1px solid var(--border);border-radius:50%;background:var(--card2);color:var(--text);font-size:21px;line-height:1;cursor:pointer}
+  .mobile-trace-sheet .tl{font-size:12px}.mobile-trace-sheet .tl .row{padding:8px 0}
+  @keyframes tracePulse{50%{opacity:.48;transform:scale(.82)}}
+}
+
+
 /* ===== 互動展示重整：對話優先，RAG 軌跡作為可讀的佐證 ===== */
 /* 桌機只保留兩個同層主角：LINE 對話與本次 AI 處理軌跡。
    範例問題改為下一列，避免把三種資訊硬擠在同一行。 */

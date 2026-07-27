@@ -47,6 +47,14 @@
         <div class="pt-st">● 線上 · 自動回覆中</div></div>
       </div>
       <div class="msgs" id="msgs"></div>
+      <div class="mobile-trace" id="mobileTrace" hidden>
+        <button class="mobile-trace-summary" id="mobileTraceOpen" type="button" aria-expanded="false">
+          <span class="mt-dot" aria-hidden="true"></span>
+          <span class="mt-copy"><b id="mobileTraceState">AI 正在處理</b><small id="mobileTraceDetail">正在準備檢索</small></span>
+          <span class="mt-progress" id="mobileTraceProgress">0 / 6</span>
+          <span class="mt-more">查看流程 ›</span>
+        </button>
+      </div>
       <div class="compose">
         <input id="inp" placeholder="輸入問題，或點下方/右側範例…" autocomplete="off">
         <button id="send">送出</button>
@@ -96,6 +104,20 @@
       </div>
     </div>
   </div>
+
+  <section class="mobile-trace-sheet" id="mobileTraceSheet" aria-hidden="true" aria-label="本次 AI 處理流程">
+    <div class="mts-panel">
+      <div class="mts-head"><div><strong>本次 AI 處理流程</strong><span id="mobileTraceOutcome">等待送出問題</span></div><button id="mobileTraceClose" type="button" aria-label="關閉處理流程">×</button></div>
+      <div class="tl" id="mobileTimeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
+    </div>
+  </section>
+
+  <section class="mobile-trace-sheet" id="mobileTraceSheet" aria-hidden="true" aria-label="本次 AI 處理流程">
+    <div class="mts-panel">
+      <div class="mts-head"><div><strong>本次 AI 處理流程</strong><span id="mobileTraceOutcome">等待送出問題</span></div><button id="mobileTraceClose" type="button" aria-label="關閉處理流程">×</button></div>
+      <div class="tl" id="mobileTimeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
+    </div>
+  </section>
 
   <!-- ===== 技術與設計說明（摺疊，預設收起以保持精簡） ===== -->
   <h2 class="sec">技術與設計說明</h2>

@@ -197,7 +197,31 @@
   var inp = document.getElementById("inp");
   var sendBtn = document.getElementById("send");
   var timeline = document.getElementById("timeline");
+  var mobileTrace = document.getElementById("mobileTrace");
+  var mobileTraceState = document.getElementById("mobileTraceState");
+  var mobileTraceDetail = document.getElementById("mobileTraceDetail");
+  var mobileTraceProgress = document.getElementById("mobileTraceProgress");
+  var mobileTraceSheet = document.getElementById("mobileTraceSheet");
+  var mobileTimeline = document.getElementById("mobileTimeline");
+  var mobileTraceOutcome = document.getElementById("mobileTraceOutcome");
+  var mobileTraceOpen = document.getElementById("mobileTraceOpen");
+  var mobileTraceClose = document.getElementById("mobileTraceClose");
   var busy = false;
+
+  function updateMobileTrace(state, detail, progress) {
+    mobileTrace.hidden = false;
+    mobileTrace.classList.toggle("is-complete", state === "已回覆");
+    mobileTraceState.textContent = state;
+    mobileTraceDetail.textContent = detail;
+    mobileTraceProgress.textContent = progress;
+  }
+  function setMobileSheet(open) {
+    mobileTraceSheet.classList.toggle("is-open", open);
+    mobileTraceSheet.setAttribute("aria-hidden", String(!open));
+    mobileTraceOpen.setAttribute("aria-expanded", String(open));
+  }
+  mobileTraceOpen.onclick = function () { setMobileSheet(true); };
+  mobileTraceClose.onclick = function () { setMobileSheet(false); };
 
   function addMsg(text, who, route) {
     var row = document.createElement("div");
@@ -279,6 +303,7 @@
     t.style.borderBottom = "none";
     t.innerHTML = "<span style='color:#fff;font-weight:700'>合計</span><span style='color:#22c55e;font-weight:700'>" + total + "ms</span>";
     timeline.appendChild(t);
+    mobileTimeline.innerHTML = timeline.innerHTML;
   }
 
   function run(text) {
@@ -289,6 +314,7 @@
 
     var plan = buildPlan(text);
     clearNodes();
+    updateMobileTrace("AI 正在處理", "收到訊息，準備分類", "0/6");
 
     // 打字中（含頭像）
     var typing = document.createElement("div");
@@ -317,6 +343,8 @@
         plan.steps.forEach(function (s) { if (s.k === k && s.side) pingSide(s.side); });
         // 宜搭特例
         if (plan.steps.some(function (s) { return s.side === "yida" && (k === "ai"); })) pingSide("yida");
+        var traceLabel = { line: "收到 LINE 訊息", n8n: "驗證並接收請求", route: "判斷問題類型", rag: "查詢資料與 RAG", ai: "組裝 AI 回覆", reply: "傳送回覆" };
+        updateMobileTrace("AI 正在處理", traceLabel[k], (ni + 1) + "/6");
         ni++;
         setTimeout(tick, 360);
       } else {
@@ -329,6 +357,15 @@
       renderTimeline(plan.steps, total);
       setNode("reply", "done");
       highlightGate(plan.gateKey);
+      var outcome = {
+        code: "商品編號精準命中 · 冷資料",
+        cat: "品類索引命中 · 冷資料",
+        fuzzy: "語意檢索完成 · 熱資料",
+        faq: "FAQ 知識庫命中 · 冷資料",
+        fallback: "語意檢索完成 · 熱資料"
+      }[plan.gateKey];
+      updateMobileTrace("已回覆", outcome, "6/6");
+      mobileTraceOutcome.textContent = outcome + " · 總處理時間 " + total + "ms";
       busy = false; sendBtn.disabled = false;
       inp.focus();
     }

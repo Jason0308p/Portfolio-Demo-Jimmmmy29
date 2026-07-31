@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GA + MCP 數據分析 — 展示用</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="../index.html" title="返回作品集首頁" class="float-home">← 作品集首頁</a>
+
+<nav>
+  <div class="brand"><span class="dot"></span>GA + MCP<span>·AI 分析</span></div>
+  <div class="nav-right">
+    <span class="badge-demo">DEMO</span>
+    <a href="../index.html" class="nav-back">← 作品集首頁</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>GA4 + GSC + GTM 數據，透過官方 GA MCP 餵給 AI 分析</h1>
+    <p>把 Google Analytics 4、Search Console、Tag Manager 的數據，透過 <b>Google 官方 GA MCP</b> 與 GSC / GTM API 餵給 AI，
+       自動產出洞察分析與可視化儀表板。</p>
+    <div class="tags">
+      <span class="tag">GA4 Data API</span>
+      <span class="tag">Google Search Console (GSC) API</span>
+      <span class="tag">Google Tag Manager (GTM) API</span>
+      <span class="tag cool">官方 GA MCP (Google)</span>
+      <span class="tag">GSC / GTM API 整合</span>
+      <span class="tag">GTM 版本控制 / 變更管理</span>
+      <span class="tag">OAuth / Service Account</span>
+      <span class="tag">Plotly.js</span>
+      <span class="tag">AI 分析</span>
+      <span class="tag">資料視覺化</span>
+      <span class="tag">Python</span>
+    </div>
+  </div>
+
+  <!-- ===== 資料流程順序 ===== -->
+  <h2 class="sec">資料流程順序（頁面載入自動播放一次）</h2>
+  <div class="pipe" id="pipe">
+    <div class="node src" data-k="ga"><span class="step">1</span><div class="ic">📊</div><div class="nm">GA4</div><div class="sub">流量 / 事件 / 轉換</div><div class="ms" data-ms="ga"></div></div>
+    <div class="node src" data-k="gsc"><span class="step">1</span><div class="ic">🔍</div><div class="nm">GSC</div><div class="sub">點擊 / 曝光 / 排名</div><div class="ms" data-ms="gsc"></div></div>
+    <div class="node src" data-k="gtm"><span class="step">1</span><div class="ic">🏷️</div><div class="nm">GTM</div><div class="sub">標籤 / 事件設定</div><div class="ms" data-ms="gtm"></div></div>
+    <div class="node" data-k="mcp"><span class="step">2</span><div class="ic">🔌</div><div class="nm">官方 GA MCP</div><div class="sub">＋GSC / GTM API 取數</div><div class="ms" data-ms="mcp"></div></div>
+    <div class="node" data-k="ai"><span class="step">3</span><div class="ic">🤖</div><div class="nm">AI 分析</div><div class="sub">跨來源解讀</div><div class="ms" data-ms="ai"></div></div>
+    <div class="node out" data-k="out"><span class="step">4</span><div class="ic">📈</div><div class="nm">儀表板 / 洞察</div><div class="sub">視覺化報告</div><div class="ms" data-ms="out"></div></div>
+  </div>
+  <div class="aux">
+    <div class="node side" data-k="gen"><div class="ic">🚦</div><div class="nm">API 配額 / 節流</div><div class="sub">分頁·退避重試·快取</div></div>
+    <div class="node side" data-k="viz"><div class="ic">🧩</div><div class="nm">跨資料模型對齊</div><div class="sub">GA4 / GSC / GTM 口徑統一</div></div>
+    <div class="node side" data-k="lang"><div class="ic">📉</div><div class="nm">GA4 抽樣處理</div><div class="sub">拆區間·偵測 sampling</div></div>
+  </div>
+  <div class="runbar">
+    <button id="runBtn">▶ 重播資料流程</button>
+    <span class="runhint">頁面載入會自動播一次；亦可手動重播</span>
+  </div>
+
+  <section class="ai-insight" aria-label="本月 AI 洞察">
+    <div class="ai-insight-kicker">AI PRIORITY INSIGHT</div>
+    <div><strong>自然流量上升，但互動率下降</strong><p>先檢查高流量落地頁的首屏 CTA 與 GTM 事件是否完整；這是本月最優先的轉換修正項目。</p></div>
+    <button type="button">查看建議行動 →</button>
+  </section>
+
+  <!-- ===== KPI ===== -->
+  <h2 class="sec">本月概況 KPI</h2>
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <!-- ===== 1. GSC 三軸組合趨勢圖 ===== -->
+  <h2 class="sec">GSC 成效趨勢（近 14 天）</h2>
+  <div class="panel">
+    <div id="gscTrendChart" class="pchart pchart-lg"></div>
+    <div class="chart-note">曝光（面積）／點擊（長條）／平均排名（線，Y 軸已反轉，線越靠上代表名次越好）</div>
+  </div>
+
+  <!-- ===== 流量來源 + 裝置分佈 ===== -->
+  <div class="analysis-area" style="margin-top:16px">
+    <div class="panel"><h3>流量來源結構</h3><div id="srcChart" class="pchart pchart-sm"></div></div>
+    <div class="panel"><h3>裝置分佈</h3><div id="deviceChart" class="pchart pchart-sm"></div></div>
+  </div>
+
+  <!-- ===== 3. Day × Hour Heatmap ===== -->
+  <h2 class="sec">流量熱力圖（星期 × 時段）</h2>
+  <div class="panel">
+    <div id="heatmapChart" class="pchart pchart-lg"></div>
+    <div class="chart-note">z 值為 sessions；平日白天與晚間、假日午後至深夜各有一段高峰，貼近真實電商流量的作息模式。</div>
+  </div>
+
+  <!-- ===== 4. 頁面類型多線趨勢 + 下拉選單 ===== -->
+  <h2 class="sec">頁面類型流量趨勢</h2>
+  <div class="panel">
+    <div id="pageTypeChart" class="pchart pchart-lg"></div>
+    <div class="chart-note">右上角下拉選單可切換 Sessions / Users / Pageviews，切換時僅重繪資料序列（Plotly restyle），不重新載入整張圖。</div>
+  </div>
+
+  <!-- ===== 5. Session Duration Histogram ===== -->
+  <h2 class="sec">工作階段時長分佈</h2>
+  <div class="panel">
+    <div class="durcat-overview">
+      <h5>全站</h5>
+      <div id="sessionDurChart" class="pchart pchart-xs"></div>
+    </div>
+    <div class="durcat-cats">
+      <div class="durcat-cell"><h5>首頁</h5><div id="durCatHome" class="pchart pchart-xs"></div></div>
+      <div class="durcat-cell"><h5>商品頁</h5><div id="durCatProduct" class="pchart pchart-xs"></div></div>
+      <div class="durcat-cell"><h5>分類頁</h5><div id="durCatCollection" class="pchart pchart-xs"></div></div>
+      <div class="durcat-cell"><h5>內容頁</h5><div id="durCatPage" class="pchart pchart-xs"></div></div>
+      <div class="durcat-cell"><h5>部落格</h5><div id="durCatBlog" class="pchart pchart-xs"></div></div>
+    </div>
+    <div class="durcat-legend" id="durcatLegend"></div>
+    <div class="chart-note">全站多數工作階段落在數十秒到數分鐘之間，右側長尾為深度瀏覽 / 高互動使用者；拆解到頁面大類可看出部落格／商品頁停留明顯較長，首頁則多為快速跳轉。</div>
+  </div>
+
+  <!-- ===== 8. 關鍵字溫度圖 ===== -->
+  <h2 class="sec">GSC 熱門關鍵字（欄位溫度圖）</h2>
+  <div class="panel" style="overflow-x:auto">
+    <table class="kwt" id="kwTable"><thead><tr><th>關鍵字</th><th>點擊</th><th>曝光</th><th>CTR</th><th>平均排名</th></tr></thead><tbody id="kwBody"></tbody></table>
+    <div class="chart-note">每欄依該欄數值的 min–max 各自上色（非整表統一色階），顏色越亮代表該欄位表現越好；與上方 day×hour 熱力圖是不同的視覺化手法。</div>
+  </div>
+
+  <!-- ===== 2. 雙轉換漏斗 ===== -->
+  <h2 class="sec">雙轉換漏斗</h2>
+  <div class="panel">
+    <div class="pchart-row">
+      <div class="pchart-half">
+        <h4 class="pchart-h4">表單詢價漏斗</h4>
+        <div id="funnelForm" class="pchart" style="height:300px"></div>
+      </div>
+      <div class="pchart-half">
+        <h4 class="pchart-h4">LINE 點擊轉換漏斗</h4>
+        <div id="funnelLine" class="pchart" style="height:300px"></div>
+      </div>
+    </div>
+    <div class="chart-note">兩條路徑共用同一批進站流量，分別追蹤「填表詢價」與「導流至 LINE 官方帳號」兩種轉換終點，以 Plotly 原生 funnel 呈現真實梯形收斂。</div>
+  </div>
+
+  <!-- ===== GTM 版本控制 ===== -->
+  <h2 class="sec">GTM 版本控制與變更管理</h2>
+  <div class="panel">
+    <p class="gtm-intro">變更一律先在<b>獨立 Workspace</b> 中開發、確認無誤後才由人工審核並手動發布——API 存取權杖刻意不給 publish scope，避免草稿直接影響正式追蹤設定。</p>
+    <div class="gtm-ver">
+      <div class="gv-cur">已發布版本 <b id="gvCur">—</b></div>
+      <div class="gv-arrow">⟵ 比對草稿 Workspace ⟶</div>
+      <div class="gv-prev">草稿 Workspace <b id="gvPrev">—</b></div>
+    </div>
+    <div class="gtm-meta" id="gtmMeta"></div>
+
+    <div class="gtm-scenario">
+      <h4>範例變更：新增 <code>?debug=1</code> 開發者除錯開關</h4>
+      <p>目的是讓開發者在網址加上查詢參數就能即時進 GA4 DebugView 驗證事件觸發是否正確，同時完全不影響一般使用者的正式資料。</p>
+    </div>
+
+    <div class="gtm-diff" id="gtmDiff"></div>
+    <div class="chart-note">變更類型：<span style="color:var(--green)">＋新增</span>／<span style="color:var(--gold)">～修改</span>／<span style="color:var(--red)">－刪除</span></div>
+
+    <div class="note gtm-api-note">
+      <b>API 行為備註：</b>GTM API 的更新是「整包覆寫」而非局部 patch——每次修改都要先 <code>GET</code> 現有設定，在本地合併新參數後再把完整物件送出，漏掉既有欄位會直接被覆蓋清空。
+    </div>
+
+    <div class="gtm-stats">
+      <div class="grp-tech">
+        <b>容器組成範例：</b>29 個標籤 — 18 個 GA4 事件標籤・7 個轉換標籤・2 個基礎設定標籤，全數皆設有 Consent Mode v2 的 <code>consentSettings</code>。
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== AI 分析 + 熱門進站頁 ===== -->
+  <h2 class="sec">AI 分析與熱門進站頁</h2>
+  <div class="analysis-area">
+    <div class="panel ai-panel">
+      <div class="ai-head">
+        <span class="av-ai">🤖</span>
+        <div>
+          <div class="ai-name">AI 分析助手<span class="badge-ai">AI</span></div>
+          <div class="ai-st">● 由 MCP 取得 GA4 / GSC / GTM 數據後生成</div>
+        </div>
+      </div>
+      <div class="ai-out" id="aiOut">
+        <div class="ai-placeholder">在下方選擇一個分析情境，AI 會依本月 KPI 與跨來源數據逐字產出分析洞察。</div>
+      </div>
+      <div class="ai-tabs-wrap">
+        <div class="ai-tabs-label">選擇分析情境</div>
+        <div class="ai-tabs" id="aiTabs" role="tablist">
+          <button class="ai-tab active" data-scene="overview" role="tab" aria-selected="true">整體成效摘要</button>
+          <button class="ai-tab" data-scene="seo" role="tab" aria-selected="false">SEO 機會</button>
+          <button class="ai-tab" data-scene="conv" role="tab" aria-selected="false">轉換分析</button>
+          <button class="ai-tab" data-scene="ref" role="tab" aria-selected="false">AI 引薦流量</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel chart-panel">
+      <h3>熱門進站頁</h3>
+      <div id="landingPagesChart" class="pchart" style="height:360px"></div>
+      <div class="chart-note">Hover 顯示平均互動時間／跳出率；金色列為互動時間異常偏低、PV 比例異常偏高的疑似機器人流量，保留在圖上是為了示範資料品質檢核意識。</div>
+    </div>
+  </div>
+
+  <!-- ===== 技術與設計說明（摺疊） ===== -->
+  <h2 class="sec">技術與設計說明</h2>
+
+  <details class="acc acc-lg" open>
+    <summary><span class="ic">✨</span> 設計重點<span class="cnt">5 項</span></summary>
+    <div class="abody">
+  <ul class="dlist">
+    <li><span class="ic">🔌</span><div class="tx"><h4>官方 GA MCP + GSC / GTM API 取數</h4><p>以 Google 官方 GA MCP 取 GA4 數據，並整合 GSC / GTM API，讓 AI 以一致介面取用跨來源指標，不必逐一處理各家 API 細節。</p></div></li>
+    <li><span class="ic">🔗</span><div class="tx"><h4>跨來源資料整合</h4><p>流量（GA4）、自然搜尋（GSC）與事件設定（GTM）合在同一份脈絡裡解讀，洞察比單看任一來源更完整。</p></div></li>
+    <li><span class="ic">🚦</span><div class="tx"><h4>API 配額管理與節流</h4><p>GA4 / GSC API 有每日與每分鐘配額，大量取數時做分頁、節流、失敗退避重試與快取，避免 429 超額中斷。</p></div></li>
+    <li><span class="ic">📉</span><div class="tx"><h4>GA4 抽樣（sampling）處理</h4><p>大範圍或高基數查詢會被 GA4 抽樣導致數字失真；以拆分日期區間、縮小維度並偵測 samplingLevel 來降低或標示抽樣。</p></div></li>
+    <li><span class="ic">🧩</span><div class="tx"><h4>跨資料模型對齊</h4><p>GA4（事件）、GSC（查詢）、GTM（標籤）口徑不同，需對齊時間、維度與指標，才能把 GSC 關鍵字對應到 GA4 到達頁與轉換做可信交叉分析。</p></div></li>
+  </ul>
+    </div>
+  </details>
+
+  <details class="acc acc-lg" open>
+    <summary><span class="ic">🛠️</span> 專案實作項目<span class="cnt">6 項</span></summary>
+    <div class="abody">
+  <div class="didblock" style="border:none;padding:0;background:none">
+    <p class="lead">獨立完成的<b>行銷數據決策系統</b>：整合 GA4／GSC／GTM 三方數據，透過官方 GA MCP 讓 AI 直接取數並輸出可執行洞察，
+    把原本分散、需人工彙整的報表，轉化為能直接支援投放與 SEO 決策的依據。</p>
+    <ul class="did">
+      <li>
+        <div class="h"><span class="ic">🔌</span>串接官方 GA MCP + GSC / GTM API</div>
+        <p class="d">以 <b>Google 官方 GA MCP</b> 取 <b>GA4</b> 數據，並整合 <b>Search Console</b> 與 <b>Tag Manager</b> API，
+        讓 AI 以一致介面取得跨來源數據，不必各自處理授權與回應格式。（另在宜搭、台股輿情等專案自建 MCP。）</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🚦</span>API 配額管理與快取</div>
+        <p class="d">針對 <b>GA4 / GSC API 配額</b> 設計請求<b>節流、分頁與增量快取</b>，
+        並對失敗做退避重試，確保大量、定期取數穩定不中斷（不撞 429）。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🤖</span>AI 自動產出分析</div>
+        <p class="d">由 AI 讀取整合後的指標，產出<b>成效摘要、SEO 機會、轉換洞察與 AI 引薦流量歸因</b>等可讀報告，
+        把「數字」轉成「人看得懂、可行動的建議」。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">📈</span>Plotly.js 資料視覺化儀表板</div>
+        <p class="d">以 <b>Plotly.js</b> 建置 KPI 卡、GSC 三軸組合趨勢圖、雙轉換漏斗（原生 funnel 梯形）、day×hour 熱力圖與可切換指標的多線趨勢圖，
+        把跨來源數據整理成一眼看懂、可據以決策的儀表板。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🧩</span>跨資料模型整合</div>
+        <p class="d">對齊 <b>GA4 事件模型</b>與 <b>GSC 查詢模型</b>的維度、時間與口徑，
+        把 GSC 關鍵字對應到 GA4 到達頁與轉換，才能做可信的跨來源交叉分析。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🏗️</span>自動化重生與發布</div>
+        <p class="d">把假數據重生、版面建置與發布串成<b>可重複執行的流程</b>，
+        更新只需一鍵重跑，不必手改成品 HTML，維護成本低且不易出錯。</p>
+      </li>
+    </ul>
+    <p class="foot">＊ 實際帳號、measurement id、查詢語法、資料屬性與分析 prompt 屬機密，<b>未公開</b>於本展示，可於面談時進一步說明。</p>
+  </div>
+    </div>
+  </details>
+
+  <footer>
+    Jason ｜ jason0308p@gmail.com ｜ 展示資料為範例，AI 與後端行為為前端模擬。
+  </footer>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

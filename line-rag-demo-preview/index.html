@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LINE 智能客服機器人 — 展示用 (MVP)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="../index.html" title="返回作品集首頁" class="float-home">← 作品集首頁</a>
+
+<nav>
+  <div class="brand"><span class="dot"></span>LINE 智能客服<span>·RAG</span></div>
+  <div class="nav-right">
+    <span class="badge-demo">DEMO</span>
+    <a href="../index.html">← 作品集首頁</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>B2B 禮品 LINE 智能客服機器人</h1>
+    <p>串接 LINE、n8n、RAG 向量資料庫與 AI，客戶在 LINE 上詢問產品、價格、交期時自動分流並回覆，
+       並把詢問同步通知內部。本頁為<b>純前端互動展示</b>。</p>
+    <div class="tags">
+      <span class="tag">LINE Messaging API</span>
+      <span class="tag">n8n</span>
+      <span class="tag">RAG / 向量檢索</span>
+      <span class="tag">AI 生成回覆</span>
+      <span class="tag">宜搭表單</span>
+      <span class="tag">群組通知</span>
+      <span class="tag hot">熱資料</span>
+      <span class="tag cool">冷資料</span>
+    </div>
+  </div>
+
+  <div class="service-outcomes"><span><b>精準問題先查冷資料</b>減少不必要的 AI 檢索</span><span><b>無對應價格即轉人工</b>避免自動誤報價</span><span><b>詢問同步內部通知</b>降低漏單風險</span></div>
+
+  <!-- ===== 互動體驗：聊天 + 即時亮燈動畫並排 ===== -->
+  <h2 class="sec">互動體驗（送出訊息後，旁邊會即時亮燈）</h2>
+  <div class="chat-area">
+    <div class="phone">
+      <div class="phone-top"><span class="av">🤖</span>
+        <div class="pt-info"><div class="pt-name">AI 客服 · 禮品小幫手</div>
+        <div class="pt-st">● 線上 · 自動回覆中</div></div>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="mobile-trace" id="mobileTrace" hidden>
+        <button class="mobile-trace-summary" id="mobileTraceOpen" type="button" aria-expanded="false">
+          <span class="mt-dot" aria-hidden="true"></span>
+          <span class="mt-copy"><b id="mobileTraceState">AI 正在處理</b><small id="mobileTraceDetail">正在準備檢索</small></span>
+          <span class="mt-progress" id="mobileTraceProgress">0 / 6</span>
+          <span class="mt-more">查看流程 ›</span>
+        </button>
+      </div>
+      <div class="compose">
+        <input id="inp" placeholder="輸入問題，或點下方範例開始體驗…" autocomplete="off">
+        <button id="send">送出</button>
+      </div>
+    </div>
+
+    <!-- 聊天輔助：範例問題緊接聊天窗（點了會直接送進輸入框，邏輯上屬於互動的一部分） -->
+    <div class="side-panel">
+      <div class="panel">
+        <h3>試試這些問題（依技術分類）</h3>
+        <div id="chips"></div>
+      </div>
+    </div>
+
+    <!-- 即時處理狀態：精簡動畫 + 本次流程紀錄，同一群組，送出訊息後同步亮燈/更新 -->
+    <div class="compact-anim">
+      <div class="trace-summary" id="traceSummary" aria-live="polite">
+        <span class="trace-status">等待提問</span>
+        <span class="trace-detail">送出問題後，這裡會顯示本次資料路徑與回覆時間。</span>
+      </div>
+      <div class="ca-block">
+        <h3>處理流程</h3>
+        <div class="cpipe" id="cpipe">
+          <div class="cnode node line" data-k="line"><span class="cstep">1</span><span class="cic">💬</span><span class="cnm">LINE</span></div>
+          <div class="cnode node" data-k="n8n"><span class="cstep">2</span><span class="cic">🔀</span><span class="cnm">n8n</span></div>
+          <div class="cnode node" data-k="route"><span class="cstep">3</span><span class="cic">🧭</span><span class="cnm">路由</span></div>
+          <div class="cnode node" data-k="rag"><span class="cstep">4</span><span class="cic">🗂️</span><span class="cnm">RAG</span></div>
+          <div class="cnode node" data-k="ai"><span class="cstep">5</span><span class="cic">🤖</span><span class="cnm">AI</span></div>
+          <div class="cnode node line" data-k="reply"><span class="cstep">6</span><span class="cic">📤</span><span class="cnm">回覆</span></div>
+        </div>
+        <div class="caux">
+          <span class="cnode node side" data-k="sheet">❄️ 冷資料源</span>
+          <span class="cnode node side" data-k="vec">🔥 熱資料</span>
+          <span class="cnode node side" data-k="yida">📋 宜搭表單</span>
+        </div>
+      </div>
+      <div class="ca-block">
+        <h3>冷熱判斷閘道</h3>
+        <div class="cgate" id="cgateTree">
+          <div class="cgate-row gate-row" data-row="code"><span class="cgq">Q1 編號？</span><span class="cgleaf cold">❄️冷</span></div>
+          <div class="cgate-row gate-row" data-row="cat"><span class="cgq">Q2 品類？</span><span class="cgleaf cold">❄️冷</span></div>
+          <div class="cgate-row gate-row" data-row="fuzzy"><span class="cgq">Q3 模糊？</span><span class="cgleaf hot">🔥熱</span></div>
+          <div class="cgate-row gate-row" data-row="faq"><span class="cgq">Q4 FAQ？</span><span class="cgleaf cold">❄️冷</span></div>
+          <div class="cgate-row gate-row" data-row="fallback"><span class="cgq">皆未命中</span><span class="cgleaf hot">🔥熱</span></div>
+        </div>
+      </div>
+      <p class="ca-hint">完整節點說明與冷熱資料設計原理，見下方「技術與設計說明 → 詳細動畫版」。</p>
+      <div class="panel ca-timeline">
+        <h3>本次處理流程</h3>
+        <div class="tl" id="timeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="mobile-trace-sheet" id="mobileTraceSheet" aria-hidden="true" aria-label="本次 AI 處理流程">
+    <div class="mts-panel">
+      <div class="mts-head"><div><strong>本次 AI 處理流程</strong><span id="mobileTraceOutcome">等待送出問題</span></div><button id="mobileTraceClose" type="button" aria-label="關閉處理流程">×</button></div>
+      <div class="tl" id="mobileTimeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
+    </div>
+  </section>
+
+  <!-- ===== 技術與設計說明（摺疊，預設收起以保持精簡） ===== -->
+  <h2 class="sec">技術與設計說明</h2>
+
+  <details class="acc acc-lg">
+    <summary><span class="ic">🔍</span> 詳細動畫版（完整節點說明 + 冷熱判斷邏輯）<span class="cnt">與上方即時同步</span></summary>
+    <div class="abody">
+  <p class="detail-note">下面是「互動體驗」旁精簡動畫的完整版本：節點名稱、耗時與判斷條件都完整標示，方便理解每一步在做什麼。<b>與聊天窗旁的精簡版共用同一組動畫狀態</b>——在上面送出訊息時，這裡也會同步亮燈。</p>
+
+  <h4 class="detail-h">處理流程順序</h4>
+  <div class="pipe" id="pipe">
+    <div class="node line" data-k="line"><span class="step">1</span><div class="ic">💬</div><div class="nm">LINE 用戶</div><div class="sub">收到訊息</div><div class="ms" data-ms="line"></div></div>
+    <div class="node" data-k="n8n"><span class="step">2</span><div class="ic">🔀</div><div class="nm">n8n Webhook</div><div class="sub">去抖動·驗章</div><div class="ms" data-ms="n8n"></div></div>
+    <div class="node" data-k="route"><span class="step">3</span><div class="ic">🧭</div><div class="nm">路由判斷</div><div class="sub">分流問題類型</div><div class="ms" data-ms="route"></div></div>
+    <div class="node" data-k="rag"><span class="step">4</span><div class="ic">🗂️</div><div class="nm">RAG 檢索</div><div class="sub">冷熱資料分層</div><div class="ms" data-ms="rag"></div></div>
+    <div class="node" data-k="ai"><span class="step">5</span><div class="ic">🤖</div><div class="nm">AI 生成</div><div class="sub">組裝回覆</div><div class="ms" data-ms="ai"></div></div>
+    <div class="node line" data-k="reply"><span class="step">6</span><div class="ic">📤</div><div class="nm">回覆 + 通知</div><div class="sub">LINE·內部群組</div><div class="ms" data-ms="reply"></div></div>
+  </div>
+  <div class="aux">
+    <div class="node side" data-k="sheet"><div class="ic">❄️</div><div class="nm">冷資料源</div><div class="sub">FAQ／產品／牌價（批次同步）</div></div>
+    <div class="node side" data-k="vec"><div class="ic">🔥</div><div class="nm">熱資料</div><div class="sub">向量庫快取／即時檢索</div></div>
+    <div class="node side" data-k="yida"><div class="ic">📋</div><div class="nm">宜搭表單</div><div class="sub">需人工報價時建單</div></div>
+  </div>
+
+  <h4 class="detail-h">冷熱資料判斷邏輯閘道</h4>
+  <div class="panel gate-panel">
+    <p class="gate-intro">每則訊息依序通過下面 4 道判斷閘門，<b>命中就立即分流、不再往下走</b>——真正決定的是「查<b>冷資料</b>本地索引」還是「查<b>熱資料</b>向量庫」。在上方送出聊天訊息後，這裡會同步亮起對應命中的分支。</p>
+    <div class="gate-tree" id="gateTree">
+      <div class="gate-in">📩 使用者訊息</div>
+      <div class="gate-row" data-row="code">
+        <div class="gate-q">Q1　含產品編號？<span class="gq-eg">例：GIFT-1001</span></div>
+        <div class="gate-arrow">是 →</div>
+        <div class="gate-leaf cold" data-leaf="code">❄️ 冷資料<small>本地編號索引精準命中，跳過向量搜尋</small></div>
+      </div>
+      <div class="gate-row" data-row="cat">
+        <div class="gate-q">Q2　含品類關鍵字？<span class="gq-eg">例：保溫杯、環保袋</span></div>
+        <div class="gate-arrow">是 →</div>
+        <div class="gate-leaf cold" data-leaf="cat">❄️ 冷資料<small>本地分類索引，回傳整類清單</small></div>
+      </div>
+      <div class="gate-row" data-row="fuzzy">
+        <div class="gate-q">Q3　需求模糊、無明確品項？<span class="gq-eg">例：送禮推薦、質感小禮</span></div>
+        <div class="gate-arrow">是 →</div>
+        <div class="gate-leaf hot" data-leaf="fuzzy">🔥 熱資料<small>向量語意檢索，即時算相似度</small></div>
+      </div>
+      <div class="gate-row" data-row="faq">
+        <div class="gate-q">Q4　命中 FAQ 關鍵字？<span class="gq-eg">例：運費、交期、發票</span></div>
+        <div class="gate-arrow">是 →</div>
+        <div class="gate-leaf cold" data-leaf="faq">❄️ 冷資料<small>FAQ 知識庫（批次同步）</small></div>
+      </div>
+      <div class="gate-row" data-row="fallback">
+        <div class="gate-q gate-fallback">以上皆未命中</div>
+        <div class="gate-arrow">→</div>
+        <div class="gate-leaf hot" data-leaf="fallback">🔥 熱資料<small>語意檢索 fallback，轉一般回答再由人工跟進</small></div>
+      </div>
+    </div>
+    <div class="coldhot-compare">
+      <div class="ch-card cold">
+        <h4>❄️ 冷資料</h4>
+        <p>變動少、可預先算好的資料：<b>商品編號／分類索引</b>與<b>FAQ 知識庫</b>。批次同步後建成記憶體快照，依檔案 <code>mtime</code>／<code>size</code> 判斷是否需要重建索引，查詢時直接讀記憶體，不需要即時運算。</p>
+      </div>
+      <div class="ch-card hot">
+        <h4>🔥 熱資料</h4>
+        <p>需要「即時理解語意」才回答得了的情境：<b>向量資料庫語意檢索</b>。只在編號／分類／FAQ 關鍵字都沒命中時才觸發，因為語意檢索的運算成本明顯高於本地索引查表，優先順序刻意放在最後。</p>
+      </div>
+    </div>
+  </div>
+    </div>
+  </details>
+
+  <details class="acc acc-lg" open>
+    <summary><span class="ic">✨</span> 設計重點<span class="cnt">5 項</span></summary>
+    <div class="abody">
+  <ul class="dlist">
+    <li><span class="ic">🎯</span><div class="tx"><h4>分層檢索（先精準、後語意）</h4><p>先用編號／關鍵字做精準比對，命中就直接回覆；找不到才動用 AI 語意搜尋，同時顧到準確度與運算成本。</p></div></li>
+    <li><span class="ic">❄️🔥</span><div class="tx"><h4>冷熱資料分流</h4><p>變動少的 FAQ／產品／牌價以批次方式同步為「冷資料」，查詢時走「熱資料」快取與向量索引，明顯降低回應延遲。</p></div></li>
+    <li><span class="ic">🛡️</span><div class="tx"><h4>報價保守、不亂估</h4><p>沒有對應牌價時不臆測價格，改提示「需人工確認」並自動建立宜搭詢價單，避免報錯價造成商業風險。</p></div></li>
+    <li><span class="ic">🔔</span><div class="tx"><h4>即時通知、不漏單</h4><p>客戶詢問同步通知內部群組，重要詢價與需人工處理的案件不漏接。</p></div></li>
+    <li><span class="ic">⚡</span><div class="tx"><h4>本地快照索引與快取重建</h4><p>把上萬筆產品建成記憶體索引（編號／分類／關鍵詞），並用檔案 mtime／size 判斷是否重建，避免每次查詢重讀整份資料、大幅降低延遲。</p></div></li>
+  </ul>
+    </div>
+  </details>
+
+  <details class="acc acc-lg" open>
+    <summary><span class="ic">🛠️</span> 專案實作項目<span class="cnt">6 項</span></summary>
+    <div class="abody">
+  <div class="didblock" style="border:none;padding:0;background:none">
+    <p class="lead">獨立完成從<b>系統設計、多平台整合到生產化維運</b>的 B2B 智能客服：以 RAG 與分層檢索確保回覆準確、
+    將報價風險與 API 成本納入設計，讓常見詢問自動化處理，把人力集中在真正需要人工的高價值客戶。</p>
+    <ul class="did">
+      <li>
+        <div class="h"><span class="ic">🔗</span>多平台整合</div>
+        <p class="d">串接 <b>LINE Messaging API</b>、<b>n8n</b> 自動化流程、<b>向量資料庫</b>與 <b>AI 生成模型</b>，
+        並整合 <b>宜搭表單</b>與內部群組通知，串起「客戶詢問 → 自動回覆 → 內部跟進」的完整閉環。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🧠</span>檢索式生成（RAG）架構</div>
+        <p class="d">將 FAQ 與產品知識向量化建立索引，依問題語意檢索相關內容後再交給模型生成回答，
+        讓回覆<b>有所本、可控、可追溯</b>，而非單純讓模型自由發揮。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">⚡</span>檢索策略與成本最佳化</div>
+        <p class="d">設計<b>多層檢索</b>：精準比對優先、語意搜尋為後備，並以<b>冷熱資料分層</b>與本地快取
+        減少不必要的向量運算與外部呼叫，<b>同時改善回應速度與 API 成本</b>。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🛡️</span>商業風險控管</div>
+        <p class="d">針對報價情境採<b>保守策略</b>，無對應牌價即轉人工並自動建單，
+        把「AI 答錯造成的營運風險」納入系統設計，而不只是追求看起來會回答。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🏗️</span>生產化與工程紀律</div>
+        <p class="d">處理 webhook 簽章驗證、訊息去抖動、增量資料同步與本地快照索引等生產細節，
+        並以<b>自動化測試</b>守住關鍵行為（產品編號不被語意搜尋覆蓋、報價不亂估），確保穩定可維護。</p>
+      </li>
+      <li>
+        <div class="h"><span class="ic">🔁</span>從低程式碼到工程實作</div>
+        <p class="d">先以 <b>n8n</b> 快速驗證可行性並上線，再為了效能、成本與可控性
+        <b>重構為可維護的服務</b>——兼具「快速落地」與「長期可維運」兩種能力。</p>
+      </li>
+    </ul>
+    <p class="foot">＊ 實際的檢索邏輯、資料結構、prompt 與門檻參數屬營運 know-how，未公開於本展示，可於面談時進一步說明。</p>
+  </div>
+    </div>
+  </details>
+
+  <footer>
+    Jason ｜ jason0308p@gmail.com ｜ 展示資料為範例，AI 與後端行為為前端模擬。
+  </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

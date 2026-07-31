@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Job Research Dashboard — UX Preview</title>
+  <style>
+    html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#f5f7fb}
+  </style>
+</head>
+<body>
+  <iframe id="dashboard" src="./index.html" title="Job Research Dashboard preview"></iframe>
+  <script>
+    const frame = document.querySelector('#dashboard');
+    frame.addEventListener('load', () => {
+      const doc = frame.contentDocument;
+      if (!doc || doc.querySelector('#preview-dashboard-overrides')) return;
+      const style = doc.createElement('style');
+      style.id = 'preview-dashboard-overrides';
+      style.textContent = `
+        th:nth-child(4), td.region { width:92px; max-width:92px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .job-title-link { color:var(--ink); font-weight:750; text-decoration:none; }
+        .job-title-link::after { content:'↗'; display:inline-block; margin-left:6px; color:var(--accent); font-size:.85em; }
+        .job-title-link:hover { color:var(--accent); text-decoration:underline; }
+      `;
+      doc.head.append(style);
+      const titleHeader = doc.querySelector('thead tr');
+      if (titleHeader && titleHeader.cells.length > 6) titleHeader.cells[6].remove();
+      const enhanceRows = () => doc.querySelectorAll('#rows tr').forEach(row => {
+        const cells = row.cells;
+        if (!cells || cells.length < 7) return;
+        const titleCell = cells[1];
+        const regionCell = cells[3];
+        const jobLink = cells[6].querySelector('a[href]');
+        regionCell.classList.add('region');
+        if (jobLink && !titleCell.querySelector('a')) {
+          const link = doc.createElement('a');
+          link.className = 'job-title-link';
+          link.href = jobLink.href;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.textContent = titleCell.textContent;
+          titleCell.replaceChildren(link);
+        }
+        cells[6].remove();
+      });
+      enhanceRows();
+      new frame.contentWindow.MutationObserver(enhanceRows)
+        .observe(doc.querySelector('#rows'), { childList:true });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DEMO BRAND 30 天 GA4 / GSC Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <style>
+    :root {
+      --ink: #0f172a; --muted: #64748b; --faint: #94a3b8;
+      --surface: #ffffff; --border: #e6ebf3; --line: #eef2f8;
+      --primary: #4f46e5; --primary-soft: #eef0fe;
+      --accent: #0ea5e9; --emerald: #10b981; --violet: #7c3aed; --amber: #f59e0b;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Inter", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif; font-feature-settings: "tnum" 0; font-size: 16px; background: radial-gradient(1200px 600px at 80% -10%, #eaf0ff 0%, transparent 60%), linear-gradient(180deg, #f6f8fc 0%, #eef2f9 100%); color: var(--ink); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+    .page { max-width: 1480px; margin: 0 auto; padding: 18px 18px 64px; }
+    .nav { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 16px; margin: -18px -18px 22px; background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .nav .brand { font-weight: 800; color: var(--ink); margin-right: 12px; letter-spacing: .2px; }
+    .nav a { text-decoration: none; color: #475569; background: #fff; border: 1px solid var(--border); border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 500; transition: all .15s; }
+    .nav a:hover { border-color: var(--primary); color: var(--primary); }
+    .nav a.switch { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .range-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 22px; }
+    .range-label { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .range-pill { text-decoration: none; color: #475569; background: #fff; border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; font-size: 13px; }
+    .range-pill.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+    h1 { margin: 0 0 6px; font-size: 30px; font-weight: 800; letter-spacing: -0.4px; }
+    .sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+    .note { background: #fffaf0; border: 1px solid #fde9c8; color: #92600a; padding: 12px 16px; border-radius: 14px; margin-bottom: 16px; font-size: 13px; }
+    /* KPI hero cards */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 16px; }
+    .kpi-grid .card { position: relative; overflow: hidden; padding: 18px 18px 16px; }
+    .kpi-grid .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary); }
+    .kpi-grid .card:nth-child(6n+1)::before { background: var(--primary); }
+    .kpi-grid .card:nth-child(6n+2)::before { background: var(--emerald); }
+    .kpi-grid .card:nth-child(6n+3)::before { background: var(--violet); }
+    .kpi-grid .card:nth-child(6n+4)::before { background: var(--accent); }
+    .kpi-grid .card:nth-child(6n+5)::before { background: var(--amber); }
+    .kpi-grid .card:nth-child(6n+6)::before { background: #ec4899; }
+    .card, .subcard, section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); }
+    .card .label { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    .card .value { margin-top: 6px; font-size: 30px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+    section { margin-bottom: 20px; }
+    section h2 { margin: 0 0 10px; font-size: 19px; font-weight: 700; padding-left: 12px; position: relative; }
+    section h2::before { content: ""; position: absolute; left: 0; top: 3px; bottom: 3px; width: 4px; border-radius: 3px; background: linear-gradient(var(--primary), var(--accent)); }
+    section p { margin: 0 0 14px; color: var(--muted); font-size: 16px; line-height: 1.55; }
+    .subcard { box-shadow: var(--shadow-sm); }
+    .subcard h3 { margin: 0 0 8px; font-size: 16px; font-weight: 700; color: #1e293b; }
+    .toggle-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .toggle-btn { border: 1px solid var(--border); background: #fff; color: #475569; border-radius: 999px; padding: 6px 13px; font-size: 13px; cursor: pointer; transition: all .15s; }
+    .toggle-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .toggle-pane { display: none; }
+    .toggle-pane.active { display: block; }
+    .insight { margin-top: 12px; padding: 13px 16px; border-radius: 12px; background: linear-gradient(120deg, var(--primary-soft), #f5fbff); color: #2a2f6b; font-size: 14px; border: 1px solid #e3e7fd; }
+    /* Key takeaways band */
+    .takeaways { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .takeaway { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow-sm); }
+    .takeaway .tk-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--primary); display: flex; align-items: center; gap: 6px; }
+    .takeaway .tk-body { margin-top: 7px; font-size: 14px; line-height: 1.45; color: #1e293b; }
+    .takeaway .tk-body b { color: var(--ink); }
+    /* metric mini-card — minimal: one headline number + up to two clean metrics */
+    .mini-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 12px; margin-top: 4px; }
+    .mini-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow-sm); }
+    a.mini-card.mc-link { display: block; text-decoration: none; color: inherit; cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s; }
+    a.mini-card.mc-link:hover { border-color: var(--primary); box-shadow: 0 6px 18px rgba(79,70,229,.16); transform: translateY(-1px); }
+    .mini-card .mc-go { flex: none; font-size: 12px; color: #cbd5e1; font-weight: 700; }
+    a.mini-card.mc-link:hover .mc-go { color: var(--primary); }
+    .mini-card .mc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; min-height: 20px; }
+    .mini-card .mc-rank { flex: none; width: 20px; height: 20px; border-radius: 6px; background: #f1f5f9; color: #64748b; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .mini-card .mc-name { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-card .mc-num { font-size: 27px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; color: var(--ink); }
+    .mini-card .mc-label { font-size: 13px; color: #64748b; font-weight: 600; margin-top: 3px; }
+    .mini-card .mc-subs { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); display: flex; gap: 22px; }
+    .mini-card .mc-sub { display: flex; flex-direction: column; gap: 2px; }
+    .mini-card .mc-sub .mc-sub-l { font-size: 10.5px; color: var(--muted); font-weight: 500; }
+    .mini-card .mc-sub .mc-num2 { font-size: 15px; font-weight: 700; color: #1e293b; }
+    /* top-3 rank badges get a clear colour ramp so the ranking reads at a glance */
+    .mini-grid .mini-card:nth-child(1) .mc-rank { background: var(--primary); color: #fff; }
+    .mini-grid .mini-card:nth-child(2) .mc-rank { background: #c7d2fe; color: #3730a3; }
+    .mini-grid .mini-card:nth-child(3) .mc-rank { background: #e0e7ff; color: #4338ca; }
+    /* "熱門 / 偏低" pills */
+    .mini-card .mc-tag { flex: none; font-size: 10px; font-weight: 700; padding: 1px 8px; border-radius: 999px; line-height: 1.7; }
+    .mini-card .mc-tag.hot { background: #fef3c7; color: #b45309; }
+    .mini-card .mc-tag.cold { background: #eef2f7; color: #94a3b8; }
+    /* headline value bar (filled + heat-coloured by runtime JS) */
+    .mini-card .mc-track { height: 6px; border-radius: 999px; background: #f1f5f9; overflow: hidden; margin-top: 11px; }
+    .mini-card .mc-fill { height: 100%; width: 5%; border-radius: 999px; background: #ea580c; transition: width .45s ease; }
+    /* MoM footer: previous value + coloured delta pushed to the right */
+    .mini-card .mc-meta { display: flex; align-items: center; gap: 6px; margin-top: 11px; font-size: 11.5px; color: var(--muted); }
+    .mini-card .mc-meta .mc-prev { font-weight: 700; color: #475569; }
+    .mini-card .mc-delta { margin-left: auto; font-size: 12.5px; font-weight: 800; }
+    .mini-card .mc-delta.up { color: #dc2626; }
+    .mini-card .mc-delta.down { color: #16a34a; }
+    .mini-card .mc-delta.flat { color: var(--faint); }
+    /* secondary metric mini-meters */
+    .mini-card .mc-meter { height: 4px; border-radius: 999px; background: #f1f5f9; overflow: hidden; margin-top: 5px; }
+    .mini-card .mc-meter-fill { height: 100%; width: 3%; border-radius: 999px; background: #93c5fd; }
+    .mc-empty { color: var(--faint); font-size: 13px; padding: 10px 2px; }
+    /* Collapsible heavy sections */
+    details.fold { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; padding: 0; }
+    details.fold > summary { list-style: none; cursor: pointer; padding: 18px 22px; font-size: 19px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    details.fold > summary::-webkit-details-marker { display: none; }
+    details.fold > summary::before { content: "▸"; color: var(--primary); font-size: 14px; transition: transform .15s; }
+    details.fold[open] > summary::before { transform: rotate(90deg); }
+    details.fold > summary .fold-hint { margin-left: auto; font-size: 12px; font-weight: 500; color: var(--faint); }
+    details.fold > .fold-body { padding: 0 22px 20px; }
+    details.fold .subcard { box-shadow: none; }
+    .chart { width: 100%; min-height: 360px; }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+    .two-col > * { min-width: 0; overflow: hidden; }
+    .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+    table.data-table { width: 100%; min-width: 0; border-collapse: collapse; font-size: 16px; table-layout: auto; }
+    .data-table th, .data-table td { border-top: 1px solid var(--line); padding: 11px 12px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+    .data-table td:first-child:not(.rank-col), .data-table th:first-child:not(.rank-col) { min-width: 120px; }
+    .data-table td.rank-col, .data-table th.rank-col { min-width: 0; width: 26px; }
+    .data-table th { color: var(--muted); font-weight: 700; background: #f8fafc; font-size: 13.5px; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+    .data-table tr:first-child th { border-top: 0; }
+    .data-table tr:hover td { background: rgba(79, 70, 229, 0.04); }
+    .note-box { border: 1px dashed var(--amber); background: #fffaf0; color: #92600a; border-radius: 12px; padding: 14px; font-size: 13px; }
+    /* Page tabs (CSS-only: radio + label, no JS — must survive the public-build's
+       regex that strips the trailing <script> block, see build_dashboard_public.py) */
+    .tabbar { position: sticky; top: 49px; z-index: 19; display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px; margin: 0 -18px 22px; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .tab-radio { position: absolute; opacity: 0; pointer-events: none; }
+    .tab-label { cursor: pointer; user-select: none; color: #475569; background: #fff; border: 1px solid var(--border); border-radius: 999px; padding: 7px 15px; font-size: 13px; font-weight: 600; transition: all .15s; }
+    .tab-label:hover { border-color: var(--primary); color: var(--primary); }
+    .tab-panel { display: none; }
+    #tab-0:checked ~ .page .tabbar .tab-label[for="tab-0"] { background: var(--primary); border-color: var(--primary); color: #fff; } #tab-0:checked ~ .page .tab-panel[data-tab="0"] { display: block; }#tab-1:checked ~ .page .tabbar .tab-label[for="tab-1"] { background: var(--primary); border-color: var(--primary); color: #fff; } #tab-1:checked ~ .page .tab-panel[data-tab="1"] { display: block; }#tab-2:checked ~ .page .tabbar .tab-label[for="tab-2"] { background: var(--primary); border-color: var(--primary); color: #fff; } #tab-2:checked ~ .page .tab-panel[data-tab="2"] { display: block; }#tab-3:checked ~ .page .tabbar .tab-label[for="tab-3"] { background: var(--primary); border-color: var(--primary); color: #fff; } #tab-3:checked ~ .page .tab-panel[data-tab="3"] { display: block; }#tab-4:checked ~ .page .tabbar .tab-label[for="tab-4"] { background: var(--primary); border-color: var(--primary); color: #fff; } #tab-4:checked ~ .page .tab-panel[data-tab="4"] { display: block; }#tab-5:checked ~ .page .tabbar .tab-label[for="tab-5"] { background: var(--primary); border-color: var(--primary); color: #fff; } #tab-5:checked ~ .page .tab-panel[data-tab="5"] { display: block; }#tab-6:checked ~ .page .tabbar .tab-label[for="tab-6"] { background: var(--primary); border-color: var(--primary); color: #fff; } #tab-6:checked ~ .page .tab-panel[data-tab="6"] { display: block; }
+  </style>
+</head>
+<body>
+  <input type="radio" name="dashtab" id="tab-0" class="tab-radio" checked><input type="radio" name="dashtab" id="tab-1" class="tab-radio"><input type="radio" name="dashtab" id="tab-2" class="tab-radio"><input type="radio" name="dashtab" id="tab-3" class="tab-radio"><input type="radio" name="dashtab" id="tab-4" class="tab-radio"><input type="radio" name="dashtab" id="tab-5" class="tab-radio"><input type="radio" name="dashtab" id="tab-6" class="tab-radio">
+  <div class="page">
+    <div class="nav">
+      <span class="brand">DEMO BRAND GA4</span>
+    </div>
+    <h1>DEMO BRAND 30 天 GA4 / GSC Dashboard</h1>
+    <div class="sub">示意資料 demo snapshot · <span style="background:#fef9c3;padding:2px 8px;border-radius:6px;font-weight:600;color:#854d0e;">DEMO · 數據為虛構示意，僅供面試展示</span></div>
+    
+    <div class="range-bar"><span class="range-label">區間</span><a href="dashboard_30.html" class="range-pill active">30天</a><a href="dashboard.html" class="range-pill">90天</a><a href="dashboard_180.html" class="range-pill">180天</a></div>
+    <div class="tabbar">
+      <label class="tab-label" for="tab-0">摘要</label>
+      <label class="tab-label" for="tab-1">流量來源</label>
+      <label class="tab-label" for="tab-2">頁面類型</label>
+      <label class="tab-label" for="tab-3">事件與轉換</label>
+      <label class="tab-label" for="tab-4">GSC／搜尋</label>
+      <label class="tab-label" for="tab-5">受眾／LINE</label>
+      <label class="tab-label" for="tab-6">最近更新</label>
+    </div>
+
+    <div class="tab-panel" data-tab="0">
+    <section id="summary">
+      <h2>摘要</h2>
+      <div class="kpi-grid">
+        <div class="card"><div class="label">30 天工作階段</div><div class="value">38,335</div></div>
+        <div class="card"><div class="label">互動率</div><div class="value">74.2%</div></div>
+        <div class="card"><div class="label">詢價用戶（表單+LINE）</div><div class="value">455</div><div class="label" style="color:var(--muted);font-size:10px">兩漏斗最終用戶加總·未去重</div></div>
+        <div class="card"><div class="label">詢價率（表單+LINE）</div><div class="value">1.1%</div><div class="label" style="color:var(--muted);font-size:10px">詢價用戶 ÷ 工作階段</div></div>
+        <div class="card"><div class="label">GSC 點擊</div><div class="value">5,728</div></div>
+        <div class="card"><div class="label">GSC 平均 CTR</div><div class="value">2.6%</div></div>
+      </div>
+    </section>
+
+    
+    <section id="actions">
+      <h2>本月行動建議</h2>
+      <p>以下每一條都是把下方各區塊的數字重新排序、抓出最該優先處理的項目——判斷邏輯：詢價率＝(表單+LINE)÷Sessions；管道加碼/檢討＝互動率是否高於平均、近3週趨勢是否上升。數字本身可以在下方對應區塊核對來源。</p>
+      <div class="two-col">
+        <div class="subcard">
+          <h3>詢價率最高品類</h3>
+          <div class="table-wrap"><table class="data-table noheat-table" style="font-size:12.5px;"><tr><th>核心分類</th><th style="text-align:right">Sessions</th><th style="text-align:right">詢價數</th><th style="text-align:right">詢價率</th></tr><tr><td><b>吸管杯</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">88GZ</code></td><td style="text-align:right;font-variant-numeric:tabular-nums">20</td><td style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#16a34a">7</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 100%, transparent 100%)"><b>35.0%</b></td></tr><tr><td><b>筆袋</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">33UE</code></td><td style="text-align:right;font-variant-numeric:tabular-nums">31</td><td style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#16a34a">8</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 74%, transparent 74%)"><b>25.8%</b></td></tr><tr><td><b>行動電源</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">77JZ</code></td><td style="text-align:right;font-variant-numeric:tabular-nums">24</td><td style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#16a34a">5</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 59%, transparent 59%)"><b>20.8%</b></td></tr><tr><td><b>旅行盥洗組</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">54HZ</code></td><td style="text-align:right;font-variant-numeric:tabular-nums">47</td><td style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#16a34a">8</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 49%, transparent 49%)"><b>17.0%</b></td></tr><tr><td><b>牛皮證件夾</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">73TT</code></td><td style="text-align:right;font-variant-numeric:tabular-nums">68</td><td style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#16a34a">11</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 46%, transparent 46%)"><b>16.2%</b></td></tr></table></div>
+        </div>
+        <div class="subcard">
+          <h3>本月表現變化最大的頁面</h3>
+          <div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><a href="https://www.demo-store/pages/design-service" target="_blank" rel="noopener" style="color:#334155;text-decoration:none">design-service ↗</a></span><b style="color:#dc2626;white-space:nowrap;font-variant-numeric:tabular-nums">▲ +238 (+70.0%)</b></div><div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><a href="https://www.demo-store/collections/不鏽鋼保溫瓶" target="_blank" rel="noopener" style="color:#334155;text-decoration:none">不鏽鋼保溫瓶 ↗</a></span><b style="color:#dc2626;white-space:nowrap;font-variant-numeric:tabular-nums">▲ +125 (+260.4%)</b></div><div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#334155;text-decoration:none">鋁製名片盒 ↗</a></span><b style="color:#dc2626;white-space:nowrap;font-variant-numeric:tabular-nums">▲ +124 (+113.8%)</b></div>
+          <div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><a href="https://www.demo-store/products/75BH-0005" target="_blank" rel="noopener" style="color:#334155;text-decoration:none">75BH-0005 ↗</a></span><b style="color:#16a34a;white-space:nowrap;font-variant-numeric:tabular-nums">▼ -61 (-70.1%)</b></div><div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><a href="https://www.demo-store/products/51BA-0047" target="_blank" rel="noopener" style="color:#334155;text-decoration:none">51BA-0047 ↗</a></span><b style="color:#16a34a;white-space:nowrap;font-variant-numeric:tabular-nums">▼ -59 (-86.8%)</b></div><div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><a href="https://www.demo-store/products/54BA-1063" target="_blank" rel="noopener" style="color:#334155;text-decoration:none">54BA-1063 ↗</a></span><b style="color:#16a34a;white-space:nowrap;font-variant-numeric:tabular-nums">▼ -58 (-81.7%)</b></div>
+        </div>
+        <div class="subcard">
+          <h3>管道建議</h3>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><b>Direct</b> <span style="background:#dcfce7;color:#15803d;border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:700;">加碼</span></span><span style="color:var(--muted);white-space:nowrap;">互動率 79.0%</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><b>Organic Search</b> <span style="background:#dcfce7;color:#15803d;border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:700;">加碼</span></span><span style="color:var(--muted);white-space:nowrap;">互動率 81.5%</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><b>Paid Search</b> <span style="background:#dcfce7;color:#15803d;border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:700;">加碼</span></span><span style="color:var(--muted);white-space:nowrap;">互動率 87.0%</span></div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><b>Unassigned</b> <span style="background:#fef3c7;color:#b45309;border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:700;">該檢討</span></span><span style="color:var(--muted);white-space:nowrap;">互動率 53.8%、低於平均</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><b>Referral</b> <span style="background:#fef3c7;color:#b45309;border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:700;">該檢討</span></span><span style="color:var(--muted);white-space:nowrap;">互動率 77.6%、低於平均</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px;"><span><b>Organic Social</b> <span style="background:#fef3c7;color:#b45309;border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:700;">該檢討</span></span><span style="color:var(--muted);white-space:nowrap;">互動率 46.9%、低於平均</span></div>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <div class="tab-panel" data-tab="1">
+    <section id="landing">
+      <h2>進站頁與流量來源</h2>
+      <p>這張圖保留原本的進站頁量體視角；更深入的來源與互動診斷已同步到正式表。 右邊是各管道的平均互動秒數、每 session 頁數、互動率、流量規模，表格內用長條底色標出每欄的相對高低。</p>
+      <div class="two-col" style="grid-template-columns:0.8fr 1.2fr;">
+        <div class="subcard">
+          <h3>熱門進站頁（Sessions）</h3>
+          <div id="chart_landing" class="chart"></div>
+        </div>
+        <div class="subcard">
+          <h3>各管道成效：互動秒數 × 頁數 × 互動率 × 規模</h3>
+          <div class="table-wrap"><table class="data-table noheat-table" style="font-size:12.5px;"><tr><th>來源管道</th><th style="text-align:right">Sessions</th><th>近30天趨勢</th><th style="text-align:right">平均互動秒數</th><th style="text-align:right">每 Session 頁數</th><th style="text-align:right">互動率</th></tr><tr><td><b>Direct</b></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 100%, transparent 100%)">50,278</td><td class="noheat"><svg width="76" height="24" viewBox="0 0 76 24" style="display:block"><polyline points="0.0,17.3 19.0,3.0 38.0,14.9 57.0,15.6 76.0,21.0" fill="none" stroke="#4f46e5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="76.0" cy="21.0" r="2.2" fill="#4f46e5"/></svg></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 5%, transparent 5%)">4.8s</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 19%, transparent 19%)">1.91</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 91%, transparent 91%)">79.0%</td></tr><tr><td><b>Organic Search</b></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 29%, transparent 29%)">14,605</td><td class="noheat"><svg width="76" height="24" viewBox="0 0 76 24" style="display:block"><polyline points="0.0,21.0 19.0,5.0 38.0,4.6 57.0,4.0 76.0,3.0" fill="none" stroke="#4f46e5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="76.0" cy="3.0" r="2.2" fill="#4f46e5"/></svg></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 72%, transparent 72%)">68.9s</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 47%, transparent 47%)">4.62</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 94%, transparent 94%)">81.5%</td></tr><tr><td><b>Unassigned</b></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 3%, transparent 3%)">1,618</td><td class="noheat"><svg width="76" height="24" viewBox="0 0 76 24" style="display:block"><polyline points="0.0,21.0 19.0,4.7 38.0,10.2 57.0,13.8 76.0,3.0" fill="none" stroke="#4f46e5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="76.0" cy="3.0" r="2.2" fill="#4f46e5"/></svg></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 36%, transparent 36%)">34.3s</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 23%, transparent 23%)">2.29</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 62%, transparent 62%)">53.8%</td></tr><tr><td><b>Referral</b></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 1%, transparent 1%)">375</td><td class="noheat"><svg width="76" height="24" viewBox="0 0 76 24" style="display:block"><polyline points="0.0,21.0 19.0,8.9 38.0,8.2 57.0,6.1 76.0,3.0" fill="none" stroke="#4f46e5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="76.0" cy="3.0" r="2.2" fill="#4f46e5"/></svg></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 59%, transparent 59%)">56.9s</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 61%, transparent 61%)">6.04</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 89%, transparent 89%)">77.6%</td></tr><tr><td><b>Paid Search</b></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 0%, transparent 0%)">177</td><td class="noheat"><svg width="76" height="24" viewBox="0 0 76 24" style="display:block"><polyline points="0.0,21.0 19.0,3.0 38.0,3.7 57.0,10.2 76.0,3.4" fill="none" stroke="#4f46e5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="76.0" cy="3.4" r="2.2" fill="#4f46e5"/></svg></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 100%, transparent 100%)">95.7s</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 55%, transparent 55%)">5.41</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 100%, transparent 100%)">87.0%</td></tr><tr><td><b>AI Assistant</b></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 0%, transparent 0%)">129</td><td class="noheat"><svg width="76" height="24" viewBox="0 0 76 24" style="display:block"><polyline points="0.0,21.0 19.0,4.6 38.0,3.0 57.0,7.4 76.0,6.8" fill="none" stroke="#4f46e5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="76.0" cy="6.8" r="2.2" fill="#4f46e5"/></svg></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 94%, transparent 94%)">90.0s</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 57%, transparent 57%)">5.61</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 92%, transparent 92%)">79.8%</td></tr><tr><td><b>Organic Social</b></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 0%, transparent 0%)">64</td><td class="noheat"><svg width="76" height="24" viewBox="0 0 76 24" style="display:block"><polyline points="0.0,21.0 19.0,8.3 38.0,5.1 57.0,3.0 76.0,10.4" fill="none" stroke="#4f46e5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="76.0" cy="10.4" r="2.2" fill="#4f46e5"/></svg></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 17%, transparent 17%)">16.0s</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 27%, transparent 27%)">2.66</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 54%, transparent 54%)">46.9%</td></tr><tr><td><b>Organic Shopping</b></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 0%, transparent 0%)">6</td><td class="noheat"><svg width="76" height="24" viewBox="0 0 76 24" style="display:block"><polyline points="0.0,21.0 19.0,3.0 38.0,21.0 57.0,12.0 76.0,21.0" fill="none" stroke="#4f46e5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="76.0" cy="21.0" r="2.2" fill="#4f46e5"/></svg></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 68%, transparent 68%)">64.8s</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 100%, transparent 100%)">9.83</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 96%, transparent 96%)">83.3%</td></tr><tr><td><b>Cross-network</b></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 0%, transparent 0%)">2</td><td class="noheat"><svg width="76" height="24" viewBox="0 0 76 24" style="display:block"><polyline points="0.0,21.0 19.0,3.0 38.0,3.0 57.0,21.0 76.0,21.0" fill="none" stroke="#4f46e5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="76.0" cy="21.0" r="2.2" fill="#4f46e5"/></svg></td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 0%, transparent 0%)">0.0s</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 15%, transparent 15%)">1.5</td><td class="noheat" style="text-align:right;font-variant-numeric:tabular-nums;background:linear-gradient(to left, var(--primary-soft) 57%, transparent 57%)">50.0%</td></tr></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="paid-search">
+      <h2>Paid Search（廣告流量）深挖</h2>
+      <p>本專案沒有串接 Google Ads API，看不到花費／CPC／ROAS；以下用 GA4 的「Paid Search」管道（google / cpc 等付費搜尋來源）估算流量品質，幫助判斷廣告帶來的訪客值不值得繼續投放，實際投放決策仍需搭配 Google Ads 後台的花費數字。</p>
+      <div class="kpi-grid"><div class="card"><div class="label">Paid Search Sessions</div><div class="value">101</div></div><div class="card"><div class="label">平均互動秒數</div><div class="value">54</div></div><div class="card"><div class="label">每 Session 頁數</div><div class="value">3</div></div><div class="card"><div class="label">互動率</div><div class="value">81.8%</div></div></div>
+      <div class="subcard">
+        <h3>廣告到達頁排名（Sessions）</h3>
+        <p>哪些頁面接住了付費搜尋流量；搭配上方互動率／每 session 頁數判斷這些頁面承接得好不好。</p>
+        <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>項目</th><th style="text-align:right">Sessions</th><th style="text-align:right">訪客</th></tr><tr><td>1</td><td><a href="https://www.demo-store/collections/天然軟木杯墊吸管組" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">天然軟木杯墊吸管組 ↗</a></td><td>53</td><td>50</td></tr><tr><td>2</td><td><a href="https://www.demo-store/collections/輕量折疊傘" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">輕量折疊傘 ↗</a></td><td>52</td><td>52</td></tr><tr><td>3</td><td><a href="https://www.demo-store/collections/帆布筆袋" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">帆布筆袋 ↗</a></td><td>2</td><td>2</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/天然軟木杯墊吸管組/products/88BQ-2273" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">88BQ-2273 ↗</a></td><td>1</td><td>1</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/矽膠杯套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠杯套 ↗</a></td><td>1</td><td>1</td></tr><tr><td>6</td><td><a href="https://www.demo-store/collections/天然軟木杯墊吸管組/products/53AC-0013" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">53AC-0013 ↗</a></td><td>1</td><td>1</td></tr><tr><td>7</td><td><a href="https://www.demo-store/collections/胡桃木書籤/products/56FH-0002" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">56FH-0002 ↗</a></td><td>1</td><td>1</td></tr><tr><td>8</td><td><a href="https://www.demo-store/collections/日月曆農民曆" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">日月曆農民曆 ↗</a></td><td>1</td><td>1</td></tr><tr><td>9</td><td><a href="https://www.demo-store/products/62HJ-3339" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">62HJ-3339 ↗</a></td><td>1</td><td>1</td></tr></table></div>
+      </div>
+    </section>
+    </div>
+
+    <div class="tab-panel" data-tab="2">
+    
+    <section id="page-type">
+      <h2>頁面類型總覽（page / blog / collection / product）</h2>
+      <p>比較四種 Shopify 頁面家族（商品 / 分類 / 自訂頁 / Blog）誰在成長、轉換、曝光最多。分兩塊看：上方<b>趨勢折線圖</b>＝隨時間的變化，下方<b>區間彙總表</b>＝整段期間的總量與成長。</p>
+      <h3>趨勢（隨時間）</h3>
+      <p>橫軸＝週（每點為該週加總，已平滑掉每日雜訊），每條線是一種頁面類型。左上下拉切換指標（工作階段 / 瀏覽量 / 訪客）；點圖例可單獨開關某一類型。</p>
+      <div class="chart" id="chart_page_type"></div>
+      <h3 style="margin-top:18px;">區間彙總</h3>
+      <p>整段區間彙總；各欄資料來源不同、沒有混成同一個數字：<b>瀏覽/工作階段/訪客</b> 來自 GA4 <code>date+pagePath</code>；<b>本月增幅</b>＝本月 vs 上月 sessions（202606 → 202607）；<b>轉換/轉換率</b> 來自 <code>landingPage+eventName</code>（form_submit+LINE，率＝轉換÷該類 landing sessions）；<b>GSC 曝光/點擊</b> 來自 Search Console <code>page</code> 維度。</p>
+      <div class="table-wrap"><table class="data-table noheat-table"><tr><th>類型</th><th>瀏覽量</th><th>工作階段</th><th>訪客</th><th>本月增幅</th><th>轉換</th><th>轉換率</th><th>GSC曝光</th><th>GSC點擊</th></tr><tr><td><b>分類頁 /collections/*</b></td><td><b>54,256</b> <span style="color:var(--muted);font-size:11px;">(35.3%)</span></td><td>23,446 <span style="color:var(--muted);font-size:11px;">(29.6%)</span></td><td>16,791</td><td><span style="color:#dc2626;font-weight:700">+7,824 (+100.2%)</span></td><td>1,097</td><td>14.59%</td><td>179,060</td><td>4,619</td></tr><tr><td><b>商品頁 /products/*</b></td><td><b>93,276</b> <span style="color:var(--muted);font-size:11px;">(60.8%)</span></td><td>52,527 <span style="color:var(--muted);font-size:11px;">(66.3%)</span></td><td>33,048</td><td><span style="color:#16a34a;font-weight:700">-8,591 (-28.1%)</span></td><td>515</td><td>1.72%</td><td>24,829</td><td>1,052</td></tr><tr><td><b>自訂頁 /pages/*</b></td><td><b>4,825</b> <span style="color:var(--muted);font-size:11px;">(3.1%)</span></td><td>2,601 <span style="color:var(--muted);font-size:11px;">(3.3%)</span></td><td>1,900</td><td><span style="color:#dc2626;font-weight:700">+645 (+66.0%)</span></td><td>96</td><td>12.46%</td><td>9,212</td><td>262</td></tr><tr><td><b>Blog /blogs/*</b></td><td><b>1,136</b> <span style="color:var(--muted);font-size:11px;">(0.7%)</span></td><td>688 <span style="color:var(--muted);font-size:11px;">(0.9%)</span></td><td>351</td><td><span style="color:#dc2626;font-weight:700">+106 (+36.4%)</span></td><td>14</td><td>4.84%</td><td>5,121</td><td>117</td></tr></table></div>
+    </section>
+    <section id="ai-referrer">
+      <h2>AI / Referrer 來源表</h2>
+      <p>資料區間：近 30 天。資料來源：landingPage + pageReferrer。Sessions = 從該 AI 網站點進來的 sessions；不重複頁數 = 被送進的不重複頁面數；<b>主要到達頁</b> = 該 AI 來源實際送進來最多 sessions 的前幾個頁面（看 AI 都把人帶到哪）。</p>
+      <div class="table-wrap"><table class="data-table"><tr><th>來源</th><th style="text-align:right">Sessions</th><th style="text-align:right">不重複頁數</th><th>主要到達頁（sessions）</th><th>Referrer 樣本</th></tr><tr><td><b>ChatGPT</b></td><td>36</td><td>32</td><td><a href="https://www.demo-store/collections/10-30元商品" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">10-30元商品 ↗</a> <b style="color:#4f46e5">2</b><br><a href="https://www.demo-store/collections/原木相框" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">原木相框 ↗</a> <b style="color:#4f46e5">2</b><br><a href="https://www.demo-store/collections/不鏽鋼便當盒" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">不鏽鋼便當盒 ↗</a> <b style="color:#4f46e5">2</b><br><a href="https://www.demo-store/collections/木質立體拼圖" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">木質立體拼圖 ↗</a> <b style="color:#4f46e5">2</b></td><td>https://chatgpt.com/</td></tr><tr><td><b>Gemini</b></td><td>8</td><td>8</td><td><a href="https://www.demo-store/collections/帆布托特包" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">帆布托特包 ↗</a> <b style="color:#4f46e5">1</b><br><a href="https://www.demo-store/collections/客製滑鼠墊" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">客製滑鼠墊 ↗</a> <b style="color:#4f46e5">1</b><br><a href="https://www.demo-store/collections/廣告尺" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">廣告尺 ↗</a> <b style="color:#4f46e5">1</b><br><a href="https://www.demo-store/collections/後背包" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">後背包 ↗</a> <b style="color:#4f46e5">1</b></td><td>https://gemini.google.com/</td></tr><tr><td><b>Perplexity</b></td><td>3</td><td>3</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/供應鏈管理觀念" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">推薦五款經濟實惠的客製化商品-低成本高cp值選擇 ↗</a> <b style="color:#4f46e5">1</b><br><a href="https://www.demo-store/collections/金屬筆" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">金屬筆 ↗</a> <b style="color:#4f46e5">1</b><br><a href="https://www.demo-store/products/52EA-1059" target="_blank" rel="noopener" style="color:#475569;text-decoration:none;border-bottom:1px dotted #cbd5e1">52EA-1059 ↗</a> <b style="color:#4f46e5">1</b></td><td>https://www.perplexity.ai/</td></tr></table></div>
+    </section>
+    <details class="fold" id="landing-diagnostics" open>
+      <summary>Landing Page 深挖區<span class="fold-hint">點擊收合</span></summary>
+      <div class="fold-body">
+      <p>資料區間：近 30 天。這一區集中放後續值得深挖的 GA 判讀表，全部都用目前已抓回來的真實資料，不用推估值補空。</p>
+      <div class="two-col">
+        <div class="subcard">
+          <h3>Landing Page Sessions 排名</h3>
+          <p>主要入口頁的 sessions 量體（已移除「排除停留 3 秒」對照：本資料排名無變化，徒增噪音）。</p>
+          <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>項目</th><th style="text-align:right">工作階段(sessions)</th><th style="text-align:right">停留秒</th></tr><tr><td>1</td><td><a href="https://www.demo-store/" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">首頁 / ↗</a></td><td>2,862</td><td>37.26</td></tr><tr><td>2</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>238</td><td>142.79</td></tr><tr><td>3</td><td><a href="https://www.demo-store/search" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">search ↗</a></td><td>236</td><td>55.67</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/高硼矽水瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">高硼矽水瓶 ↗</a></td><td>145</td><td>120.88</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a></td><td>121</td><td>88.61</td></tr><tr><td>6</td><td><a href="https://www.demo-store/collections/矽膠隔熱手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠隔熱手套 ↗</a></td><td>121</td><td>83.22</td></tr><tr><td>7</td><td><a href="https://www.demo-store/collections/天然軟木杯墊吸管組" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">天然軟木杯墊吸管組 ↗</a></td><td>110</td><td>102.62</td></tr><tr><td>8</td><td><a href="https://www.demo-store/collections/夜跑螢光手環" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">夜跑螢光手環 ↗</a></td><td>97</td><td>64.38</td></tr><tr><td>9</td><td><a href="https://www.demo-store/pages/bulk-order" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">bulk-order ↗</a></td><td>95</td><td>119.85</td></tr><tr><td>10</td><td><a href="https://www.demo-store/collections/竹纖維餐碗" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">竹纖維餐碗 ↗</a></td><td>92</td><td>87.89</td></tr></table></div>
+        </div>
+        <div class="subcard">
+          <h3>Landing Page 本月 vs 上月增幅（sessions）</h3>
+          <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">上月</th><th style="text-align:right">本月</th><th style="text-align:right">增幅</th></tr><tr><td>1</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>88</td><td>150</td><td>▲ +78</td></tr><tr><td>2</td><td><a href="https://www.demo-store/collections/高硼矽水瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">高硼矽水瓶 ↗</a></td><td>56</td><td>89</td><td>▲ +39</td></tr><tr><td>3</td><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a></td><td>38</td><td>83</td><td>▲ +82</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/矽膠隔熱手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠隔熱手套 ↗</a></td><td>40</td><td>81</td><td>▲ +68</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/摺疊購物籃" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">摺疊購物籃 ↗</a></td><td>24</td><td>59</td><td>▲ +41</td></tr><tr><td>6</td><td><a href="https://www.demo-store/pages/bulk-order" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">bulk-order ↗</a></td><td>38</td><td>58</td><td>▲ +36</td></tr><tr><td>7</td><td><a href="https://www.demo-store/products/56PZ-1737" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">56PZ-1737 ↗</a></td><td>27</td><td>56</td><td>▲ +41</td></tr><tr><td>8</td><td><a href="https://www.demo-store/collections/束口袋" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">束口袋 ↗</a></td><td>17</td><td>48</td><td>▲ +43</td></tr><tr><td>9</td><td><a href="https://www.demo-store/collections/矽膠手機立架" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠手機立架 ↗</a></td><td>19</td><td>45</td><td>▲ +36</td></tr><tr><td>10</td><td><a href="https://www.demo-store/collections/防潑水後背包/products/60EA-0009" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">60EA-0009 ↗</a></td><td>1</td><td>23</td><td>▲ +36</td></tr></table></div>
+        </div>
+      </div>
+      <div class="two-col" style="margin-top:18px;">
+        <div class="subcard">
+          <h3>Landing Page → 後續互動分佈</h3>
+          <p>用 landingPage + eventName 真資料，看哪些入口頁有搜尋與 LINE 行為。</p>
+          <div class="table-wrap"><table class="data-table noheat-table"><tr><th>項目</th><th style="text-align:right">工作階段(sessions)</th><th style="text-align:right">搜尋</th><th style="text-align:right">LINE</th></tr><tr><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>239</td><td>39</td><td>38</td></tr><tr><td><a href="https://www.demo-store/collections/高硼矽水瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">高硼矽水瓶 ↗</a></td><td>145</td><td>14</td><td>17</td></tr><tr><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a></td><td>121</td><td>6</td><td>21</td></tr><tr><td><a href="https://www.demo-store/collections/矽膠隔熱手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠隔熱手套 ↗</a></td><td>121</td><td>0</td><td>13</td></tr><tr><td><a href="https://www.demo-store/collections/天然軟木杯墊吸管組" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">天然軟木杯墊吸管組 ↗</a></td><td>110</td><td>11</td><td>18</td></tr><tr><td><a href="https://www.demo-store/collections/輕量折疊傘" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">輕量折疊傘 ↗</a></td><td>96</td><td>6</td><td>15</td></tr><tr><td><a href="https://www.demo-store/collections/防潑水後背包" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">防潑水後背包 ↗</a></td><td>91</td><td>14</td><td>14</td></tr><tr><td><a href="https://www.demo-store/collections/藍牙隨身喇叭" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">藍牙隨身喇叭 ↗</a></td><td>70</td><td>21</td><td>19</td></tr><tr><td><a href="https://www.demo-store/collections/純棉運動毛巾" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">純棉運動毛巾 ↗</a></td><td>54</td><td>24</td><td>12</td></tr><tr><td><a href="https://www.demo-store/collections/活動手環帶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">活動手環帶 ↗</a></td><td>50</td><td>0</td><td>13</td></tr></table></div>
+        </div>
+        <div class="subcard">
+          <h3>站內搜尋字</h3>
+          <p>searchTerm + eventName 可見到的搜尋與表單事件，先看哪些搜尋字有量。</p>
+          <div class="table-wrap"><table class="data-table noheat-table"><tr><th>項目</th><th style="text-align:right">搜尋次數</th><th style="text-align:right">結果</th></tr><tr><td><code style="font-size:12px">磁吸小白板</code></td><td>10</td><td>66</td></tr><tr><td><code style="font-size:12px">&quot;便籤本&quot;</code></td><td>57</td><td>63</td></tr><tr><td><code style="font-size:12px">手帳本</code></td><td>23</td><td>29</td></tr><tr><td><code style="font-size:12px">&quot;高硼矽水瓶&quot;</code></td><td>25</td><td>28</td></tr><tr><td><code style="font-size:12px">風扇</code></td><td>21</td><td>26</td></tr><tr><td><code style="font-size:12px">客製化</code></td><td>22</td><td>22</td></tr><tr><td><code style="font-size:12px">20合一多功能3C清潔套裝｜鍵盤刷 耳機清潔筆 手機螢幕除塵組</code></td><td>22</td><td>22</td></tr><tr><td><code style="font-size:12px">保溫瓶</code></td><td>20</td><td>21</td></tr><tr><td><code style="font-size:12px">鑰匙扣</code></td><td>18</td><td>18</td></tr><tr><td><code style="font-size:12px">&quot;34UT&quot;</code></td><td>13</td><td>16</td></tr></table></div>
+        </div>
+      </div>
+      </div>
+    </details>
+    <details class="fold" id="landing-b4" open>
+      <summary>Landing Page 對應 B4 核心分類<span class="fold-hint">點擊收合</span></summary>
+      <div class="fold-body">
+      <p>每一列＝一個核心分類，把底下所有 /collections/ 頁面的 Sessions、瀏覽量、使用者、GSC 點擊／曝光、詢價（form_submit）、LINE 點擊（LINE_CHAT）加總；核心分類由 B4「對應核心分類編碼」決定，不使用 B4 的 L1/L2/URL 欄位。</p>
+      <div class="subcard" style="box-shadow:none;padding:0;">
+          <h3>各 B4 大類 sessions 彙總</h3>
+          <p>依所屬 B4 大類（比核心分類更粗的分組）彙總；佔比＝占總流量比例，本月增幅＝本月 vs 上月（紅漲綠跌）。</p>
+          <div class="table-wrap"><table class="data-table noheat-table"><tr><th>大類</th><th style="text-align:right">Sessions</th><th style="text-align:right">佔比</th><th style="text-align:right">本月增幅</th></tr><tr><td><b>未分類</b></td><td>5,222</td><td>71.55%</td><td><span style="color:#16a34a;font-weight:700">-9,016 (-30.1%)</span></td></tr><tr><td><b>A-分類群</b></td><td>558</td><td>8.56%</td><td><span style="color:#dc2626;font-weight:700">+349 (+89.9%)</span></td></tr><tr><td><b>E-分類群</b></td><td>232</td><td>5.81%</td><td><span style="color:#dc2626;font-weight:700">+269 (+40.3%)</span></td></tr><tr><td><b>B-分類群</b></td><td>198</td><td>4.07%</td><td><span style="color:#dc2626;font-weight:700">+182 (+49.9%)</span></td></tr><tr><td><b>G-分類群</b></td><td>195</td><td>3.02%</td><td><span style="color:#dc2626;font-weight:700">+216 (+67.3%)</span></td></tr><tr><td><b>M-分類群</b></td><td>54</td><td>1.13%</td><td><span style="color:#dc2626;font-weight:700">+130 (+101.6%)</span></td></tr></table></div>
+      </div>
+      <div class="subcard" style="box-shadow:none;padding:0;margin-top:14px;">
+          <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>核心分類</th><th style="text-align:right">Sessions</th><th style="text-align:right">PV</th><th style="text-align:right">使用者</th><th style="text-align:right">GSC點擊</th><th style="text-align:right">GSC曝光</th><th style="text-align:right">詢價</th><th style="text-align:right">LINE</th><th>涵蓋頁面</th></tr><tr><td>3</td><td><b>矽膠隔熱手套</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">75JR</code></td><td>168</td><td>837</td><td>152</td><td>95</td><td>5,745</td><td>1</td><td>1</td><td><a href="https://www.demo-store/collections/矽膠隔熱手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠隔熱手套 ↗</a> <span style="color:#94a3b8">(202)</span></td></tr><tr><td>4</td><td><b>夜跑螢光手環</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">88BI</code></td><td>138</td><td>560</td><td>132</td><td>116</td><td>4,105</td><td>11</td><td>2</td><td><a href="https://www.demo-store/collections/夜跑螢光手環" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">夜跑螢光手環 ↗</a> <span style="color:#94a3b8">(170)</span>、<a href="https://www.demo-store/collections/帆布零錢包" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">帆布零錢包 ↗</a> <span style="color:#94a3b8">(22)</span></td></tr><tr><td>6</td><td><b>高硼矽水瓶</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">59XW</code></td><td>88</td><td>740</td><td>86</td><td>71</td><td>3,699</td><td>12</td><td>4</td><td><a href="https://www.demo-store/collections/高硼矽水瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">高硼矽水瓶 ↗</a> <span style="color:#94a3b8">(173)</span></td></tr><tr><td>2</td><td><b>帆布袋</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">83LA</code></td><td>164</td><td>1,024</td><td>153</td><td>128</td><td>3,584</td><td>7</td><td>3</td><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a> <span style="color:#94a3b8">(216)</span></td></tr><tr><td>5</td><td><b>便籤本</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">37YT</code></td><td>142</td><td>1,064</td><td>138</td><td>65</td><td>3,248</td><td>7</td><td>4</td><td><a href="https://www.demo-store/collections/天然軟木杯墊吸管組" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">天然軟木杯墊吸管組 ↗</a> <span style="color:#94a3b8">(166)</span>、<a href="https://www.demo-store/collections/帆布筆袋" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">帆布筆袋 ↗</a> <span style="color:#94a3b8">(12)</span></td></tr><tr><td>1</td><td><b>磁吸小白板</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">60VD</code></td><td>145</td><td>1,212</td><td>137</td><td>123</td><td>2,958</td><td>20</td><td>5</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a> <span style="color:#94a3b8">(302)</span></td></tr><tr><td>7</td><td><b>竹纖維餐碗</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">52HY</code></td><td>71</td><td>478</td><td>70</td><td>71</td><td>2,863</td><td>13</td><td>1</td><td><a href="https://www.demo-store/collections/竹纖維餐碗" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">竹纖維餐碗 ↗</a> <span style="color:#94a3b8">(165)</span></td></tr><tr><td>8</td><td><b>防滑觸控手套製作</b> <code style="font-size:10.5px;background:#f1f5f9;color:#4338ca;border-radius:5px;padding:1px 5px;">36KG</code></td><td>83</td><td>386</td><td>77</td><td>89</td><td>515</td><td>2</td><td>3</td><td><a href="https://www.demo-store/collections/防滑觸控手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">防滑觸控手套 ↗</a> <span style="color:#94a3b8">(134)</span></td></tr></table></div>
+      </div>
+      </div>
+    </details>
+    <details class="fold" id="page-session-ranking" open>
+      <summary>頁面 Session 排名與月增幅<span class="fold-hint">點擊收合</span></summary>
+      <div class="fold-body">
+      <p>這一組表的 metric 都是 `sessions`；`Sessions` 來自 GA4，`GSC Clicks` 則是同頁面在同報表期間的 GSC 點擊，並列對照，不是混成同一個數字。</p>
+      <div class="subcard">
+        <h3>目前頁面 Session 排名</h3>
+        <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>項目</th><th style="text-align:right">工作階段(sessions)</th><th style="text-align:right">GSC點擊</th></tr><tr><td>1</td><td><a href="https://www.demo-store/pages/design-service" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">design-service ↗</a></td><td>386</td><td>0</td></tr><tr><td>2</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>310</td><td>202</td></tr><tr><td>3</td><td><a href="https://www.demo-store/collections/高硼矽水瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">高硼矽水瓶 ↗</a></td><td>249</td><td>118</td></tr><tr><td>4</td><td><a href="https://www.demo-store/pages/get-quote" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">get-quote ↗</a></td><td>233</td><td>18</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a></td><td>192</td><td>94</td></tr><tr><td>6</td><td><a href="https://www.demo-store/pages/return-policy" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">return-policy ↗</a></td><td>186</td><td>0</td></tr><tr><td>7</td><td><a href="https://www.demo-store/collections/矽膠隔熱手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠隔熱手套 ↗</a></td><td>173</td><td>69</td></tr><tr><td>8</td><td><a href="https://www.demo-store/pages/bulk-order" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">bulk-order ↗</a></td><td>149</td><td>62</td></tr><tr><td>9</td><td><a href="https://www.demo-store/collections/竹纖維餐碗" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">竹纖維餐碗 ↗</a></td><td>123</td><td>92</td></tr><tr><td>10</td><td><a href="https://www.demo-store/collections/不鏽鋼保溫瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">不鏽鋼保溫瓶 ↗</a></td><td>99</td><td>0</td></tr></table></div>
+      </div>
+      <p style="margin-top:18px;">202606 vs 202607</p>
+      <script>
+      // Defined in its own script tag here (NOT the trailing Plotly script near the
+      // end of the document) because build_dashboard_public.py regex-strips that
+      // entire trailing block wholesale to remove Plotly for the public artifact.
+      // That used to silently delete this function too, leaving the buttons below
+      // calling an undefined function — no visible effect other than a swallowed
+      // ReferenceError, so it LOOKED like "the buttons just don't do anything" on
+      // the public artifact even though the onclick wiring and CSS toggle logic
+      // were both correct. Keep this block's literal opening/closing script tags
+      // as the ONLY such tags before the main trailing one, or the public-build
+      // regex (which is deliberately greedy from the first "script" it finds
+      // through the last "/script" before "/body") will swallow everything
+      // in between, including sections after this one.
+      function togglePageRank(mode, button) {
+        document.querySelectorAll("#page-session-ranking .toggle-pane").forEach((node) => {
+          node.classList.remove("active");
+        });
+        document.querySelectorAll("#page-session-ranking .toggle-btn").forEach((node) => {
+          node.classList.remove("active");
+        });
+        const target = document.getElementById(`page-rank-${mode}`);
+        if (target) target.classList.add("active");
+        if (button) button.classList.add("active");
+      }
+      </script>
+      <div class="toggle-bar">
+        <button class="toggle-btn active" onclick="togglePageRank('overall', this)">整體</button>
+        <button class="toggle-btn" onclick="togglePageRank('pages', this)">自訂頁 /pages</button>
+        <button class="toggle-btn" onclick="togglePageRank('blogs', this)">Blog /blogs</button>
+        <button class="toggle-btn" onclick="togglePageRank('meta', this)">Meta 來源頁面</button>
+      </div>
+      <div id="page-rank-overall" class="toggle-pane active">
+        <div class="two-col">
+          <div class="subcard">
+            <h3>本月成長最多頁面 Top 10</h3>
+            <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">上月</th><th style="text-align:right">本月</th><th style="text-align:right">增幅</th></tr><tr><td>1</td><td><a href="https://www.demo-store/pages/design-service" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">design-service ↗</a></td><td>143</td><td>243</td><td>▲ +238</td></tr><tr><td>2</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>112</td><td>198</td><td>▲ +108</td></tr><tr><td>3</td><td><a href="https://www.demo-store/collections/高硼矽水瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">高硼矽水瓶 ↗</a></td><td>92</td><td>156</td><td>▲ +76</td></tr><tr><td>4</td><td><a href="https://www.demo-store/pages/get-quote" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">get-quote ↗</a></td><td>82</td><td>151</td><td>▲ +82</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a></td><td>61</td><td>130</td><td>▲ +124</td></tr><tr><td>6</td><td><a href="https://www.demo-store/pages/return-policy" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">return-policy ↗</a></td><td>59</td><td>126</td><td>▲ +85</td></tr><tr><td>7</td><td><a href="https://www.demo-store/collections/矽膠隔熱手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠隔熱手套 ↗</a></td><td>55</td><td>119</td><td>▲ +107</td></tr><tr><td>8</td><td><a href="https://www.demo-store/collections/不鏽鋼保溫瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">不鏽鋼保溫瓶 ↗</a></td><td>22</td><td>78</td><td>▲ +125</td></tr><tr><td>9</td><td><a href="https://www.demo-store/collections/藍牙隨身喇叭" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">藍牙隨身喇叭 ↗</a></td><td>31</td><td>70</td><td>▲ +62</td></tr><tr><td>10</td><td><a href="https://www.demo-store/collections/束口袋" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">束口袋 ↗</a></td><td>22</td><td>69</td><td>▲ +66</td></tr></table></div>
+          </div>
+          <div class="subcard">
+            <h3>本月下滑最多頁面 Top 10</h3>
+            <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">上月</th><th style="text-align:right">本月</th><th style="text-align:right">增幅</th></tr><tr><td>1</td><td><a href="https://www.demo-store/products/75BH-0005" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">75BH-0005 ↗</a></td><td>70</td><td>26</td><td>▼ 61</td></tr><tr><td>2</td><td><a href="https://www.demo-store/products/51CT-0101" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">51CT-0101 ↗</a></td><td>56</td><td>21</td><td>▼ 51</td></tr><tr><td>3</td><td><a href="https://www.demo-store/products/51BA-0047" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">51BA-0047 ↗</a></td><td>54</td><td>9</td><td>▼ 59</td></tr><tr><td>4</td><td><a href="https://www.demo-store/products/75BH-0001" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">75BH-0001 ↗</a></td><td>50</td><td>29</td><td>▼ 51</td></tr><tr><td>5</td><td><a href="https://www.demo-store/products/79LA-0035" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">79LA-0035 ↗</a></td><td>45</td><td>4</td><td>▼ 53</td></tr><tr><td>6</td><td><a href="https://www.demo-store/products/67BA-0031" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">67BA-0031 ↗</a></td><td>44</td><td>8</td><td>▼ 52</td></tr><tr><td>7</td><td><a href="https://www.demo-store/products/51CT-0103" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">51CT-0103 ↗</a></td><td>42</td><td>32</td><td>▼ 54</td></tr><tr><td>8</td><td><a href="https://www.demo-store/products/54BA-1063" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">54BA-1063 ↗</a></td><td>33</td><td>13</td><td>▼ 58</td></tr><tr><td>9</td><td><a href="https://www.demo-store/products/51BA-0046" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">51BA-0046 ↗</a></td><td>31</td><td>8</td><td>▼ 52</td></tr><tr><td>10</td><td><a href="https://www.demo-store/products/52AB-0187" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">52AB-0187 ↗</a></td><td>27</td><td>12</td><td>▼ 50</td></tr></table></div>
+          </div>
+        </div>
+      </div>
+      <div id="page-rank-pages" class="toggle-pane">
+        <div class="two-col">
+          <div class="subcard">
+            <h3>自訂頁 /pages 成長 Top 10</h3>
+            <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">上月</th><th style="text-align:right">本月</th><th style="text-align:right">增幅</th></tr><tr><td>1</td><td><a href="https://www.demo-store/pages/design-service" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">design-service ↗</a></td><td>143</td><td>243</td><td>▲ +238</td></tr><tr><td>2</td><td><a href="https://www.demo-store/pages/get-quote" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">get-quote ↗</a></td><td>82</td><td>151</td><td>▲ +82</td></tr><tr><td>3</td><td><a href="https://www.demo-store/pages/return-policy" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">return-policy ↗</a></td><td>59</td><td>126</td><td>▲ +85</td></tr><tr><td>4</td><td><a href="https://www.demo-store/pages/bulk-order" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">bulk-order ↗</a></td><td>59</td><td>90</td><td>▲ +54</td></tr><tr><td>5</td><td><a href="https://www.demo-store/pages/brand-story" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">brand-story ↗</a></td><td>40</td><td>72</td><td>▲ +40</td></tr><tr><td>6</td><td><a href="https://www.demo-store/pages/summer-event" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">summer-event ↗</a></td><td>25</td><td>37</td><td>▲ +18</td></tr><tr><td>7</td><td><a href="https://www.demo-store/pages/new-arrivals" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">new-arrivals ↗</a></td><td>12</td><td>33</td><td>▲ +27</td></tr><tr><td>8</td><td><a href="https://www.demo-store/pages/press-room" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">press-room ↗</a></td><td>14</td><td>32</td><td>▲ +26</td></tr><tr><td>9</td><td><a href="https://www.demo-store/pages/2026台北婦幼展活動周邊禮贈品" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">2026台北婦幼展活動周邊禮贈品 ↗</a></td><td>12</td><td>25</td><td>▲ +17</td></tr><tr><td>10</td><td><a href="https://www.demo-store/pages/客製化usb風扇" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">客製化usb風扇 ↗</a></td><td>3</td><td>15</td><td>▲ +20</td></tr></table></div>
+          </div>
+          <div class="subcard">
+            <h3>自訂頁 /pages 下滑 Top 10</h3>
+            <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">上月</th><th style="text-align:right">本月</th><th style="text-align:right">增幅</th></tr><tr><td>1</td><td><a href="https://www.demo-store/pages/客製化水瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">客製化水瓶 ↗</a></td><td>23</td><td>33</td><td>▼ 15</td></tr><tr><td>2</td><td><a href="https://www.demo-store/pages/summer_sale" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">summer_sale ↗</a></td><td>14</td><td>25</td><td>▲ +2</td></tr><tr><td>3</td><td><a href="https://www.demo-store/pages/gift-guide" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">gift-guide ↗</a></td><td>22</td><td>18</td><td>▼ 12</td></tr><tr><td>4</td><td><a href="https://www.demo-store/pages/採購q-a-工商日誌客製化怎麼挑-尺寸-款式-logo印刷一次搞懂" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">採購q-a-工商日誌客製化怎麼挑-尺寸-款式-logo印刷一次搞懂 ↗</a></td><td>13</td><td>11</td><td>▼ 9</td></tr><tr><td>5</td><td><a href="https://www.demo-store/pages/客製行動電源" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">客製行動電源 ↗</a></td><td>8</td><td>8</td><td>▼ 1</td></tr><tr><td>6</td><td><a href="https://www.demo-store/pages/sustainability" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">sustainability ↗</a></td><td>1</td><td>2</td><td>▲ +1</td></tr><tr><td>7</td><td><a href="https://www.demo-store/pages/expo-2025" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">expo-2025 ↗</a></td><td>1</td><td>1</td><td>± 0</td></tr><tr><td>8</td><td><a href="https://www.demo-store/pages/partner-program" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">partner-program ↗</a></td><td>1</td><td>1</td><td>± 0</td></tr><tr><td>9</td><td><a href="https://www.demo-store/pages/shipping-info" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">shipping-info ↗</a></td><td>0</td><td>1</td><td>▲ +1</td></tr><tr><td>10</td><td><a href="https://www.demo-store/pages/loyalty-club" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">loyalty-club ↗</a></td><td>1</td><td>0</td><td>▼ 1</td></tr></table></div>
+          </div>
+        </div>
+      </div>
+      <div id="page-rank-blogs" class="toggle-pane">
+        <div class="two-col">
+          <div class="subcard">
+            <h3>Blog /blogs 成長 Top 10</h3>
+            <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">上月</th><th style="text-align:right">本月</th><th style="text-align:right">增幅</th></tr><tr><td>1</td><td><a href="https://www.demo-store/blogs/news/回購率提升技巧" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">news/回購率提升技巧 ↗</a></td><td>13</td><td>30</td><td>▲ +17</td></tr><tr><td>2</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/展場行銷實戰心得" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">客製化便籤本推薦指南 ↗</a></td><td>11</td><td>25</td><td>▲ +14</td></tr><tr><td>3</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/通路經營經驗談" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">help-center-guide ↗</a></td><td>0</td><td>24</td><td>▲ +24</td></tr><tr><td>4</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">news/如何挑選企業送禮 ↗</a></td><td>14</td><td>22</td><td>▲ +8</td></tr><tr><td>5</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/2026三角桌曆推薦款" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">2026三角桌曆推薦款 ↗</a></td><td>4</td><td>14</td><td>▲ +10</td></tr><tr><td>6</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/商品包裝設計重點" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">客製化工商日誌-提升企業形象與效率的最佳選擇 ↗</a></td><td>3</td><td>12</td><td>▲ +9</td></tr><tr><td>7</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/三角桌曆製作攻略" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">三角桌曆製作攻略 ↗</a></td><td>2</td><td>10</td><td>▲ +8</td></tr><tr><td>8</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/節慶行銷檔期規劃" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">常見製作印刷問題集錦-色彩篇-上 ↗</a></td><td>2</td><td>10</td><td>▲ +8</td></tr><tr><td>9</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/供應鏈管理觀念" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">推薦五款經濟實惠的客製化商品-低成本高cp值選擇 ↗</a></td><td>2</td><td>10</td><td>▲ +8</td></tr><tr><td>10</td><td><a href="https://www.demo-store/blogs/製稿說明/廣告尺製作說明" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">廣告尺製作說明 ↗</a></td><td>0</td><td>9</td><td>▲ +9</td></tr></table></div>
+          </div>
+          <div class="subcard">
+            <h3>Blog /blogs 下滑 Top 10</h3>
+            <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">上月</th><th style="text-align:right">本月</th><th style="text-align:right">增幅</th></tr><tr><td>1</td><td><a href="https://www.demo-store/blogs/禮品採購專欄/help-center-guide" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">help-center-guide ↗</a></td><td>31</td><td>5</td><td>▼ 36</td></tr><tr><td>2</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/拉鍊袋客製與印刷介紹" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">拉鍊袋客製與印刷介紹 ↗</a></td><td>14</td><td>14</td><td>▼ 4</td></tr><tr><td>3</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/小量訂製常見問答" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">常見製作印刷問題集錦_色彩篇_上 ↗</a></td><td>10</td><td>0</td><td>▼ 15</td></tr><tr><td>4</td><td><a href="https://www.demo-store/blogs/procurement-guide/tech-gifts" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">tech-gifts ↗</a></td><td>8</td><td>3</td><td>▼ 8</td></tr><tr><td>5</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/牛皮貼紙" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">牛皮貼紙 ↗</a></td><td>4</td><td>0</td><td>▼ 6</td></tr><tr><td>6</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/客製化交期說明" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">標籤貼紙-造型貼紙印製-sample-request ↗</a></td><td>3</td><td>1</td><td>▼ 4</td></tr><tr><td>7</td><td><a href="https://www.demo-store/blogs/procurement-guide/hospitality-gifts" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">hospitality-gifts ↗</a></td><td>3</td><td>1</td><td>▼ 3</td></tr><tr><td>8</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/會員經營策略" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">客製化矽膠杯套-背卡-多功能-盒裝-造型矽膠杯套-多種款式和尺寸可供選擇 ↗</a></td><td>2</td><td>1</td><td>▼ 3</td></tr><tr><td>9</td><td><a href="https://www.demo-store/blogs/news/如何挑選企業送禮/一張logo無限想像-企業cis識別最佳幫手" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">一張logo無限想像-企業cis識別最佳幫手 ↗</a></td><td>2</td><td>0</td><td>▼ 2</td></tr><tr><td>10</td><td><a href="https://www.demo-store/blogs/procurement-guide/government-gifts" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">government-gifts ↗</a></td><td>2</td><td>2</td><td>▼ 2</td></tr></table></div>
+          </div>
+        </div>
+      </div>
+      <div id="page-rank-meta" class="toggle-pane">
+        <p>看 date + landingPage + sessionSourceMedium 的 FB / IG / Threads 來源，比只抓 fbclid 穩定。</p>
+        <div class="two-col">
+          <div class="subcard">
+            <h3>Meta 來源頁面成長 Top 5</h3>
+            <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">上月</th><th style="text-align:right">本月</th><th style="text-align:right">增幅</th></tr><tr><td>1</td><td><a href="https://www.demo-store/products/71JD-7216" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">71JD-7216 ↗</a></td><td>2</td><td>8</td><td>▲ +6</td></tr><tr><td>2</td><td><a href="https://www.demo-store/products/61NO-1165" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">61NO-1165 ↗</a></td><td>0</td><td>4</td><td>▲ +4</td></tr><tr><td>3</td><td><a href="https://www.demo-store/products/69MD-6412" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">69MD-6412 ↗</a></td><td>0</td><td>4</td><td>▲ +4</td></tr><tr><td>4</td><td><a href="https://www.demo-store/products/46SD-2657" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">46SD-2657 ↗</a></td><td>0</td><td>3</td><td>▲ +3</td></tr><tr><td>5</td><td><a href="https://www.demo-store/products/74CA-0022" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">74CA-0022 ↗</a></td><td>0</td><td>3</td><td>▲ +3</td></tr></table></div>
+          </div>
+          <div class="subcard">
+            <h3>Meta 來源頁面下滑 Top 5</h3>
+            <div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">上月</th><th style="text-align:right">本月</th><th style="text-align:right">增幅</th></tr><tr><td>1</td><td><a href="https://www.demo-store/products/52AA-0023" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">52AA-0023 ↗</a></td><td>3</td><td>0</td><td>▼ 3</td></tr><tr><td>2</td><td><a href="https://www.demo-store/products/58RA-0008" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">58RA-0008 ↗</a></td><td>2</td><td>0</td><td>▼ 2</td></tr><tr><td>3</td><td><a href="https://www.demo-store/products/75CA-0011" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">75CA-0011 ↗</a></td><td>2</td><td>0</td><td>▼ 2</td></tr><tr><td>4</td><td><a href="https://www.demo-store/products/79NA-1000" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">79NA-1000 ↗</a></td><td>2</td><td>0</td><td>▼ 2</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/胡桃木書籤" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">胡桃木書籤 ↗</a></td><td>1</td><td>0</td><td>▼ 1</td></tr></table></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </details>
+    
+    </div>
+
+    <div class="tab-panel" data-tab="3">
+    <section id="events">
+      <h2>Top Events</h2>
+      <details class="fold" id="events-overview" open>
+        <summary>事件總覽（Top 10，未篩選）<span class="fold-hint">點擊收合</span></summary>
+        <div class="fold-body">
+        <p>全站 Top 10 事件，不限於下方行為分組收錄的事件（例如 page_view、first_visit 等未分組事件也看得到）。</p>
+        <div id="chart_events" class="chart"></div>
+        </div>
+      </details>
+      <p>事件依「代表的訪客行為」分組（商品興趣／瀏覽深度／站內搜尋／轉換意圖／基礎入站互動），每個事件顯示總次數、使用者數，以及主要觸發頁面與佔比；每張卡片下方附分析說明。點頁面可直接開該頁。</p>
+      <div style="display:flex;flex-direction:column;gap:18px;"><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--violet);margin:0 0 4px;">商品興趣訊號</div><p style="margin:0 0 10px;color:var(--muted);font-size:12.5px;line-height:1.5;">使用者對商品內容主動探索的行為：放大商品圖、進入商品頁、在分類頁點擊商品卡片。觸發頁越集中，代表該商品／分類越能抓住目光。</p><div class="two-col"><div class="subcard"><h3 style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><code style="font-size:12px;background:#f1f5f9;color:#4338ca;border-radius:6px;padding:2px 7px;">product_picture</code><span style="font-size:13px;font-weight:700;color:#0f172a;">次數 49,377<span style="font-size:11px;font-weight:500;color:#94a3b8;"> · 使用者 4,149</span></span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">此頁次數</th><th style="text-align:right;width:88px">佔事件總次數%</th></tr><tr><td>1</td><td><a href="https://www.demo-store/products/56PZ-1737" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">56PZ-1737 ↗</a></td><td>199</td><td>0.63%</td></tr><tr><td>2</td><td><a href="https://www.demo-store/products/82QI-4866" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">82QI-4866 ↗</a></td><td>168</td><td>0.48%</td></tr><tr><td>3</td><td><a href="https://www.demo-store/products/71JD-7216" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">71JD-7216 ↗</a></td><td>149</td><td>0.35%</td></tr><tr><td>4</td><td><a href="https://www.demo-store/products/75PY-9874" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">75PY-9874 ↗</a></td><td>129</td><td>0.43%</td></tr><tr><td>5</td><td><a href="https://www.demo-store/products/74EI-9107" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">74EI-9107 ↗</a></td><td>127</td><td>0.46%</td></tr></table></div><p style="margin:10px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5;">點擊放大商品圖代表對該商品產生興趣；觸發次數集中的商品頁，可優先納入首頁／分類頁推薦或加碼行銷。</p></div><div class="subcard"><h3 style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><code style="font-size:12px;background:#f1f5f9;color:#4338ca;border-radius:6px;padding:2px 7px;">view_item</code><span style="font-size:13px;font-weight:700;color:#0f172a;">次數 46,481<span style="font-size:11px;font-weight:500;color:#94a3b8;"> · 使用者 39,280</span></span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">此頁次數</th><th style="text-align:right;width:88px">佔事件總次數%</th></tr><tr><td>1</td><td><a href="https://www.demo-store/products/75BH-0005" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">75BH-0005 ↗</a></td><td>84</td><td>0.18%</td></tr><tr><td>2</td><td><a href="https://www.demo-store/products/75BH-0001" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">75BH-0001 ↗</a></td><td>65</td><td>0.19%</td></tr><tr><td>3</td><td><a href="https://www.demo-store/products/51CT-0103" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">51CT-0103 ↗</a></td><td>55</td><td>0.18%</td></tr><tr><td>4</td><td><a href="https://www.demo-store/products/75BH-0003" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">75BH-0003 ↗</a></td><td>47</td><td>0.18%</td></tr><tr><td>5</td><td><a href="https://www.demo-store/products/51CT-0102" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">51CT-0102 ↗</a></td><td>46</td><td>0.18%</td></tr></table></div><p style="margin:10px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5;">商品頁被查看的次數，反映哪些商品頁本身流量最大（是後續轉換的必要條件，但不代表一定有興趣）。</p></div><div class="subcard"><h3 style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><code style="font-size:12px;background:#f1f5f9;color:#4338ca;border-radius:6px;padding:2px 7px;">collection_product</code><span style="font-size:13px;font-weight:700;color:#0f172a;">次數 13,234<span style="font-size:11px;font-weight:500;color:#94a3b8;"> · 使用者 2,967</span></span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">此頁次數</th><th style="text-align:right;width:88px">佔事件總次數%</th></tr><tr><td>1</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>487</td><td>4.42%</td></tr><tr><td>2</td><td><a href="https://www.demo-store/collections/高硼矽水瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">高硼矽水瓶 ↗</a></td><td>443</td><td>4.08%</td></tr><tr><td>3</td><td><a href="https://www.demo-store/collections/牛皮證件夾" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">牛皮證件夾 ↗</a></td><td>286</td><td>2.8%</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/矽膠隔熱手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠隔熱手套 ↗</a></td><td>221</td><td>2.58%</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/天然軟木杯墊吸管組" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">天然軟木杯墊吸管組 ↗</a></td><td>218</td><td>2.58%</td></tr></table></div><p style="margin:10px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5;">分類頁內點擊商品卡片的次數，顯示哪個分類頁的商品陳列／排序最能引導點擊，可用來檢視分類頁排序策略。</p></div></div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--violet);margin:0 0 4px;">頁面吸引力與瀏覽深度</div><p style="margin:0 0 10px;color:var(--muted);font-size:12.5px;line-height:1.5;">使用者願意「繼續看下去」的行為：往下捲動、在分類頁往後翻頁找更多商品。</p><div class="two-col"><div class="subcard"><h3 style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><code style="font-size:12px;background:#f1f5f9;color:#4338ca;border-radius:6px;padding:2px 7px;">scroll</code><span style="font-size:13px;font-weight:700;color:#0f172a;">次數 134,859<span style="font-size:11px;font-weight:500;color:#94a3b8;"> · 使用者 34,038</span></span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">此頁次數</th><th style="text-align:right;width:88px">佔事件總次數%</th></tr><tr><td>1</td><td><a href="https://www.demo-store/" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">首頁 / ↗</a></td><td>4,036</td><td>4.83%</td></tr><tr><td>2</td><td><a href="https://www.demo-store/search" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">search ↗</a></td><td>3,002</td><td>4.95%</td></tr><tr><td>3</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>1,142</td><td>0.94%</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/不鏽鋼保溫瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">不鏽鋼保溫瓶 ↗</a></td><td>650</td><td>0.98%</td></tr><tr><td>5</td><td><a href="https://www.demo-store/pages/design-service" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">design-service ↗</a></td><td>587</td><td>1.04%</td></tr></table></div><p style="margin:10px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5;">頁面被往下捲動超過門檻的次數，觸發頁集中代表該頁版型／內容讓使用者願意繼續往下看，可用來評估版型設計成效。</p></div><div class="subcard"><h3 style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><code style="font-size:12px;background:#f1f5f9;color:#4338ca;border-radius:6px;padding:2px 7px;">category_pagination_click</code><span style="font-size:13px;font-weight:700;color:#0f172a;">次數 10,276<span style="font-size:11px;font-weight:500;color:#94a3b8;"> · 使用者 1,910</span></span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">此頁次數</th><th style="text-align:right;width:88px">佔事件總次數%</th></tr><tr><td>1</td><td><a href="https://www.demo-store/search" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">search ↗</a></td><td>841</td><td>20.57%</td></tr><tr><td>2</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>337</td><td>4.54%</td></tr><tr><td>3</td><td><a href="https://www.demo-store/collections/高硼矽水瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">高硼矽水瓶 ↗</a></td><td>307</td><td>3.46%</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/不鏽鋼保溫瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">不鏽鋼保溫瓶 ↗</a></td><td>229</td><td>4.85%</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a></td><td>205</td><td>3.78%</td></tr></table></div><p style="margin:10px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5;">分類頁「上一頁／下一頁」分頁按鈕的點擊。集中在特定分類頁，通常代表該分類商品量大、使用者有意願往後翻頁；也可能是排序或篩選不夠精準，需要往後翻找。</p></div></div><div class="two-col" style="align-items:start;"><div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--violet);margin:0 0 4px;">站內搜尋意圖</div><p style="margin:0 0 10px;color:var(--muted);font-size:12.5px;line-height:1.5;">使用者實際輸入的熱門搜尋字詞，反映商品／分類命名與使用者用語的落差。</p><div class="subcard"><h3 style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><code style="font-size:12px;background:#f1f5f9;color:#4338ca;border-radius:6px;padding:2px 7px;">view_search_results</code><span style="font-size:13px;font-weight:700;color:#0f172a;">次數 5,077<span style="font-size:11px;font-weight:500;color:#94a3b8;"> · 使用者 1,285</span></span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>項目</th><th style="text-align:right">搜尋次數</th><th style="text-align:right">結果</th></tr><tr><td>1</td><td><code style="font-size:12px">磁吸小白板</code></td><td>10</td><td>66</td></tr><tr><td>2</td><td><code style="font-size:12px">&quot;便籤本&quot;</code></td><td>57</td><td>63</td></tr><tr><td>3</td><td><code style="font-size:12px">手帳本</code></td><td>23</td><td>29</td></tr><tr><td>4</td><td><code style="font-size:12px">&quot;高硼矽水瓶&quot;</code></td><td>25</td><td>28</td></tr><tr><td>5</td><td><code style="font-size:12px">客製化</code></td><td>22</td><td>22</td></tr><tr><td>6</td><td><code style="font-size:12px">20合一多功能3C清潔套裝｜鍵盤刷 耳機清潔筆 手機螢幕除塵組</code></td><td>22</td><td>22</td></tr><tr><td>7</td><td><code style="font-size:12px">保溫瓶</code></td><td>20</td><td>21</td></tr><tr><td>8</td><td><code style="font-size:12px">鑰匙扣</code></td><td>18</td><td>18</td></tr></table></div><p style="margin:10px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5;">下表為熱門搜尋字詞排名（按搜尋次數）；觸發頁本身多半落在 /search，看字詞比看頁面更有用，可作為選品、分類命名或 SEO 關鍵字的參考。</p></div></div><div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--violet);margin:0 0 4px;">轉換意圖</div><p style="margin:0 0 10px;color:var(--muted);font-size:12.5px;line-height:1.5;">使用者開始留下聯絡／詢價資訊，是轉換漏斗最前段的高意圖訊號。</p><div class="subcard"><h3 style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><code style="font-size:12px;background:#f1f5f9;color:#4338ca;border-radius:6px;padding:2px 7px;">form_start</code><span style="font-size:13px;font-weight:700;color:#0f172a;">次數 4,051<span style="font-size:11px;font-weight:500;color:#94a3b8;"> · 使用者 1,657</span></span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">此頁次數</th><th style="text-align:right;width:88px">佔事件總次數%</th></tr><tr><td>1</td><td><a href="https://www.demo-store/" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">首頁 / ↗</a></td><td>305</td><td>12.06%</td></tr><tr><td>2</td><td><a href="https://www.demo-store/search" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">search ↗</a></td><td>236</td><td>14.3%</td></tr><tr><td>3</td><td><a href="https://www.demo-store/pages/design-service" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">design-service ↗</a></td><td>112</td><td>7.06%</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/牛皮證件夾" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">牛皮證件夾 ↗</a></td><td>33</td><td>1.14%</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a></td><td>27</td><td>1.26%</td></tr></table></div><p style="margin:10px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5;">「開始填表」是高轉換意圖訊號，觸發頁集中的地方代表詢價／聯絡動機最強的內容頁，適合優先優化表單體驗或加強 CTA。</p></div></div></div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--violet);margin:0 0 4px;">基礎入站與互動基準（對照 Landing Pages）</div><p style="margin:0 0 10px;color:var(--muted);font-size:12.5px;line-height:1.5;">session_start／user_engagement 幾乎在每個頁面都會觸發，本質上接近入站頁分布；放在這裡主要用來跟上方 Landing Pages 區塊交叉核對，並比較「進站」與「有效互動」的落差。</p><div class="two-col"><div class="subcard"><h3 style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><code style="font-size:12px;background:#f1f5f9;color:#4338ca;border-radius:6px;padding:2px 7px;">session_start</code><span style="font-size:13px;font-weight:700;color:#0f172a;">次數 66,799<span style="font-size:11px;font-weight:500;color:#94a3b8;"> · 使用者 60,580</span></span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">此頁次數</th><th style="text-align:right;width:88px">佔事件總次數%</th></tr><tr><td>1</td><td><a href="https://www.demo-store/" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">首頁 / ↗</a></td><td>2,931</td><td>6.87%</td></tr><tr><td>2</td><td><a href="https://www.demo-store/search" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">search ↗</a></td><td>249</td><td>0.75%</td></tr><tr><td>3</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>248</td><td>0.51%</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/矽膠隔熱手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠隔熱手套 ↗</a></td><td>133</td><td>0.33%</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a></td><td>130</td><td>0.32%</td></tr></table></div><p style="margin:10px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5;">工作階段開始所在頁面，理論上排序應與 Landing Pages 區塊高度一致；若明顯不同，可能代表有跨裝置／跨分頁的特殊進站行為。</p></div><div class="subcard"><h3 style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;"><code style="font-size:12px;background:#f1f5f9;color:#4338ca;border-radius:6px;padding:2px 7px;">user_engagement</code><span style="font-size:13px;font-weight:700;color:#0f172a;">次數 43,898<span style="font-size:11px;font-weight:500;color:#94a3b8;"> · 使用者 24,853</span></span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col">#</th><th>頁面</th><th style="text-align:right">此頁次數</th><th style="text-align:right;width:88px">佔事件總次數%</th></tr><tr><td>1</td><td><a href="https://www.demo-store/" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">首頁 / ↗</a></td><td>1,622</td><td>6.1%</td></tr><tr><td>2</td><td><a href="https://www.demo-store/search" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">search ↗</a></td><td>1,269</td><td>5.82%</td></tr><tr><td>3</td><td><a href="https://www.demo-store/pages/design-service" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">design-service ↗</a></td><td>436</td><td>2.33%</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>186</td><td>0.51%</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a></td><td>115</td><td>0.57%</td></tr></table></div><p style="margin:10px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5;">GA4 判定「有效互動」（停留 10 秒以上或有互動事件）時所在的頁面。若某頁 session_start 占比高但這裡占比明顯偏低，代表該頁容易讓使用者快速跳出。</p></div></div></div>
+    </section>
+    <section id="funnels">
+      <h2>Funnels</h2>
+      <div class="two-col">
+        <div id="chart_funnel_form" class="chart"></div>
+        <div id="chart_funnel_line" class="chart"></div>
+      </div>
+    </section>
+    </div>
+
+    <div class="tab-panel" data-tab="4">
+    <section id="gsc">
+      <h2>Google Search Console</h2>
+      <p>自然搜尋成效：曝光（被搜尋看到）、點擊（被點進來）、平均排名（搜尋結果中的平均名次，數字越小越前面）。</p>
+      <div class="kpi-grid">
+        <div class="card"><div class="label">總曝光 Impressions</div><div class="value">200,818</div></div>
+        <div class="card"><div class="label">總點擊 Clicks</div><div class="value">5,728</div></div>
+        <div class="card"><div class="label">平均 CTR</div><div class="value">2.6%</div></div>
+        <div class="card"><div class="label">平均搜尋排名</div><div class="value">4</div></div>
+      </div>
+      <div class="subcard">
+        <h3>搜尋走勢：點擊 × 曝光 × 排名（整合一圖）</h3>
+        <p>同一條時間軸：點擊（綠長條）、曝光（灰線）、平均排名（橘線，越低越好、軸已反轉）。</p>
+        <div id="chart_gsc_trend" class="chart"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;align-items:start;">
+        <div class="subcard">
+          <h3>熱門頁面：點擊 × 曝光 × 排名（合併一表）</h3>
+          <p>每一列＝一個頁面，把點擊、曝光、CTR、平均排名並列（排名越小越前面；綠≤10、橘≤20）。點頁面可直接開該網址。時間軸用上方 30/90/180 天切換。</p>
+          <div class="table-wrap"><table class="data-table noheat-table"><tr><th>頁面</th><th style="text-align:right">點擊</th><th style="text-align:right">曝光</th><th style="text-align:right">CTR</th><th style="text-align:right">平均排名</th></tr><tr><td><a href="https://www.demo-store/" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">首頁 / ↗</a></td><td>426</td><td>7,561</td><td>4.76%</td><td>8.11</td></tr><tr><td><a href="https://www.demo-store/collections/高硼矽水瓶" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">高硼矽水瓶 ↗</a></td><td>118</td><td>6,092</td><td>1.79%</td><td>6.99</td></tr><tr><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">磁吸小白板 ↗</a></td><td>202</td><td>4,869</td><td>4.54%</td><td>6.48</td></tr><tr><td><a href="https://www.demo-store/collections/矽膠隔熱手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">矽膠隔熱手套 ↗</a></td><td>69</td><td>4,153</td><td>1.94%</td><td>7.81</td></tr><tr><td><a href="https://www.demo-store/collections/竹纖維餐碗" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">竹纖維餐碗 ↗</a></td><td>92</td><td>3,728</td><td>2.17%</td><td>5.28</td></tr><tr><td><a href="https://www.demo-store/collections/夜跑螢光手環" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">夜跑螢光手環 ↗</a></td><td>85</td><td>2,921</td><td>2.99%</td><td>5.66</td></tr><tr><td><a href="https://www.demo-store/collections/鋁製名片盒" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">鋁製名片盒 ↗</a></td><td>94</td><td>2,641</td><td>3.78%</td><td>5.49</td></tr><tr><td><a href="https://www.demo-store/collections/藍牙隨身喇叭" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">藍牙隨身喇叭 ↗</a></td><td>67</td><td>1,810</td><td>3.96%</td><td>5.25</td></tr><tr><td><a href="https://www.demo-store/pages/bulk-order" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">bulk-order ↗</a></td><td>62</td><td>1,763</td><td>3.22%</td><td>5.79</td></tr><tr><td><a href="https://www.demo-store/collections/防滑觸控手套" target="_blank" rel="noopener" style="color:#4f46e5;text-decoration:none">防滑觸控手套 ↗</a></td><td>62</td><td>357</td><td>16.78%</td><td>3.49</td></tr></table></div>
+        </div>
+        <div class="subcard">
+          <h3>裝置</h3>
+          <div id="chart_gsc_devices" class="chart" style="min-height:0;"></div>
+        </div>
+      </div>
+    </section>
+    <section id="search-insights">
+      <h2>🔎 搜尋字詞洞察與廣告建議</h2>
+      <p>同一批客人的兩種搜尋訊號：<b>左＝外部</b>（客人在 Google 打什麼字找到你，來自 GSC）、<b>右＝站內</b>（進站後在網站搜尋框打什麼字，來自 GA4）。兩者交叉可看出「市場想要什麼」與「你哪裡吃不到量」。</p>
+      <div class="two-col">
+        <div class="subcard"><h3>Google 搜尋（外部）Top 10 <span style="font-weight:500;color:#64748b;font-size:12px;">· 來源：Google Search Console (GSC)</span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col" style="">#</th><th class="" style="">搜尋字</th><th class="" style="text-align:right;">點擊</th><th class="" style="text-align:right;">曝光</th><th class="" style="text-align:right;">CTR</th><th class="" style="text-align:right;">排名</th></tr><tr><td>1</td><td><code style="font-size:12px;">矽膠隔熱手套</code></td><td>16</td><td>2,645</td><td>0.68%</td><td>6.1</td></tr><tr><td>2</td><td><code style="font-size:12px;">高硼矽水瓶</code></td><td>37</td><td>2,307</td><td>1.52%</td><td>4.21</td></tr><tr><td>3</td><td><code style="font-size:12px;">USB桌上風扇</code></td><td>12</td><td>1,308</td><td>0.95%</td><td>4.3</td></tr><tr><td>4</td><td><code style="font-size:12px;">輕量折疊傘</code></td><td>14</td><td>804</td><td>1.53%</td><td>3.71</td></tr><tr><td>5</td><td><code style="font-size:12px;">防滑觸控手套</code></td><td>9</td><td>565</td><td>1.49%</td><td>4.22</td></tr><tr><td>6</td><td><code style="font-size:12px;">工商日誌</code></td><td>8</td><td>465</td><td>1.51%</td><td>6.28</td></tr><tr><td>7</td><td><code style="font-size:12px;">刷毛保暖毯</code></td><td>20</td><td>461</td><td>4.75%</td><td>3.0</td></tr><tr><td>8</td><td><code style="font-size:12px;">磁吸小白板</code></td><td>119</td><td>199</td><td>55.61%</td><td>0.95</td></tr><tr><td>9</td><td><code style="font-size:12px;">不鏽鋼便當盒</code></td><td>105</td><td>173</td><td>51.68%</td><td>0.98</td></tr><tr><td>10</td><td><code style="font-size:12px;">精梳棉短T</code></td><td>11</td><td>36</td><td>27.28%</td><td>1.29</td></tr></table></div></div>
+        <div class="subcard"><h3>站內搜尋 Top 10 <span style="font-weight:500;color:#64748b;font-size:12px;">· 來源：GA4（站內搜尋事件）</span></h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col" style="">#</th><th class="" style="">站內搜尋字</th><th class="" style="text-align:right;">搜尋次數</th></tr><tr><td>1</td><td><code style="font-size:12px;">&quot;便籤本&quot;</code></td><td>43</td></tr><tr><td>2</td><td><code style="font-size:12px;">磁吸小白板</code></td><td>42</td></tr><tr><td>3</td><td><code style="font-size:12px;">客製化</code></td><td>36</td></tr><tr><td>4</td><td><code style="font-size:12px;">手帳本</code></td><td>34</td></tr><tr><td>5</td><td><code style="font-size:12px;">風扇</code></td><td>30</td></tr><tr><td>6</td><td><code style="font-size:12px;">鑰匙扣</code></td><td>28</td></tr><tr><td>7</td><td><code style="font-size:12px;">保溫瓶</code></td><td>27</td></tr><tr><td>8</td><td><code style="font-size:12px;">20合一多功能3C清潔套裝｜鍵盤刷 耳機清潔筆 手機螢幕除塵組</code></td><td>27</td></tr><tr><td>9</td><td><code style="font-size:12px;">&quot;高硼矽水瓶&quot;</code></td><td>26</td></tr><tr><td>10</td><td><code style="font-size:12px;">&quot;34UT&quot;</code></td><td>15</td></tr></table></div></div>
+      </div>
+      <h3 style="margin-top:14px;">建議投放的廣告關鍵字（依資料自動分層）</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;"><div class="subcard" style="padding:14px;"><div style="font-weight:700;font-size:13px;color:#1e293b;margin-bottom:6px;">① 品牌防禦字</div><div style="margin-bottom:8px;"><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">磁吸小白板</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">不鏽鋼便當盒</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">矽膠手機立架</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">磁吸小白板印刷</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">磁吸小白板禮品</span></div><div style="color:#64748b;font-size:12px;line-height:1.6;">已排名第 1、CTR 最高但曝光量小；出價最低，投放是防競品攔截你的品牌字。</div></div><div class="subcard" style="padding:14px;"><div style="font-weight:700;font-size:13px;color:#1e293b;margin-bottom:6px;">② 高需求・排名落後搶量字</div><div style="margin-bottom:8px;"><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">矽膠隔熱手套</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">鑰匙扣</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">胡桃木書籤</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">斜背帆布包</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">露營椅</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">立可帶</span></div><div style="color:#64748b;font-size:12px;line-height:1.6;">GSC 曝光極高但自然排名落在 5 名外、CTR 偏低＝需求大卻吃不到量；付費廣告最該補這層。</div></div><div class="subcard" style="padding:14px;"><div style="font-weight:700;font-size:13px;color:#1e293b;margin-bottom:6px;">③ 客製化長尾（高轉換）</div><div style="margin-bottom:8px;"><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">不鏽鋼便當盒</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">精梳棉短T</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">客製化高硼矽水瓶</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">l夾客製化</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">大豆香氛蠟燭 客製</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">天然軟木杯墊袋客製化</span></div><div style="color:#64748b;font-size:12px;line-height:1.6;">帶「客製化」字＝採購意圖明確、競爭較冷、CTR 高；適合長期常態投放的主力。</div></div><div class="subcard" style="padding:14px;"><div style="font-weight:700;font-size:13px;color:#1e293b;margin-bottom:6px;">④ 站內需求延伸字</div><div style="margin-bottom:8px;"><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">&quot;便籤本&quot;</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">客製化</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">磁吸小白板</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">手帳本</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">保溫瓶</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">鑰匙扣</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">20合一多功能3C清潔套裝｜鍵盤刷 耳機清潔筆 手機螢幕除塵組</span><span style="display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff;border-radius:999px;padding:2px 10px;margin:3px 4px 0 0;font-size:12px;">&quot;高硼矽水瓶&quot;</span></div><div style="color:#64748b;font-size:12px;line-height:1.6;">站內搜尋量高、但外部市場可能還沒被對手鎖定；搭配「客製化＋品項」投放，並確認有對應到達頁。</div></div></div>
+      <p style="margin-top:12px;color:#334155;font-size:13px;line-height:1.7;"><b>TA 市場分析：</b>品牌指名字 ＋「客製化＋品項」＋ 禮贈品／USB桌上風扇感謝狀 等訊號一致指向<b>企業／組織的客製化禮贈品採購</b>（行銷、福委、學校協會），而非泛泛的個人送禮；站內搜尋（貼紙、鑰匙扣、便籤本、刷毛保暖毯…）反映他們要的是<b>客製小物與活動週邊</b>。投放建議先以「品牌字＋客製長尾」穩健起手，第②層搶量字用小預算測 CTR／詢價後再放大；最終取捨仍需疊上各品項毛利與實際詢價轉換（GA4 詢價／LINE 漏斗）。</p>
+      <p style="color:var(--muted);font-size:11px;margin-top:8px;">字詞為近 30 天資料自動產生；建議為輔助判斷，非最終投放決策。</p>
+    </section>
+
+    </div>
+
+    <div class="tab-panel" data-tab="5">
+    <section id="audiences">
+      <h2>目標對象成效（受眾流量）</h2>
+      <p>各目標對象（受眾）在近 30 天累積的流量，資料源為 GA4 audienceName 維度，與 GA4 後台 / Looker 一致；會隨上方區間切換變動。同期全站平均停留 2.30 分（138.1 秒）。</p>
+      <div class="table-wrap"><table class="data-table noheat-table"><tr><th>目標對象名稱</th><th style="text-align:right;">使用者</th><th style="text-align:right;">工作階段</th><th style="text-align:right;">瀏覽</th><th style="text-align:right;">轉換</th><th style="text-align:right;">轉換率</th></tr><tr><td><b>All Users</b></td><td>36,369 (100.0%)</td><td><b>43,390 (100.0%)</b></td><td>119,096</td><td>1,501 (100.0%)</td><td>3.46%</td></tr><tr><td><b>工作階段持續時間小於一分鐘目標客群</b><br><span style="color:var(--muted);font-size:11px;">sessionDuration &lt; 60s · 靜態·曾經符合保留 · 建立 2026-06-15 · 近7天 20,484 工作階段</span></td><td>20,346 (55.9%)</td><td><b>21,517 (49.6%)</b></td><td>47,298</td><td>328 (21.9%)</td><td>1.47%</td></tr><tr><td><b>搜尋者</b></td><td>1,069 (2.9%)</td><td><b>2,784 (6.4%)</b></td><td>15,988</td><td>270 (18.0%)</td><td>9.99%</td></tr><tr><td><b>購買者</b></td><td>115 (0.3%)</td><td><b>312 (0.7%)</b></td><td>2,647</td><td>139 (9.3%)</td><td>40.54%</td></tr><tr><td><b>工作階段持續時間大於三分鐘目標客群</b><br><span style="color:var(--muted);font-size:11px;">sessionDuration &gt; 180s · 動態·當下符合才算 · 建立 2026-05-13 · 近7天 805 工作階段</span></td><td>3,527 (9.7%)</td><td><b>4,616 (10.6%)</b></td><td>2,536</td><td>0 (0.0%)</td><td>0.0%</td></tr></table></div>
+      <div class="two-col" style="margin-top:16px;">
+        <div class="subcard">
+          <h3>各受眾轉換率（不含 All Users）</h3>
+          <p>看哪個受眾最會轉換（轉換＝GA4 關鍵事件/keyEvents ÷ 工作階段）。</p>
+          <div id="chart_aud_convrate" class="chart"></div>
+        </div>
+        <div class="subcard">
+          <h3>各受眾工作階段趨勢</h3>
+          <p>近 30 天每日工作階段，看各受眾消長；點圖例可開關。</p>
+          <div id="chart_aud_trend" class="chart"></div>
+        </div>
+      </div>
+      <p style="color:var(--muted);font-size:12px;margin-top:8px;">資料抓取日：2026-06-23　·　註：受眾流量「不回溯」，只從受眾建立日起算，故 90/180 天可能與較短區間相同；新建或剛重建的受眾需數日後才開始累積資料。</p>
+    </section>
+
+    <section id="line">
+      <h2>LINE 互動分析（依頁面類型）</h2>
+      <p>近 30 天 LINE 真實點擊。左圖兩個維度：<b>每一列＝使用者點擊當下所在的「頁面類型」</b>（商品頁／分類頁／首頁…），<b>顏色＝他點的是「哪個位置」的 LINE 按鈕</b>（頁頭鈕／聊天視窗／商品內嵌鈕／頁尾鈕）。例：「商品頁 × 商品內嵌鈕」＝在商品頁上、點了嵌在商品頁中段的那顆 LINE 鈕。右表「傾向率」＝每千次瀏覽帶來幾次 LINE 點擊（紅字＝最高，去除流量大小影響）。曝光(hover) 1,391 次不計入點擊。</p>
+      <div class="kpi-grid"><div class="card"><div class="label">真實點擊</div><div class="value">228</div><div class="label" style="color:var(--muted)">頁頭+聊天+頁尾+產品頁</div></div><div class="card"><div class="label">聊天視窗顯示</div><div class="value">793</div><div class="label" style="color:var(--muted)">hover/曝光，非點擊</div></div><div class="card"><div class="label">產品頁 LINE 點擊</div><div class="value">50</div><div class="label" style="color:var(--muted)">商品頁那顆按鈕</div></div></div>
+      <div class="two-col">
+        <div class="subcard">
+          <h3>各頁面類型 × 按鈕（點擊量）</h3>
+          <div id="chart_line_type" style="width:100%;height:340px"></div><script>(function(){if(!window.Plotly)return;var D={"labels": ["商品頁", "分類頁", "首頁", "其他頁面", "詢價頁", "搜尋", "其他"], "header": [61, 37, 16, 11, 10, 9, 3], "chat": [79, 48, 12, 4, 1, 3, 2], "footer": [8, 1, 3, 2, 2, 0, 0], "product": [88, 0, 0, 0, 0, 0, 0]};var b=function(n,k,c){return {name:n,y:D.labels,x:D[k],type:"bar",orientation:"h",marker:{color:c}};};Plotly.newPlot("chart_line_type",[b("\u9801\u982d\u9215","header","#4f46e5"),b("\u804a\u5929\u8996\u7a97","chat","#06c755"),b("\u5546\u54c1\u5167\u5d4c\u9215","product","#f59e0b"),b("\u9801\u5c3e\u9215","footer","#cbd5e1")],{barmode:"stack",height:330,margin:{l:88,r:20,t:34,b:38},paper_bgcolor:"#fff",plot_bgcolor:"#fff",hoverlabel:{bgcolor:"#ffffff",bordercolor:"#e2e8f0",font:{color:"#172033",size:12,family:"-apple-system,\"Segoe UI\",\"Microsoft JhengHei\",sans-serif"}},legend:{orientation:"h",y:1.08,itemclick:false,itemdoubleclick:false},yaxis:{autorange:"reversed",automargin:true},xaxis:{title:"LINE \u9ede\u64ca\u6b21\u6578",gridcolor:"#edf2f7"}},{responsive:true,displayModeBar:false});})();</script>
+        </div>
+        <div class="subcard">
+          <h3>傾向率：每千次瀏覽的 LINE 點擊</h3>
+          <div class="table-wrap"><table class="data-table"><tr><th>頁面類型</th>
+            <th style="text-align:right;">點擊</th>
+            <th style="text-align:right;">瀏覽量</th>
+            <th style="text-align:right;">點擊率</th></tr><tr><td>商品頁</td><td>151</td><td>53,298</td><td>+53,147 (+35196.7%)</td></tr><tr><td>分類頁</td><td>37</td><td>21,251</td><td>+21,214 (+57335.1%)</td></tr><tr><td>首頁</td><td>22</td><td>7,062</td><td>+7,040 (+32000.0%)</td></tr><tr><td>搜尋</td><td>7</td><td>5,327</td><td>+5,320 (+76000.0%)</td></tr><tr><td>其他頁面</td><td>9</td><td>1,960</td><td>+1,951 (+21677.8%)</td></tr><tr><td>詢價頁</td><td>7</td><td>1,166</td><td>+1,159 (+16557.1%)</td></tr><tr><td>其他</td><td>3</td><td>379</td><td>+376 (+12533.3%)</td></tr></table></div>
+          <p style="color:var(--muted);font-size:11px;margin-top:6px;">點擊率＝LINE點擊 ÷ 該類型瀏覽量；紅字＝最高，最值得加強 LINE 入口。</p>
+        </div>
+      </div>
+      <h3 style="margin-top:6px;">Top LINE 點擊（依頁面類型）</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+        <div class="subcard"><h3 style="font-size:13px;">商品</h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col" style="padding:9px 3px 9px 8px;text-align:center;">#</th><th>商品</th><th style="text-align:right;">LINE 點擊</th></tr><tr><td>1</td><td><a href="https://www.demo-store/products/75EA-0023" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/products/75EA-0023</a></td><td>3</td></tr><tr><td>2</td><td><a href="https://www.demo-store/products/51OA-1000" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/products/51OA-1000</a></td><td>3</td></tr><tr><td>3</td><td><a href="https://www.demo-store/products/82QI-4866" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/products/82QI-4866</a></td><td>3</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/玻璃杯/products/59FA-0079" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/collections/玻璃杯/products/59FA-0079</a></td><td>2</td></tr><tr><td>5</td><td><a href="https://www.demo-store/products/63EJ-4905" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/products/63EJ-4905</a></td><td>2</td></tr><tr><td>6</td><td><a href="https://www.demo-store/products/56PZ-1737" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/products/56PZ-1737</a></td><td>2</td></tr></table></div></div>
+        <div class="subcard"><h3 style="font-size:13px;">分類</h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col" style="padding:9px 3px 9px 8px;text-align:center;">#</th><th>分類</th><th style="text-align:right;">LINE 點擊</th></tr><tr><td>1</td><td><a href="https://www.demo-store/collections/矽膠隔熱手套" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/collections/矽膠隔熱手套</a></td><td>5</td></tr><tr><td>2</td><td><a href="https://www.demo-store/collections/高硼矽水瓶" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/collections/高硼矽水瓶</a></td><td>4</td></tr><tr><td>3</td><td><a href="https://www.demo-store/collections/矽膠手機立架" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/collections/矽膠手機立架</a></td><td>4</td></tr><tr><td>4</td><td><a href="https://www.demo-store/collections/防潑水後背包" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/collections/防潑水後背包</a></td><td>4</td></tr><tr><td>5</td><td><a href="https://www.demo-store/collections/磁吸小白板" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/collections/磁吸小白板</a></td><td>4</td></tr><tr><td>6</td><td><a href="https://www.demo-store/collections/會員卡製作" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/collections/會員卡製作</a></td><td>3</td></tr></table></div></div>
+        <div class="subcard"><h3 style="font-size:13px;">Page</h3><div class="table-wrap"><table class="data-table noheat-table"><tr><th class="rank-col" style="padding:9px 3px 9px 8px;text-align:center;">#</th><th>Page</th><th style="text-align:right;">LINE 點擊</th></tr><tr><td>1</td><td><a href="https://www.demo-store/pages/design-service" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/pages/design-service</a></td><td>13</td></tr><tr><td>2</td><td><a href="https://www.demo-store/pages/get-quote" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/pages/get-quote</a></td><td>8</td></tr><tr><td>3</td><td><a href="https://www.demo-store/pages/return-policy" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/pages/return-policy</a></td><td>5</td></tr><tr><td>4</td><td><a href="https://www.demo-store/pages/bulk-order" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/pages/bulk-order</a></td><td>2</td></tr><tr><td>5</td><td><a href="https://www.demo-store/pages/summer-event" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/pages/summer-event</a></td><td>1</td></tr><tr><td>6</td><td><a href="https://www.demo-store/pages/press-room" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all;">https://www.demo-store/pages/press-room</a></td><td>1</td></tr></table></div></div>
+        <div class="subcard"><h3 style="font-size:13px;">Blog</h3><p style="color:var(--muted);font-size:12px;">資料更新中（請重新授權 GA4 後重跑 fetch）</p></div>
+      </div>
+      <p style="color:var(--muted);font-size:12px;margin-top:8px;">資料抓取日：2026-06-23</p>
+    </section>
+
+    <section id="line-crm">
+      <h2>LINE 進線 / 業務（CRM）</h2>
+      <p>來源：Google Sheet「CRM 資料表」(唯讀，已彙總、不含客戶個資)。這裡看的是<b>真實 LINE 進線（詢問）</b>與業務處理狀況，跟上面 GA4 的「LINE 按鈕點擊」是不同層（這裡是實際進到客服的詢問）。</p>
+      <div class="kpi-grid"><div class="card"><div class="label">本月進線</div><div class="value">332</div><div class="label" style="color:var(--muted)">2026/6</div></div><div class="card"><div class="label">未處理</div><div class="value">148</div><div class="label" style="color:var(--muted)">未指派/未回</div></div><div class="card"><div class="label">未處理率</div><div class="value" style="color:#dc2626">44.5%</div><div class="label" style="color:var(--muted)">越低越好</div></div><div class="card"><div class="label">較上月</div><div class="value" style="color:#16a34a">-162</div><div class="label" style="color:var(--muted)">進線量變化</div></div></div>
+      <div class="two-col">
+        <div class="subcard">
+          <h3>進線 vs 未處理 趨勢（週）</h3>
+          <p>綠＝已處理、紅＝未處理（堆疊看量）；折線＝未處理率%（看營運健康）。</p>
+          <div id="chart_linecrm_trend" class="chart"></div>
+        </div>
+        <div class="subcard">
+          <h3>業務負荷（本月）</h3>
+          <p>各業務本月接的進線數；紅條＝未處理（沒人接）。</p>
+          <div id="chart_linecrm_sales" class="chart"></div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="subcard">
+          <h3>LINE 詢問產品 Top（B4 核心分類）</h3>
+          <p>客戶在 LINE 最常問的產品類別＝需求訊號，可對應備貨/行銷。</p>
+          <div id="chart_linecrm_cat" class="chart"></div>
+        </div>
+        <div class="subcard">
+          <h3>進線時段熱力圖</h3>
+          <p>依「建檔時間」分布（週幾×小時）。注意：這是 CRM 建檔時間，可能反映同仁批次建檔，不完全等於客戶來訊時間。</p>
+          <div id="chart_linecrm_heat" class="chart"></div>
+        </div>
+      </div>
+      <p style="color:var(--muted);font-size:12px;margin-top:8px;">快照時間：2026-06-24 10:15</p>
+    </section>
+
+    </div>
+
+    <div class="tab-panel" data-tab="6">
+
+    <section id="updates"><h2>🔄 最近網站更新</h2><p>（示意）近期商店與分析系統的變更紀錄。</p><div class="card"><div style="margin-bottom:14px;"><h3 style="margin:0 0 4px;font-size:14px;">2026-06-23</h3><p style="margin:0 0 6px;color:#475569;font-size:12.5px;">更新首頁主視覺並補齊 10 張分類主圖。</p><ul style="margin:0;padding-left:4px;list-style:none;"><li style="margin:6px 0;line-height:1.6;"><span style="display:inline-block;min-width:48px;text-align:center;font-size:11px;font-weight:700;color:#fff;background:#2e7d32;border-radius:4px;padding:1px 6px;margin-right:8px;">示意</span>新增並上架 10 張分類主圖。</li><li style="margin:6px 0;line-height:1.6;"><span style="display:inline-block;min-width:48px;text-align:center;font-size:11px;font-weight:700;color:#fff;background:#2e7d32;border-radius:4px;padding:1px 6px;margin-right:8px;">示意</span>優化 8 個分類描述的 SEO 文案。</li></ul></div><div style="margin-bottom:14px;"><h3 style="margin:0 0 4px;font-size:14px;">2026-06-20</h3><p style="margin:0 0 6px;color:#475569;font-size:12.5px;">強化分類頁的常見問題與事件追蹤。</p><ul style="margin:0;padding-left:4px;list-style:none;"><li style="margin:6px 0;line-height:1.6;"><span style="display:inline-block;min-width:48px;text-align:center;font-size:11px;font-weight:700;color:#fff;background:#2e7d32;border-radius:4px;padding:1px 6px;margin-right:8px;">示意</span>分類頁新增 FAQ 區塊（含結構化資料）。</li><li style="margin:6px 0;line-height:1.6;"><span style="display:inline-block;min-width:48px;text-align:center;font-size:11px;font-weight:700;color:#fff;background:#2e7d32;border-radius:4px;padding:1px 6px;margin-right:8px;">示意</span>補上點擊事件追蹤。</li></ul></div><div style="margin-bottom:14px;"><h3 style="margin:0 0 4px;font-size:14px;">2026-06-16</h3><p style="margin:0 0 6px;color:#475569;font-size:12.5px;">分析後台擴充。</p><ul style="margin:0;padding-left:4px;list-style:none;"><li style="margin:6px 0;line-height:1.6;"><span style="display:inline-block;min-width:48px;text-align:center;font-size:11px;font-weight:700;color:#fff;background:#2e7d32;border-radius:4px;padding:1px 6px;margin-right:8px;">示意</span>儀表板新增頁面類型與受眾成效區塊。</li></ul></div></div></section>
+
+    </div>
+  </div>
+<script>
+const landingPages = [{"page": "/", "sessions": 3170, "engagedSessions": 2640, "userEngagementDuration": 128516, "screenPageViews": 12488, "bounceRate": 0.17, "avg_engagement_sec": 42.12, "is_bot_suspect": false, "label": "首頁 /", "group_code": "home", "group_label": "首頁 /"}, {"page": "(not set)", "sessions": 1170, "engagedSessions": 103, "userEngagementDuration": 15351, "screenPageViews": 1, "bounceRate": 0.88, "avg_engagement_sec": 13.23, "is_bot_suspect": true, "label": "(not set)", "group_code": "not_set", "group_label": "(not set) / 未設定"}, {"page": "/search", "sessions": 268, "engagedSessions": 216, "userEngagementDuration": 17543, "screenPageViews": 1635, "bounceRate": 0.2, "avg_engagement_sec": 66.81, "is_bot_suspect": false, "label": "search", "group_code": "search", "group_label": "搜尋頁 /search"}, {"page": "/collections/矽膠隔熱手套", "sessions": 152, "engagedSessions": 139, "userEngagementDuration": 11055, "screenPageViews": 756, "bounceRate": 0.09, "avg_engagement_sec": 73.73, "is_bot_suspect": false, "label": "矽膠隔熱手套", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/collections/磁吸小白板", "sessions": 150, "engagedSessions": 135, "userEngagementDuration": 19710, "screenPageViews": 1263, "bounceRate": 0.1, "avg_engagement_sec": 136.24, "is_bot_suspect": false, "label": "磁吸小白板", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "", "sessions": 138, "engagedSessions": 1, "userEngagementDuration": 1818, "screenPageViews": 1, "bounceRate": 1.03, "avg_engagement_sec": 13.73, "is_bot_suspect": true, "label": "", "group_code": "other", "group_label": "其他"}, {"page": "/collections/夜跑螢光手環", "sessions": 133, "engagedSessions": 122, "userEngagementDuration": 7693, "screenPageViews": 545, "bounceRate": 0.09, "avg_engagement_sec": 60.9, "is_bot_suspect": false, "label": "夜跑螢光手環", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/collections/防潑水後背包", "sessions": 117, "engagedSessions": 104, "userEngagementDuration": 9499, "screenPageViews": 552, "bounceRate": 0.12, "avg_engagement_sec": 81.71, "is_bot_suspect": false, "label": "防潑水後背包", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/collections/天然軟木杯墊吸管組", "sessions": 106, "engagedSessions": 98, "userEngagementDuration": 11354, "screenPageViews": 781, "bounceRate": 0.08, "avg_engagement_sec": 103.69, "is_bot_suspect": false, "label": "天然軟木杯墊吸管組", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/collections/防滑觸控手套", "sessions": 104, "engagedSessions": 90, "userEngagementDuration": 6779, "screenPageViews": 485, "bounceRate": 0.13, "avg_engagement_sec": 66.61, "is_bot_suspect": false, "label": "防滑觸控手套", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/products/51CT-0103", "sessions": 97, "engagedSessions": 93, "userEngagementDuration": 269, "screenPageViews": 189, "bounceRate": 0.04, "avg_engagement_sec": 2.94, "is_bot_suspect": false, "label": "51CT-0103", "group_code": "product", "group_label": "商品頁 /products/*"}, {"page": "/collections/胡桃木書籤", "sessions": 96, "engagedSessions": 90, "userEngagementDuration": 11960, "screenPageViews": 652, "bounceRate": 0.06, "avg_engagement_sec": 128.85, "is_bot_suspect": false, "label": "胡桃木書籤", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/pages/bulk-order", "sessions": 95, "engagedSessions": 82, "userEngagementDuration": 12463, "screenPageViews": 748, "bounceRate": 0.13, "avg_engagement_sec": 129.07, "is_bot_suspect": false, "label": "bulk-order", "group_code": "page", "group_label": "自訂頁 /pages/*"}, {"page": "/collections/鋁製名片盒", "sessions": 93, "engagedSessions": 81, "userEngagementDuration": 8317, "screenPageViews": 580, "bounceRate": 0.13, "avg_engagement_sec": 85.02, "is_bot_suspect": false, "label": "鋁製名片盒", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/collections/高硼矽水瓶", "sessions": 92, "engagedSessions": 85, "userEngagementDuration": 11198, "screenPageViews": 769, "bounceRate": 0.07, "avg_engagement_sec": 126.98, "is_bot_suspect": false, "label": "高硼矽水瓶", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/collections/木質立體拼圖", "sessions": 91, "engagedSessions": 86, "userEngagementDuration": 8781, "screenPageViews": 672, "bounceRate": 0.05, "avg_engagement_sec": 92.83, "is_bot_suspect": false, "label": "木質立體拼圖", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/products/75BH-0003", "sessions": 89, "engagedSessions": 80, "userEngagementDuration": 275, "screenPageViews": 169, "bounceRate": 0.1, "avg_engagement_sec": 3.01, "is_bot_suspect": false, "label": "75BH-0003", "group_code": "product", "group_label": "商品頁 /products/*"}, {"page": "/collections/輕量折疊傘", "sessions": 87, "engagedSessions": 76, "userEngagementDuration": 11173, "screenPageViews": 523, "bounceRate": 0.13, "avg_engagement_sec": 124.55, "is_bot_suspect": false, "label": "輕量折疊傘", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/products/56PZ-1737", "sessions": 80, "engagedSessions": 69, "userEngagementDuration": 4389, "screenPageViews": 249, "bounceRate": 0.13, "avg_engagement_sec": 55.2, "is_bot_suspect": false, "label": "56PZ-1737", "group_code": "product", "group_label": "商品頁 /products/*"}, {"page": "/collections/竹纖維餐碗", "sessions": 79, "engagedSessions": 70, "userEngagementDuration": 6328, "screenPageViews": 533, "bounceRate": 0.12, "avg_engagement_sec": 81.5, "is_bot_suspect": false, "label": "竹纖維餐碗", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/products/75BH-0001", "sessions": 71, "engagedSessions": 67, "userEngagementDuration": 218, "screenPageViews": 136, "bounceRate": 0.06, "avg_engagement_sec": 3.01, "is_bot_suspect": false, "label": "75BH-0001", "group_code": "product", "group_label": "商品頁 /products/*"}, {"page": "/collections/藍牙隨身喇叭", "sessions": 69, "engagedSessions": 63, "userEngagementDuration": 6433, "screenPageViews": 364, "bounceRate": 0.09, "avg_engagement_sec": 93.1, "is_bot_suspect": false, "label": "藍牙隨身喇叭", "group_code": "collection", "group_label": "分類頁 /collections/*"}, {"page": "/products/71JD-7216", "sessions": 67, "engagedSessions": 57, "userEngagementDuration": 4120, "screenPageViews": 205, "bounceRate": 0.15, "avg_engagement_sec": 63.75, "is_bot_suspect": false, "label": "71JD-7216", "group_code": "product", "group_label": "商品頁 /products/*"}, {"page": "/products/51CT-0102", "sessions": 47, "engagedSessions": 43, "userEngagementDuration": 126, "screenPageViews": 90, "bounceRate": 0.07, "avg_engagement_sec": 2.78, "is_bot_suspect": false, "label": "51CT-0102", "group_code": "product", "group_label": "商品頁 /products/*"}]
+const events = [{"event": "scroll", "eventCount": 110584, "totalUsers": 27911}, {"event": "page_view", "eventCount": 71984, "totalUsers": 25476}, {"event": "first_visit", "eventCount": 50680, "totalUsers": 50713}, {"event": "view_item", "eventCount": 33466, "totalUsers": 28282}, {"event": "product_picture", "eventCount": 32095, "totalUsers": 2697}, {"event": "session_start", "eventCount": 32064, "totalUsers": 29078}, {"event": "user_engagement", "eventCount": 18437, "totalUsers": 10438}, {"event": "collection_product", "eventCount": 10323, "totalUsers": 2314}, {"event": "category_pagination_click", "eventCount": 5857, "totalUsers": 1089}, {"event": "點擊推薦產品上下頁", "eventCount": 3086, "totalUsers": 298}]
+const funnelForm = [{"step": "1. session_start", "users": 37366, "completionRate": 0.554, "abandoned": 16669, "abandonRate": 0.446}, {"step": "2. view_item", "users": 20697, "completionRate": 0.022, "abandoned": 20251, "abandonRate": 0.978}, {"step": "3. form_start", "users": 446, "completionRate": 0.433, "abandoned": 253, "abandonRate": 0.567}, {"step": "4. form_submit", "users": 193, "completionRate": 1.0, "abandoned": 0, "abandonRate": 0.0}]
+const funnelLine = [{"step": "1. session_start", "users": 36763, "completionRate": 0.554, "abandoned": 16400, "abandonRate": 0.446}, {"step": "2. view_item", "users": 20363, "completionRate": 0.015, "abandoned": 20066, "abandonRate": 0.985}, {"step": "3. chat_cta_click", "users": 297, "completionRate": 1.0, "abandoned": 0, "abandonRate": 0.0}]
+const gscDaily = [{"date": "2026-06-18", "clicks": 103, "impressions": 4220, "ctr": 2.44, "position": 7.5}, {"date": "2026-06-19", "clicks": 109, "impressions": 5951, "ctr": 1.83, "position": 8.2}, {"date": "2026-06-20", "clicks": 99, "impressions": 4455, "ctr": 2.22, "position": 7.3}, {"date": "2026-06-21", "clicks": 157, "impressions": 6323, "ctr": 2.48, "position": 7.0}, {"date": "2026-06-22", "clicks": 255, "impressions": 9092, "ctr": 2.8, "position": 7.2}, {"date": "2026-06-23", "clicks": 199, "impressions": 6627, "ctr": 3.0, "position": 6.7}, {"date": "2026-06-24", "clicks": 325, "impressions": 9866, "ctr": 3.29, "position": 6.5}, {"date": "2026-06-25", "clicks": 266, "impressions": 8690, "ctr": 3.06, "position": 7.2}, {"date": "2026-06-26", "clicks": 187, "impressions": 8196, "ctr": 2.28, "position": 7.2}, {"date": "2026-06-27", "clicks": 143, "impressions": 6333, "ctr": 2.26, "position": 7.3}, {"date": "2026-06-28", "clicks": 213, "impressions": 8055, "ctr": 2.64, "position": 7.0}, {"date": "2026-06-29", "clicks": 333, "impressions": 10349, "ctr": 3.22, "position": 6.9}, {"date": "2026-06-30", "clicks": 280, "impressions": 9749, "ctr": 2.87, "position": 6.9}, {"date": "2026-07-01", "clicks": 340, "impressions": 11368, "ctr": 2.99, "position": 6.3}, {"date": "2026-07-02", "clicks": 352, "impressions": 11474, "ctr": 3.07, "position": 6.6}, {"date": "2026-07-03", "clicks": 144, "impressions": 6764, "ctr": 2.13, "position": 6.8}, {"date": "2026-07-04", "clicks": 131, "impressions": 6916, "ctr": 1.89, "position": 8.2}, {"date": "2026-07-05", "clicks": 175, "impressions": 6547, "ctr": 2.67, "position": 6.9}, {"date": "2026-07-06", "clicks": 389, "impressions": 11225, "ctr": 3.47, "position": 6.8}, {"date": "2026-07-07", "clicks": 390, "impressions": 12158, "ctr": 3.21, "position": 6.8}, {"date": "2026-07-08", "clicks": 239, "impressions": 7573, "ctr": 3.16, "position": 6.9}, {"date": "2026-07-09", "clicks": 226, "impressions": 7551, "ctr": 2.99, "position": 6.9}, {"date": "2026-07-10", "clicks": 87, "impressions": 3978, "ctr": 2.19, "position": 7.7}, {"date": "2026-07-11", "clicks": 94, "impressions": 4454, "ctr": 2.11, "position": 7.6}, {"date": "2026-07-12", "clicks": 293, "impressions": 9777, "ctr": 3.0, "position": 7.1}, {"date": "2026-07-13", "clicks": 414, "impressions": 12390, "ctr": 3.34, "position": 6.7}, {"date": "2026-07-14", "clicks": 363, "impressions": 11092, "ctr": 3.27, "position": 7.1}, {"date": "2026-07-15", "clicks": 223, "impressions": 6976, "ctr": 3.2, "position": 7.1}, {"date": "2026-07-16", "clicks": 223, "impressions": 6804, "ctr": 3.28, "position": 7.1}, {"date": "2026-07-17", "clicks": 172, "impressions": 6371, "ctr": 2.7, "position": 7.2}]
+const gscPages = [{"path": "/", "label": "首頁 /", "clicks": 472, "impressions": 8375, "ctr": 5.64, "position": 7.6}, {"path": "/collections/磁吸小白板", "label": "磁吸小白板", "clicks": 128, "impressions": 3082, "ctr": 4.15, "position": 5.9}, {"path": "/collections/夜跑螢光手環", "label": "夜跑螢光手環", "clicks": 116, "impressions": 3978, "ctr": 2.92, "position": 4.9}, {"path": "/collections/防滑觸控手套", "label": "防滑觸控手套", "clicks": 112, "impressions": 648, "ctr": 17.28, "position": 3.2}, {"path": "/collections/矽膠隔熱手套", "label": "矽膠隔熱手套", "clicks": 86, "impressions": 5192, "ctr": 1.66, "position": 7.4}, {"path": "/collections/竹纖維餐碗", "label": "竹纖維餐碗", "clicks": 79, "impressions": 3196, "ctr": 2.47, "position": 5.9}, {"path": "/collections/高硼矽水瓶", "label": "高硼矽水瓶", "clicks": 74, "impressions": 3844, "ctr": 1.93, "position": 6.0}, {"path": "/collections/胡桃木書籤", "label": "胡桃木書籤", "clicks": 73, "impressions": 3614, "ctr": 2.02, "position": 7.0}, {"path": "/collections/鋁製名片盒", "label": "鋁製名片盒", "clicks": 72, "impressions": 2028, "ctr": 3.55, "position": 5.8}, {"path": "/products/56PZ-1737", "label": "56PZ-1737", "clicks": 69, "impressions": 1586, "ctr": 4.35, "position": 6.3}, {"path": "/collections/藍牙隨身喇叭", "label": "藍牙隨身喇叭", "clicks": 67, "impressions": 1810, "ctr": 3.7, "position": 5.8}, {"path": "/collections/斜背帆布包", "label": "斜背帆布包", "clicks": 67, "impressions": 2623, "ctr": 2.55, "position": 7.5}, {"path": "/collections/摺疊購物籃", "label": "摺疊購物籃", "clicks": 66, "impressions": 1891, "ctr": 3.49, "position": 3.4}, {"path": "/pages/bulk-order", "label": "bulk-order", "clicks": 62, "impressions": 1763, "ctr": 3.52, "position": 6.6}, {"path": "/collections/USB桌上風扇", "label": "USB桌上風扇", "clicks": 57, "impressions": 2559, "ctr": 2.23, "position": 5.2}]
+const gscDevices = [{"device": "DESKTOP", "clicks": 4673, "impressions": 126226, "ctr": 3.7, "position": 6.9}, {"device": "MOBILE", "clicks": 1978, "impressions": 99519, "ctr": 1.99, "position": 7.1}, {"device": "TABLET", "clicks": 43, "impressions": 2179, "ctr": 1.97, "position": 6.8}]
+const baseLayout = {
+  paper_bgcolor: "#ffffff",
+  plot_bgcolor: "#ffffff",
+  margin: { l: 60, r: 24, t: 20, b: 50 },
+  font: { family: '-apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif', color: "#172033" },
+  xaxis: { gridcolor: "#edf2f7" },
+  yaxis: { gridcolor: "#edf2f7" },
+  hovermode: "closest",
+  hoverlabel: { bgcolor: "#ffffff", bordercolor: "#e2e8f0", font: { color: "#172033", size: 12, family: '-apple-system, "Segoe UI", "Microsoft JhengHei", sans-serif' } }
+};
+
+// Lazy chart rendering: with 7 CSS-only tabs, only the active tab's DOM is visible,
+// but all <script> code below still ran unconditionally on page load — Plotly built
+// all 14 charts up front (each with dozens of SVG nodes), which is what made the
+// page feel laggy (measured: 6.6k DOM nodes, 162ms forced reflow from Plotly's own
+// bBox layout reads). Charts are grouped into per-tab render functions and only the
+// functions for the tab visible on load + the tab the user switches to actually run.
+const _tabRenderers = {};   // tabIndex -> [fn, fn, ...]
+const _tabRendered = new Set();
+function _registerTabChart(tabIndex, fn) {
+  (_tabRenderers[tabIndex] = _tabRenderers[tabIndex] || []).push(fn);
+}
+function _renderTab(tabIndex) {
+  if (_tabRendered.has(tabIndex)) return;
+  _tabRendered.add(tabIndex);
+  (_tabRenderers[tabIndex] || []).forEach(fn => { try { fn(); } catch (e) { console.error(e); } });
+}
+document.querySelectorAll('input[name="dashtab"]').forEach(radio => {
+  radio.addEventListener("change", () => { if (radio.checked) _renderTab(Number(radio.id.replace("tab-", ""))); });
+});
+
+// Exclude GA artifacts that are not real landing pages: empty path and "(not set)"
+// (both are unattributed/bot traffic with 0 pageviews — they showed as a blank bar).
+const landingTop = landingPages.filter(p => p.page && p.page !== "(not set)").slice(0, 8);
+_registerTabChart(1, () => {
+Plotly.newPlot("chart_landing", [{
+  y: landingTop.map(item => item.label).reverse(),
+  x: landingTop.map(item => item.sessions).reverse(),
+  type: "bar",
+  orientation: "h",
+  marker: { color: landingTop.map(item => item.is_bot_suspect ? "#ef4444" : "#4f46e5").reverse(), cornerradius: 5 },
+  text: landingTop.map(item => item.sessions.toLocaleString()).reverse(),
+  textposition: "outside",
+  textfont: { size: 11, color: "#475569" },
+  cliponaxis: false,
+  customdata: landingTop.map(item => [item.page, item.avg_engagement_sec, item.screenPageViews, item.bounceRate]).reverse(),
+  hovertemplate: "<b>%{customdata[0]}</b><br>Sessions: %{x:,}<br>Avg engagement: %{customdata[1]}s<br>Pageviews: %{customdata[2]:,}<br>Bounce rate: %{customdata[3]:.1%}<extra></extra>"
+}], {
+  ...baseLayout,
+  height: 300,
+  margin: { l: 160, r: 40, t: 16, b: 40 },
+  xaxis: { title: "Sessions", gridcolor: "#edf2f7" },
+  yaxis: { title: "", automargin: true },
+  showlegend: false
+}, { responsive: true });
+});
+
+_registerTabChart(3, () => {
+Plotly.newPlot("chart_events", [{
+  y: events.map(item => item.event).reverse(),
+  x: events.map(item => item.eventCount).reverse(),
+  type: "bar",
+  orientation: "h",
+  marker: { color: "#7c3aed", cornerradius: 5 },
+  customdata: events.map(item => item.totalUsers).reverse(),
+  hovertemplate: "<b>%{y}</b><br>Event count: %{x:,}<br>Total users: %{customdata:,}<extra></extra>"
+}], {
+  ...baseLayout,
+  height: 380,
+  margin: { l: 240, r: 20, t: 20, b: 50 },
+  xaxis: { title: "Event count", gridcolor: "#edf2f7" },
+  yaxis: { title: "", automargin: true },
+  showlegend: false
+}, { responsive: true });
+
+Plotly.newPlot("chart_funnel_form", [{
+  y: funnelForm.map(item => item.step),
+  x: funnelForm.map(item => item.users),
+  type: "funnel",
+  textinfo: "value+percent initial",
+  marker: { color: "#10b981" }
+}], {
+  ...baseLayout,
+  height: 320,
+  margin: { l: 140, r: 40, t: 10, b: 30 }
+}, { responsive: true });
+
+Plotly.newPlot("chart_funnel_line", [{
+  y: funnelLine.map(item => item.step),
+  x: funnelLine.map(item => item.users),
+  type: "funnel",
+  textinfo: "value+percent initial",
+  marker: { color: "#06b6d4" }
+}], {
+  ...baseLayout,
+  height: 320,
+  margin: { l: 140, r: 40, t: 10, b: 30 }
+}, { responsive: true });
+});
+
+// GSC combined trend: clicks (bars) + impressions (line, y2) + position (line, y3 reversed)
+_registerTabChart(4, () => {
+Plotly.newPlot("chart_gsc_trend", [
+  { x: gscDaily.map(i => i.date), y: gscDaily.map(i => i.impressions), name: "曝光",
+     type: "scatter", mode: "lines", fill: "tozeroy", fillcolor: "rgba(148,163,184,0.12)",
+     line: { color: "#94a3b8", width: 1.5 } },
+  { x: gscDaily.map(i => i.date), y: gscDaily.map(i => i.clicks), name: "點擊",
+     type: "bar", yaxis: "y2", marker: { color: "#4f46e5", cornerradius: 2 } },
+  { x: gscDaily.map(i => i.date), y: gscDaily.map(i => i.position), name: "平均排名",
+     type: "scatter", mode: "lines", yaxis: "y3", line: { color: "#ea580c", width: 2.5, shape: "spline" },
+     hovertemplate: "%{x}<br>排名: %{y}<extra></extra>" }
+], {
+  ...baseLayout,
+  height: 360,
+  margin: { l: 56, r: 96, t: 24, b: 44 },
+  xaxis: { type: "date", gridcolor: "#edf2f7", domain: [0, 0.9] },
+  yaxis: { title: { text: "曝光", font: { color: "#64748b" } }, gridcolor: "#edf2f7", tickfont: { color: "#64748b" } },
+  yaxis2: { title: { text: "點擊", font: { color: "#4f46e5" } }, overlaying: "y", side: "right", showgrid: false, tickfont: { color: "#4f46e5" } },
+  yaxis3: { title: { text: "排名▼越低越好", font: { color: "#ea580c", size: 10 } }, overlaying: "y", side: "right", anchor: "free", position: 1.0,
+             autorange: "reversed", showgrid: false, tickfont: { size: 9, color: "#ea580c" } },
+  legend: { orientation: "h", y: 1.18 }
+}, { responsive: true });
+
+// Devices — pie (more intuitive share of clicks by device)
+Plotly.newPlot("chart_gsc_devices", [{
+  labels: gscDevices.map(i => i.device),
+  values: gscDevices.map(i => i.clicks),
+  type: "pie", hole: 0.5,
+  marker: { colors: ["#4f46e5", "#22c55e", "#f59e0b", "#60a5fa", "#a855f7"] },
+  textinfo: "label+percent", textposition: "outside",
+  customdata: gscDevices.map(i => [i.impressions, i.ctr]),
+  hovertemplate: "<b>%{label}</b><br>點擊: %{value:,}<br>曝光: %{customdata[0]:,}<br>CTR: %{customdata[1]}%<extra></extra>"
+}], {
+  ...baseLayout,
+  height: 130,
+  margin: { l: 16, r: 16, t: 16, b: 16 },
+  showlegend: false
+}, { responsive: true });
+});
+
+// Page-type overview chart (test dashboard only — div is absent on the formal
+// build, so guard before plotting to avoid breaking the rest of the charts).
+// Page-type TREND chart: x = time (daily), one line per type. Dropdown switches the
+// metric (sessions / views / users); click a legend item to toggle that type on/off.
+_registerTabChart(2, () => {
+const pts = {"dates": ["2026-06-15", "2026-06-22", "2026-06-29", "2026-07-06", "2026-07-13"], "labels": {"product": "商品頁 /products/*", "collection": "分類頁 /collections/*", "page": "自訂頁 /pages/*", "blog": "Blog /blogs/*"}, "series": {"product": {"views": [13484, 39771, 21070, 13044, 5907], "sessions": [6853, 20025, 10464, 9633, 5552], "users": [6819, 19708, 10034, 9202, 5080]}, "collection": {"views": [1883, 14426, 17088, 11752, 9107], "sessions": [719, 5152, 5680, 5848, 6047], "users": [698, 4724, 5156, 5297, 5380]}, "page": {"views": [150, 1443, 1548, 918, 766], "sessions": [64, 653, 641, 592, 651], "users": [64, 597, 587, 528, 599]}, "blog": {"views": [40, 442, 327, 167, 160], "sessions": [19, 224, 152, 126, 167], "users": [19, 220, 145, 125, 153]}}};
+if (document.getElementById("chart_page_type") && pts.dates && pts.dates.length) {
+  const cats = ["product", "collection", "page", "blog"];
+  const palette = { product: "#4f46e5", collection: "#06b6d4", page: "#10b981", blog: "#f59e0b" };
+  const metricLabels = {
+    sessions: "工作階段",
+    views: "瀏覽量",
+    users: "訪客"
+  };
+  const seriesFor = (c, m) => ((pts.series[c] || {})[m]) || [];
+  const mkTraces = (metric) => cats.map(c => ({
+    x: pts.dates, y: seriesFor(c, metric), name: pts.labels[c],
+    type: "scatter", mode: "lines", line: { width: 2, color: palette[c] }, connectgaps: true,
+    hovertemplate: "<b>%{fullData.name}</b><br>%{x}<br>%{y:,}<extra></extra>"
+  }));
+  const metricBtn = (metric) => ({
+    method: "update", label: metricLabels[metric],
+    args: [ { y: cats.map(c => seriesFor(c, metric)) }, { "yaxis.title.text": metricLabels[metric] } ]
+  });
+  Plotly.newPlot("chart_page_type", mkTraces("sessions"), {
+    ...baseLayout,
+    height: 420,
+    margin: { l: 64, r: 24, t: 64, b: 48 },
+    xaxis: { type: "date", gridcolor: "#edf2f7" },
+    yaxis: { title: metricLabels["sessions"], gridcolor: "#edf2f7", rangemode: "tozero" },
+    legend: { orientation: "h", y: 1.1 },
+    updatemenus: [{
+      type: "dropdown", direction: "down", showactive: true,
+      x: 0, xanchor: "left", y: 1.32, yanchor: "top", pad: { t: 2, b: 2 },
+      buttons: [ metricBtn("sessions"), metricBtn("views"), metricBtn("users") ]
+    }],
+    annotations: [{
+      text: "指標 ▾（圖例可開關類型）",
+      x: 0.16, xref: "paper", y: 1.38, yref: "paper", showarrow: false,
+      font: { size: 12, color: "#64748b" }, xanchor: "left"
+    }]
+  }, { responsive: true });
+}
+});
+
+// ---- LINE 進線/業務 (CRM) charts ----
+_registerTabChart(5, () => {
+const lineCrm = {"fetched_at": "2026-06-24 10:15", "source": "Google Sheet: CRM 資料表 (aggregated, no PII)", "kpi": {"month": "2026/6", "total": 308, "unhandled": 137, "handled": 171, "rate": 44.5, "mom": -113}, "monthly": [{"month": "2024/04", "total": 17, "unhandled": 1, "handled": 16, "rate": 5.9, "mom": 0}, {"month": "2024/05", "total": 19, "unhandled": 2, "handled": 17, "rate": 10.5, "mom": 12}, {"month": "2024/06", "total": 15, "unhandled": 0, "handled": 15, "rate": 0.0, "mom": -6}, {"month": "2024/07", "total": 29, "unhandled": 1, "handled": 28, "rate": 3.4, "mom": 17}, {"month": "2024/08", "total": 13, "unhandled": 1, "handled": 12, "rate": 7.7, "mom": -19}, {"month": "2024/09", "total": 23, "unhandled": 1, "handled": 22, "rate": 4.3, "mom": 5}, {"month": "2024/10", "total": 27, "unhandled": 1, "handled": 26, "rate": 3.7, "mom": 4}, {"month": "2024/11", "total": 42, "unhandled": 1, "handled": 41, "rate": 2.4, "mom": 13}, {"month": "2024/12", "total": 18, "unhandled": 1, "handled": 17, "rate": 5.6, "mom": -11}, {"month": "2025/01", "total": 28, "unhandled": 0, "handled": 28, "rate": 0.0, "mom": -6}, {"month": "2025/02", "total": 37, "unhandled": 0, "handled": 37, "rate": 0.0, "mom": 8}, {"month": "2025/03", "total": 42, "unhandled": 1, "handled": 41, "rate": 2.4, "mom": 13}, {"month": "2025/04", "total": 47, "unhandled": 1, "handled": 46, "rate": 2.1, "mom": 20}, {"month": "2025/05", "total": 92, "unhandled": 2, "handled": 90, "rate": 2.2, "mom": 50}, {"month": "2025/06", "total": 350, "unhandled": 0, "handled": 350, "rate": 0.0, "mom": 192}, {"month": "2025/07", "total": 349, "unhandled": 2, "handled": 347, "rate": 0.6, "mom": 82}, {"month": "2025/08", "total": 402, "unhandled": 2, "handled": 400, "rate": 0.5, "mom": -53}, {"month": "2025/09", "total": 315, "unhandled": 1, "handled": 314, "rate": 0.3, "mom": 59}, {"month": "2025/10", "total": 608, "unhandled": 3, "handled": 605, "rate": 0.5, "mom": 146}, {"month": "2025/11", "total": 397, "unhandled": 128, "handled": 269, "rate": 32.2, "mom": -76}, {"month": "2025/12", "total": 404, "unhandled": 164, "handled": 240, "rate": 40.6, "mom": 114}, {"month": "2026/01", "total": 593, "unhandled": 247, "handled": 346, "rate": 41.7, "mom": -65}, {"month": "2026/02", "total": 264, "unhandled": 121, "handled": 143, "rate": 45.8, "mom": -171}, {"month": "2026/03", "total": 623, "unhandled": 246, "handled": 377, "rate": 39.5, "mom": 273}, {"month": "2026/4", "total": 539, "unhandled": 230, "handled": 309, "rate": 42.7, "mom": -76}, {"month": "2026/5", "total": 350, "unhandled": 162, "handled": 188, "rate": 46.3, "mom": -18}, {"month": "2026/6", "total": 308, "unhandled": 137, "handled": 171, "rate": 44.5, "mom": -113}], "weekly": [{"week": "2026-03-09", "total": 135, "unhandled": 55, "handled": 80, "rate": 40.7}, {"week": "2026-03-16", "total": 135, "unhandled": 48, "handled": 87, "rate": 35.6}, {"week": "2026-03-23", "total": 170, "unhandled": 72, "handled": 98, "rate": 42.4}, {"week": "2026-03-30", "total": 83, "unhandled": 37, "handled": 46, "rate": 44.6}, {"week": "2026-04-06", "total": 98, "unhandled": 43, "handled": 55, "rate": 43.9}, {"week": "2026-04-13", "total": 145, "unhandled": 54, "handled": 91, "rate": 37.2}, {"week": "2026-04-20", "total": 113, "unhandled": 50, "handled": 63, "rate": 44.2}, {"week": "2026-04-27", "total": 102, "unhandled": 43, "handled": 59, "rate": 42.2}, {"week": "2026-05-04", "total": 91, "unhandled": 40, "handled": 51, "rate": 44.0}, {"week": "2026-05-11", "total": 158, "unhandled": 77, "handled": 81, "rate": 48.7}, {"week": "2026-05-18", "total": 119, "unhandled": 58, "handled": 61, "rate": 48.7}, {"week": "2026-05-25", "total": 94, "unhandled": 40, "handled": 54, "rate": 42.6}, {"week": "2026-06-01", "total": 118, "unhandled": 47, "handled": 71, "rate": 39.8}, {"week": "2026-06-08", "total": 90, "unhandled": 40, "handled": 50, "rate": 44.4}, {"week": "2026-06-15", "total": 77, "unhandled": 35, "handled": 42, "rate": 45.5}, {"week": "2026-06-22", "total": 38, "unhandled": 20, "handled": 18, "rate": 52.6}], "sales_load": [{"name": "業務A", "count": 82}, {"name": "業務B", "count": 54}, {"name": "業務C", "count": 60}, {"name": "業務D", "count": 35}, {"name": "業務E", "count": 1}, {"name": "未處理", "count": 176, "is_unhandled": true}], "category_top": [{"name": "帆布托特包", "count": 161}, {"name": "不鏽鋼保溫瓶", "count": 129}, {"name": "藍牙隨身喇叭", "count": 204}, {"name": "無線充電盤", "count": 103}, {"name": "帆布筆袋", "count": 79}, {"name": "矽膠杯套", "count": 140}, {"name": "環保吸管組", "count": 105}, {"name": "胡桃木書籤", "count": 83}, {"name": "牛皮證件夾", "count": 110}, {"name": "摺疊購物籃", "count": 112}, {"name": "純棉運動毛巾", "count": 96}, {"name": "旅行收納方包", "count": 53}], "category_classified": 7823, "heatmap": [[7, 4, 1, 3, 1, 2, 1, 2, 16, 74, 108, 123, 69, 89, 143, 139, 142, 97, 52, 38, 18, 20, 16, 19], [10, 5, 4, 2, 4, 4, 3, 4, 29, 90, 115, 134, 66, 102, 147, 159, 146, 108, 48, 29, 18, 22, 14, 15], [14, 5, 4, 2, 1, 2, 4, 4, 22, 90, 134, 125, 64, 97, 113, 132, 125, 95, 42, 24, 19, 26, 15, 13], [9, 2, 0, 1, 1, 1, 5, 4, 27, 94, 115, 130, 60, 90, 150, 114, 760, 386, 254, 29, 18, 13, 16, 7], [7, 5, 3, 2, 3, 1, 2, 4, 28, 1973, 1141, 101, 40, 83, 95, 108, 113, 72, 27, 13, 10, 9, 9, 9], [6, 4, 3, 1, 2, 0, 1, 4, 5, 8, 8, 10, 8, 8, 13, 11, 13, 10, 8, 6, 8, 15, 6, 4], [4, 2, 1, 0, 1, 0, 1, 1, 2, 5, 9, 7, 8, 8, 10, 16, 15, 7, 7, 10, 12, 11, 10, 11]], "heatmap_total": 14427};
+if (lineCrm && lineCrm.weekly && document.getElementById("chart_linecrm_trend")) {
+  const wk = lineCrm.weekly;
+  Plotly.newPlot("chart_linecrm_trend", [
+    { x: wk.map(w=>w.week), y: wk.map(w=>w.handled), name: "已處理", type:"bar", marker:{color:"#22c55e"} },
+    { x: wk.map(w=>w.week), y: wk.map(w=>w.unhandled), name: "未處理", type:"bar", marker:{color:"#ef4444"} },
+    { x: wk.map(w=>w.week), y: wk.map(w=>w.rate), name: "未處理率%", type:"scatter", mode:"lines+markers", yaxis:"y2", line:{color:"#b45309",width:2} }
+  ], { ...baseLayout, height: 320, barmode:"stack", margin:{l:48,r:48,t:16,b:40},
+    xaxis:{type:"date",gridcolor:"#edf2f7"}, yaxis:{title:"進線數",gridcolor:"#edf2f7"},
+    yaxis2:{title:"%",overlaying:"y",side:"right",showgrid:false,rangemode:"tozero"},
+    legend:{orientation:"h",y:1.18} }, {responsive:true});
+}
+if (lineCrm && lineCrm.sales_load && document.getElementById("chart_linecrm_sales")) {
+  const s = lineCrm.sales_load.slice().reverse();
+  Plotly.newPlot("chart_linecrm_sales", [{
+    y: s.map(x=>x.name), x: s.map(x=>x.count), type:"bar", orientation:"h",
+    marker:{ color: s.map(x=> x.is_unhandled ? "#ef4444" : "#06c755") },
+    text: s.map(x=>x.count.toLocaleString()), textposition:"outside", cliponaxis:false
+  }], { ...baseLayout, height: 320, margin:{l:96,r:36,t:12,b:36},
+    xaxis:{title:"進線數",gridcolor:"#edf2f7"}, yaxis:{automargin:true}, showlegend:false }, {responsive:true});
+}
+if (lineCrm && lineCrm.category_top && document.getElementById("chart_linecrm_cat")) {
+  const ct = lineCrm.category_top.slice(0,10).reverse();
+  Plotly.newPlot("chart_linecrm_cat", [{
+    y: ct.map(x=>x.name), x: ct.map(x=>x.count), type:"bar", orientation:"h",
+    marker:{color:"#4f46e5",cornerradius:4}, text: ct.map(x=>x.count.toLocaleString()), textposition:"outside", cliponaxis:false
+  }], { ...baseLayout, height: 360, margin:{l:110,r:40,t:12,b:36},
+    xaxis:{title:"詢問數",gridcolor:"#edf2f7"}, yaxis:{automargin:true}, showlegend:false }, {responsive:true});
+}
+if (lineCrm && lineCrm.heatmap && document.getElementById("chart_linecrm_heat")) {
+  const days = ['週一','週二','週三','週四','週五','週六','週日'];
+  const hours = Array.from({length:24}, (_,h)=>h+"時");
+  Plotly.newPlot("chart_linecrm_heat", [{
+    z: lineCrm.heatmap, x: hours, y: days, type:"heatmap", hoverongaps:false,
+    // low = light, high = dark (數量越多顏色越深)
+    colorscale:[[0,"#fff7ed"],[0.25,"#fed7aa"],[0.55,"#fb923c"],[0.8,"#ea580c"],[1,"#7f1d1d"]],
+    colorbar:{title:{text:"進線數",side:"right"},thickness:10,len:0.9},
+    hovertemplate: "%{y} %{x}<br>進線數: %{z}<extra></extra>"
+  }], { ...baseLayout, height: 320, margin:{l:52,r:40,t:12,b:48},
+    xaxis:{title:"小時（依 CRM 建檔時間 0–23）",tickfont:{size:9}},
+    yaxis:{title:"星期",automargin:true} }, {responsive:true});
+}
+// ---- end LINE CRM charts ----
+
+// ---- audience charts ----
+const audData = {"conv_rank": [{"name": "購買者", "conv_rate": 35.64}, {"name": "搜尋者", "conv_rate": 9.7}, {"name": "工作階段持續時間小於一分鐘目標客群", "conv_rate": 1.44}, {"name": "工作階段持續時間大於三分鐘目標客群", "conv_rate": 0.0}], "trend_dates": ["2026-05-24", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-05-30", "2026-05-31", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-06", "2026-06-07", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-13", "2026-06-14", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-19", "2026-06-20", "2026-06-21", "2026-06-22"], "trend_lines": [{"name": "工作階段持續時間小於一分鐘目標客群", "values": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 581, 879, 1060, 1472, 1082, 1418, 2980, 2672]}, {"name": "工作階段持續時間大於三分鐘目標客群", "values": [21, 100, 98, 94, 118, 77, 18, 22, 88, 92, 104, 100, 83, 22, 22, 95, 100, 96, 90, 83, 22, 22, 85, 104, 98, 92, 16, 22, 15, 0]}, {"name": "搜尋者", "values": [8, 96, 108, 89, 144, 97, 15, 15, 106, 109, 134, 126, 105, 26, 26, 131, 110, 95, 110, 81, 15, 26, 90, 128, 128, 112, 14, 17, 14, 94]}, {"name": "購買者", "values": [1, 10, 9, 5, 9, 6, 1, 2, 5, 8, 6, 9, 12, 1, 2, 11, 8, 8, 6, 8, 2, 1, 6, 6, 11, 10, 1, 1, 1, 5]}]};
+if (audData && audData.conv_rank && audData.conv_rank.length && document.getElementById("chart_aud_convrate")) {
+  const cr = audData.conv_rank.slice().reverse();
+  Plotly.newPlot("chart_aud_convrate", [{
+    y: cr.map(a=>a.name), x: cr.map(a=>a.conv_rate), type:"bar", orientation:"h",
+    marker:{ color: cr.map(a=> a.conv_rate>=10 ? "#16a34a" : (a.conv_rate>=3 ? "#4f46e5" : "#94a3b8")) },
+    text: cr.map(a=>a.conv_rate+"%"), textposition:"outside", cliponaxis:false
+  }], { ...baseLayout, height:300, margin:{l:170,r:44,t:10,b:36},
+    xaxis:{title:"%",gridcolor:"#edf2f7"}, yaxis:{automargin:true,tickfont:{size:10}}, showlegend:false }, {responsive:true});
+}
+if (audData && audData.trend_lines && audData.trend_lines.length && document.getElementById("chart_aud_trend")) {
+  const palette=["#4f46e5","#06b6d4","#f59e0b","#ef4444","#10b981","#a855f7"];
+  Plotly.newPlot("chart_aud_trend", audData.trend_lines.map((t,i)=>({
+    x: audData.trend_dates, y: t.values, name: t.name, type:"scatter", mode:"lines", line:{width:1.6, color:palette[i%palette.length]}
+  })), { ...baseLayout, height:300, margin:{l:48,r:16,t:10,b:36},
+    xaxis:{type:"date",gridcolor:"#edf2f7"}, yaxis:{title:"sessions",gridcolor:"#edf2f7",rangemode:"tozero"},
+    legend:{orientation:"h",y:1.3,font:{size:9}} }, {responsive:true});
+}
+// ---- end audience charts ----
+});
+
+// Runs unconditionally (not lazy): shades tables in every tab, not just the active one.
+
+// table heatmap: shade numeric metric columns by value.
+// Runs on the rendered DOM, so it auto-recolours the anonymized fake-data build too.
+(function () {
+  function parseNum(s) {
+    s = String(s).replace(/<[^>]+>/g, "").trim();
+    var m = s.replace(/,/g, "").match(/-?\d+(?:\.\d+)?/);
+    return m ? parseFloat(m[0]) : null;
+  }
+  function heatColor(t) {
+    var a = [255, 247, 237], b = [234, 88, 12]; // light warm -> deep warm
+    var r = Math.round(a[0] + (b[0] - a[0]) * t);
+    var g = Math.round(a[1] + (b[1] - a[1]) * t);
+    var bl = Math.round(a[2] + (b[2] - a[2]) * t);
+    return "rgb(" + r + "," + g + "," + bl + ")";
+  }
+  function shadeTable(tbl) {
+    var rows = Array.prototype.filter.call(
+      tbl.querySelectorAll("tr"),
+      function (tr) { return tr.querySelector("td"); }
+    );
+    if (rows.length < 2) return;
+    var ncol = rows[0].children.length;
+    for (var ci = 0; ci < ncol; ci++) {
+      var cells = rows.map(function (tr) { return tr.children[ci]; }).filter(Boolean);
+      if (cells.length !== rows.length) continue;
+      if (cells.some(function (td) { return td.classList && td.classList.contains("noheat"); })) continue; // opted-out column
+      var info = cells.map(function (td) {
+        return { td: td, v: parseNum(td.textContent), raw: td.textContent.trim() };
+      });
+      if (info.some(function (o) { return o.v === null; })) continue;     // text column
+      if (info.some(function (o) { return /%/.test(o.raw); })) continue;  // percentage column
+      if (info.every(function (o, i) { return o.v === i + 1; })) continue; // rank column
+      var vals = info.map(function (o) { return o.v; });
+      var mx = Math.max.apply(null, vals), mn = Math.min.apply(null, vals);
+      if (mx < 40 || mx === mn) continue;                                 // low-magnitude / flat
+      info.forEach(function (o) {
+        var t = (o.v - mn) / (mx - mn);
+        o.td.style.backgroundColor = heatColor(t);
+        o.td.style.textAlign = "right";
+        o.td.style.fontVariantNumeric = "tabular-nums";
+        if (t > 0.62) o.td.style.color = "#fff";
+      });
+    }
+  }
+  function run() { document.querySelectorAll("table.data-table:not(.noheat-table)").forEach(shadeTable); }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", run);
+  } else { run(); }
+})();
+
+// metric-card decoration: intensity-encoded value bars (hot=warm/full), 熱門/偏低 tags,
+// per-metric secondary meters, and MoM deltas — all computed from the rendered numbers,
+// so they stay correct after the fake-data generator perturbs them.
+(function () {
+  function num(el) {
+    if (!el) return null;
+    var m = el.textContent.replace(/,/g, "").match(/-?\d+(?:\.\d+)?/);
+    return m ? parseFloat(m[0]) : null;
+  }
+  function heat(t) {
+    t = Math.max(0, Math.min(1, t));
+    var a = [254, 215, 170], b = [234, 88, 12]; // light warm -> deep warm
+    return "rgb(" + Math.round(a[0]+(b[0]-a[0])*t) + "," + Math.round(a[1]+(b[1]-a[1])*t) + "," + Math.round(a[2]+(b[2]-a[2])*t) + ")";
+  }
+  function decorate() {
+    document.querySelectorAll(".mini-grid").forEach(function (grid) {
+      var cards = Array.prototype.slice.call(grid.querySelectorAll(".mini-card"));
+      var vals = cards.map(function (c) { return num(c.querySelector(".mc-num")); });
+      var mx = Math.max.apply(null, vals.filter(function (v) { return v != null; }).concat([0]));
+      cards.forEach(function (c, i) {
+        var v = vals[i], t = (mx > 0 && v != null) ? v / mx : 0;
+        var fill = c.querySelector(".mc-fill");
+        if (fill) { fill.style.width = Math.max(5, Math.round(t * 100)) + "%"; fill.style.background = heat(t); }
+        var tag = c.querySelector(".mc-tag");
+        if (tag) {
+          if (t >= 0.66) { tag.className = "mc-tag hot"; tag.textContent = "熱門"; }
+          else if (v != null && t > 0 && t <= 0.18) { tag.className = "mc-tag cold"; tag.textContent = "偏低"; }
+          else { tag.className = "mc-tag"; tag.textContent = ""; }
+        }
+        var dEl = c.querySelector(".mc-delta"), prev = num(c.querySelector(".mc-prev"));
+        if (dEl && prev != null && v != null) {
+          var d = v - prev, cls = d > 0 ? "up" : (d < 0 ? "down" : "flat"), sign = d > 0 ? "▲ +" : (d < 0 ? "▼ " : "± ");
+          dEl.className = "mc-delta " + cls;
+          dEl.textContent = sign + Math.abs(d).toLocaleString();
+        }
+      });
+      // secondary meters: scale each metric against its own column max
+      var groups = {};
+      grid.querySelectorAll(".mc-sub").forEach(function (s) {
+        var m = s.getAttribute("data-metric") || "_";
+        (groups[m] = groups[m] || []).push(s);
+      });
+      Object.keys(groups).forEach(function (m) {
+        var arr = groups[m], gv = arr.map(function (s) { return num(s.querySelector(".mc-num2")); });
+        var gmx = Math.max.apply(null, gv.filter(function (v) { return v != null; }).concat([0]));
+        arr.forEach(function (s, i) {
+          var f = s.querySelector(".mc-meter-fill"); if (!f) return;
+          var t = (gmx > 0 && gv[i] != null) ? gv[i] / gmx : 0;
+          f.style.width = Math.max(3, Math.round(t * 100)) + "%";
+          f.style.background = heat(t);
+        });
+      });
+    });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", decorate);
+  } else { decorate(); }
+})();
+
+
+// Render whichever tab is checked on page load (tab-0 has no charts, so this
+// only actually does work if a different tab was pre-checked).
+_renderTab(Number((document.querySelector('input[name="dashtab"]:checked') || {id:"tab-0"}).id.replace("tab-", "")));
+</script>
+</body>
+</html>

@@ -34,7 +34,7 @@
       <span class="tag">GSC / GTM API 整合</span>
       <span class="tag">GTM 版本控制 / 變更管理</span>
       <span class="tag">OAuth / Service Account</span>
-      <span class="tag">Plotly.js</span>
+      <span class="tag">純 SVG 視覺化（零依賴）</span>
       <span class="tag">AI 分析</span>
       <span class="tag">資料視覺化</span>
       <span class="tag">Python</span>
@@ -95,7 +95,7 @@
   <h2 class="sec">頁面類型流量趨勢</h2>
   <div class="panel">
     <div id="pageTypeChart" class="pchart pchart-lg"></div>
-    <div class="chart-note">右上角下拉選單可切換 Sessions / Users / Pageviews，切換時僅重繪資料序列（Plotly restyle），不重新載入整張圖。</div>
+    <div class="chart-note">右上角下拉選單可切換 Sessions / Users / Pageviews，切換時以純 JS 重新產生 SVG 資料序列，不依賴任何圖表庫。</div>
   </div>
 
   <!-- ===== 5. Session Duration Histogram ===== -->
@@ -136,7 +136,7 @@
         <div id="funnelLine" class="pchart" style="height:300px"></div>
       </div>
     </div>
-    <div class="chart-note">兩條路徑共用同一批進站流量，分別追蹤「填表詢價」與「導流至 LINE 官方帳號」兩種轉換終點，以 Plotly 原生 funnel 呈現真實梯形收斂。</div>
+    <div class="chart-note">兩條路徑共用同一批進站流量，分別追蹤「填表詢價」與「導流至 LINE 官方帳號」兩種轉換終點，以手刻 SVG 梯形（polygon）呈現漏斗收斂。</div>
   </div>
 
   <!-- ===== GTM 版本控制 ===== -->
@@ -240,8 +240,8 @@
         把「數字」轉成「人看得懂、可行動的建議」。</p>
       </li>
       <li>
-        <div class="h"><span class="ic">📈</span>Plotly.js 資料視覺化儀表板</div>
-        <p class="d">以 <b>Plotly.js</b> 建置 KPI 卡、GSC 三軸組合趨勢圖、雙轉換漏斗（原生 funnel 梯形）、day×hour 熱力圖與可切換指標的多線趨勢圖，
+        <div class="h"><span class="ic">📈</span>純 SVG 資料視覺化儀表板</div>
+        <p class="d">以手刻 <b>inline SVG</b>（零外部依賴、無 CDN）建置 KPI 卡、GSC 三軸組合趨勢圖、雙轉換漏斗（SVG 梯形）、day×hour 熱力圖與可切換指標的多線趨勢圖，
         把跨來源數據整理成一眼看懂、可據以決策的儀表板。</p>
       </li>
       <li>
@@ -265,7 +265,6 @@
   </footer>
 </div>
 
-<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

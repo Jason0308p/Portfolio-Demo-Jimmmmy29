@@ -418,8 +418,13 @@
   function needSel() {
     aiOut.innerHTML = '<div class="ai-placeholder">請先從左側點選一個職缺 🙋</div>';
   }
-  genCV.onclick = function () { if (!selected) return needSel(); lastGen = "cv"; typeOut(currentCvText(selected), selected); };
-  genQA.onclick = function () { if (!selected) return needSel(); lastGen = "qa"; typeOut(currentQaText(selected)); };
+  function scrollToResult() {
+    requestAnimationFrame(function () {
+      aiOut.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
+  genCV.onclick = function () { if (!selected) return needSel(); lastGen = "cv"; typeOut(currentCvText(selected), selected); scrollToResult(); };
+  genQA.onclick = function () { if (!selected) return needSel(); lastGen = "qa"; typeOut(currentQaText(selected)); scrollToResult(); };
 
   /* ---------- Notion 同步面板：多平台職缺資料庫 + Dashboard + AI 攻略頁 ---------- */
   /* 獨立於上面的職缺看板 picker（selected 變數），這裡用自己的選取狀態 notionSelected，互不影響 */

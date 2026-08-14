@@ -50,6 +50,7 @@
       label: "🎯 產品 / 報價查詢",
       tech: "本地精準索引（產品編號 / 品類）→ 直接命中，<b>跳過向量搜尋</b>，最快也最準。",
       route: "product",
+      color: "cat-a",
       items: [
         { q: "GIFT-1001 的最小訂購量？", hint: "產品編號精準命中" },
         { q: "GIFT-2008 報價多少", hint: "無牌價 → 保守處理 + 自動建單" },
@@ -60,6 +61,7 @@
       label: "💡 模糊推薦選品",
       tech: "需求不明確 → <b>AI 向量語意檢索</b>，依語意挑選相近商品再生成推薦。",
       route: "product",
+      color: "cat-b",
       items: [
         { q: "想送客戶有質感的禮物，有推薦嗎", hint: "模糊需求 → 語意推薦" },
         { q: "預算不多想送實用的小禮", hint: "模糊需求 → 語意推薦" }
@@ -69,6 +71,7 @@
       label: "❓ 一般客服 FAQ",
       tech: "FAQ 知識庫屬<b>冷資料</b>（批次同步）；命中主題後交 AI 生成回答（同義詞也能命中）。",
       route: "faq",
+      color: "cat-c",
       items: [
         { q: "寄送要運費嗎？", hint: "→ 寄送 / 運費" },
         { q: "你們營業時間？", hint: "→ 營業時間" },
@@ -81,6 +84,7 @@
       label: "🔀 混合問題（產品 + FAQ）",
       tech: "同時含商品與一般問題 → <b>雙路檢索</b>，產品精準查 + 知識庫補充，合併回答。",
       route: "mixed",
+      color: "cat-d",
       items: [
         { q: "保溫杯有哪些款式？交期多久", hint: "產品推薦 + 交期 FAQ" },
         { q: "GIFT-1007 可以客製印 logo 嗎", hint: "產品 + 印刷 FAQ" }
@@ -385,8 +389,8 @@
   var chips = document.getElementById("chips");
   SAMPLE_GROUPS.forEach(function (g, gi) {
     var det = document.createElement("details");
-    det.className = "acc";
-    if (gi === 0) det.open = true;
+    det.className = "acc " + g.color;
+    det.open = true;
     var sum = document.createElement("summary");
     sum.innerHTML = g.label + '<span class="cnt">' + g.items.length + " 題</span>";
     det.appendChild(sum);

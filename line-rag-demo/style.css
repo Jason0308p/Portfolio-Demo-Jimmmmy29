@@ -249,13 +249,6 @@ h2.sec::before{content:"";width:4px;height:16px;background:var(--accent);border-
 .cgate.has-result .cgate-row{display:none}
 .cgate.has-result .cgate-row.gate-active{display:flex}
 
-/* ---- 技術說明摺疊區裡的詳細動畫版 ---- */
-.detail-note{margin:0 0 16px;font-size:12.5px;color:var(--text2);line-height:1.6;
-  background:rgba(59,130,246,.06);border:1px solid #1e3a5f;border-radius:9px;padding:10px 13px}
-.detail-note b{color:var(--accent2)}
-.detail-h{margin:0 0 10px;font-size:13px;font-weight:700;color:var(--text)}
-.acc-lg .abody .pipe{margin-bottom:4px}
-.acc-lg .abody .gate-panel{margin-top:8px}
 .panel h3{margin:0 0 10px;font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px}
 .grp-tech{font-size:11.5px;line-height:1.5;color:var(--text2);background:rgba(59,130,246,.07);
   border:1px solid #1e3a5f;border-radius:8px;padding:7px 10px;margin-bottom:9px}
@@ -265,6 +258,20 @@ h2.sec::before{content:"";width:4px;height:16px;background:var(--accent);border-
   padding:9px 11px;color:var(--text);font-size:12.5px;cursor:pointer;transition:.18s;font-family:inherit}
 .chip:hover{border-color:var(--line);background:#10243a;transform:translateX(2px)}
 .chip small{display:block;color:var(--text3);font-size:10.5px;margin-top:2px}
+/* ---- 分類配色：每個範例問題分類用不同顏色，一眼區分 ---- */
+#chips .acc.cat-a{border-color:#3d6fd6;background:rgba(59,130,246,.12)}
+#chips .acc.cat-a>summary{color:#bcd2ff}
+#chips .acc.cat-a>summary::after{color:#7ea6f7}
+#chips .acc.cat-b{border-color:#c026d3;background:rgba(217,70,239,.12)}
+#chips .acc.cat-b>summary{color:#f3b8ff}
+#chips .acc.cat-b>summary::after{color:#e879f9}
+#chips .acc.cat-c{border-color:#0d9488;background:rgba(20,184,166,.14)}
+#chips .acc.cat-c>summary{color:#8beedd}
+#chips .acc.cat-c>summary::after{color:#2dd4bf}
+#chips .acc.cat-d{border-color:#d97706;background:rgba(245,158,11,.14)}
+#chips .acc.cat-d>summary{color:#ffd699}
+#chips .acc.cat-d>summary::after{color:#fbbf24}
+
 /* ---- 摺疊 accordion ---- */
 .acc{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--card2)}
 .acc+.acc{margin-top:8px}
@@ -418,7 +425,8 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .chat-area{
   grid-template-columns:minmax(520px,1.45fr) minmax(360px,.55fr);
   grid-template-rows:auto auto;
-  gap:18px;
+  gap:18px 18px;
+  row-gap:8px;
   align-items:stretch;
 }
 .phone{grid-column:1;grid-row:1;height:610px}
@@ -436,21 +444,30 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .ca-timeline .tl{flex:1;display:flex;flex-direction:column;justify-content:center}
 .tl .row{padding:5px 0}
 
-/* 寬螢幕把「流程」與「判斷」並列：右欄不再因連續直排而比聊天窗高一大截。 */
+/* 寬螢幕把「處理流程／冷熱判斷／接點說明」三塊並排：右欄不再因連續直排而比聊天窗高一大截。 */
+.ca-grid3{display:flex;flex-direction:column;gap:10px}
 @media (min-width:1001px){
   .compact-anim{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    align-content:start;
+    display:flex;
+    flex-direction:column;
     gap:10px;
   }
-  .compact-anim .ca-block{height:auto;align-self:start}
-  .compact-anim .ca-hint,.compact-anim .ca-timeline{grid-column:1 / -1}
+  .ca-grid3{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    align-items:start;
+    gap:10px;
+  }
+  .compact-anim .ca-block{height:100%;align-self:start}
   .ca-timeline{flex:none;display:block;max-height:174px;overflow:hidden}
   .ca-timeline .tl{display:block;max-height:116px;overflow-y:auto;padding-right:4px}
   .tl .row{padding:4px 0}
-  .caux{flex-direction:row;flex-wrap:wrap}
-  .caux .cnode.node.side{width:auto;flex:1 1 auto;text-align:center;font-size:9px;white-space:nowrap}
+  .caux{flex-direction:column;flex-wrap:wrap}
+  .caux .cnode.node.side{width:100%;text-align:left;font-size:10.5px;white-space:nowrap}
+}
+@media (min-width:1001px) and (max-width:1180px){
+  .ca-grid3{grid-template-columns:1fr 1fr}
+  .ca-grid3 .ca-block:nth-child(3){grid-column:1 / -1}
 }
 
 /* 範例問題是開始體驗的入口：改成水平可掃讀的 quick replies */
@@ -466,7 +483,7 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 
 /* 1000px 以下採完整上下流：先聊天、再看 AI 怎麼回答、最後選新問題 */
 @media (max-width:1000px){
-  .chat-area{grid-template-columns:1fr;grid-template-rows:auto;gap:16px}
+  .chat-area{grid-template-columns:1fr;grid-template-rows:auto;gap:10px}
   .phone{grid-column:1;grid-row:auto;height:540px;order:1}
   .compact-anim{grid-column:1;grid-row:auto;min-height:0;order:2}
   .side-panel{grid-column:1;grid-row:auto;order:3}
@@ -488,7 +505,6 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
   .cnode .cnm{font-size:11.5px}
   .caux{flex-direction:column}
   .caux .cnode.node.side{width:100%;text-align:left}
-  .ca-hint{display:block;font-size:11px;padding:0 3px}
   .ca-timeline .tl{justify-content:flex-start}
   #chips{grid-template-columns:1fr}
   #chips .acc>summary{min-height:48px;font-size:12.5px}

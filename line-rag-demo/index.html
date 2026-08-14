@@ -75,33 +75,37 @@
         <span class="trace-status">等待提問</span>
         <span class="trace-detail">送出問題後，這裡會顯示本次資料路徑與回覆時間。</span>
       </div>
-      <div class="ca-block">
-        <h3>處理流程</h3>
-        <div class="cpipe" id="cpipe">
-          <div class="cnode node line" data-k="line"><span class="cstep">1</span><span class="cic">💬</span><span class="cnm">LINE</span></div>
-          <div class="cnode node" data-k="n8n"><span class="cstep">2</span><span class="cic">🔀</span><span class="cnm">n8n</span></div>
-          <div class="cnode node" data-k="route"><span class="cstep">3</span><span class="cic">🧭</span><span class="cnm">路由</span></div>
-          <div class="cnode node" data-k="rag"><span class="cstep">4</span><span class="cic">🗂️</span><span class="cnm">RAG</span></div>
-          <div class="cnode node" data-k="ai"><span class="cstep">5</span><span class="cic">🤖</span><span class="cnm">AI</span></div>
-          <div class="cnode node line" data-k="reply"><span class="cstep">6</span><span class="cic">📤</span><span class="cnm">回覆</span></div>
+      <div class="ca-grid3">
+        <div class="ca-block">
+          <h3>處理流程</h3>
+          <div class="cpipe" id="cpipe">
+            <div class="cnode node line" data-k="line"><span class="cstep">1</span><span class="cic">💬</span><span class="cnm">LINE</span></div>
+            <div class="cnode node" data-k="n8n"><span class="cstep">2</span><span class="cic">🔀</span><span class="cnm">n8n</span></div>
+            <div class="cnode node" data-k="route"><span class="cstep">3</span><span class="cic">🧭</span><span class="cnm">路由</span></div>
+            <div class="cnode node" data-k="rag"><span class="cstep">4</span><span class="cic">🗂️</span><span class="cnm">RAG</span></div>
+            <div class="cnode node" data-k="ai"><span class="cstep">5</span><span class="cic">🤖</span><span class="cnm">AI</span></div>
+            <div class="cnode node line" data-k="reply"><span class="cstep">6</span><span class="cic">📤</span><span class="cnm">回覆</span></div>
+          </div>
         </div>
-        <div class="caux">
-          <span class="cnode node side" data-k="sheet">❄️ 冷資料源</span>
-          <span class="cnode node side" data-k="vec">🔥 熱資料</span>
-          <span class="cnode node side" data-k="yida">📋 宜搭表單</span>
+        <div class="ca-block">
+          <h3>冷熱判斷閘道</h3>
+          <div class="cgate" id="cgateTree">
+            <div class="cgate-row gate-row" data-row="code"><span class="cgq">Q1 編號？</span><span class="cgleaf cold">❄️冷</span></div>
+            <div class="cgate-row gate-row" data-row="cat"><span class="cgq">Q2 品類？</span><span class="cgleaf cold">❄️冷</span></div>
+            <div class="cgate-row gate-row" data-row="fuzzy"><span class="cgq">Q3 模糊？</span><span class="cgleaf hot">🔥熱</span></div>
+            <div class="cgate-row gate-row" data-row="faq"><span class="cgq">Q4 FAQ？</span><span class="cgleaf cold">❄️冷</span></div>
+            <div class="cgate-row gate-row" data-row="fallback"><span class="cgq">皆未命中</span><span class="cgleaf hot">🔥熱</span></div>
+          </div>
+        </div>
+        <div class="ca-block">
+          <h3>接點說明</h3>
+          <div class="caux">
+            <span class="cnode node side" data-k="sheet">❄️ 冷資料源</span>
+            <span class="cnode node side" data-k="vec">🔥 熱資料</span>
+            <span class="cnode node side" data-k="yida">📋 宜搭表單</span>
+          </div>
         </div>
       </div>
-      <div class="ca-block">
-        <h3>冷熱判斷閘道</h3>
-        <div class="cgate" id="cgateTree">
-          <div class="cgate-row gate-row" data-row="code"><span class="cgq">Q1 編號？</span><span class="cgleaf cold">❄️冷</span></div>
-          <div class="cgate-row gate-row" data-row="cat"><span class="cgq">Q2 品類？</span><span class="cgleaf cold">❄️冷</span></div>
-          <div class="cgate-row gate-row" data-row="fuzzy"><span class="cgq">Q3 模糊？</span><span class="cgleaf hot">🔥熱</span></div>
-          <div class="cgate-row gate-row" data-row="faq"><span class="cgq">Q4 FAQ？</span><span class="cgleaf cold">❄️冷</span></div>
-          <div class="cgate-row gate-row" data-row="fallback"><span class="cgq">皆未命中</span><span class="cgleaf hot">🔥熱</span></div>
-        </div>
-      </div>
-      <p class="ca-hint">完整節點說明與冷熱資料設計原理，見下方「技術與設計說明 → 詳細動畫版」。</p>
       <div class="panel ca-timeline">
         <h3>本次處理流程</h3>
         <div class="tl" id="timeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
@@ -116,73 +120,8 @@
     </div>
   </section>
 
-  <!-- ===== 技術與設計說明（摺疊，預設收起以保持精簡） ===== -->
+  <!-- ===== 技術與設計說明 ===== -->
   <h2 class="sec">技術與設計說明</h2>
-
-  <details class="acc acc-lg">
-    <summary><span class="ic">🔍</span> 詳細動畫版（完整節點說明 + 冷熱判斷邏輯）<span class="cnt">與上方即時同步</span></summary>
-    <div class="abody">
-  <p class="detail-note">下面是「互動體驗」旁精簡動畫的完整版本：節點名稱、耗時與判斷條件都完整標示，方便理解每一步在做什麼。<b>與聊天窗旁的精簡版共用同一組動畫狀態</b>——在上面送出訊息時，這裡也會同步亮燈。</p>
-
-  <h4 class="detail-h">處理流程順序</h4>
-  <div class="pipe" id="pipe">
-    <div class="node line" data-k="line"><span class="step">1</span><div class="ic">💬</div><div class="nm">LINE 用戶</div><div class="sub">收到訊息</div><div class="ms" data-ms="line"></div></div>
-    <div class="node" data-k="n8n"><span class="step">2</span><div class="ic">🔀</div><div class="nm">n8n Webhook</div><div class="sub">去抖動·驗章</div><div class="ms" data-ms="n8n"></div></div>
-    <div class="node" data-k="route"><span class="step">3</span><div class="ic">🧭</div><div class="nm">路由判斷</div><div class="sub">分流問題類型</div><div class="ms" data-ms="route"></div></div>
-    <div class="node" data-k="rag"><span class="step">4</span><div class="ic">🗂️</div><div class="nm">RAG 檢索</div><div class="sub">冷熱資料分層</div><div class="ms" data-ms="rag"></div></div>
-    <div class="node" data-k="ai"><span class="step">5</span><div class="ic">🤖</div><div class="nm">AI 生成</div><div class="sub">組裝回覆</div><div class="ms" data-ms="ai"></div></div>
-    <div class="node line" data-k="reply"><span class="step">6</span><div class="ic">📤</div><div class="nm">回覆 + 通知</div><div class="sub">LINE·內部群組</div><div class="ms" data-ms="reply"></div></div>
-  </div>
-  <div class="aux">
-    <div class="node side" data-k="sheet"><div class="ic">❄️</div><div class="nm">冷資料源</div><div class="sub">FAQ／產品／牌價（批次同步）</div></div>
-    <div class="node side" data-k="vec"><div class="ic">🔥</div><div class="nm">熱資料</div><div class="sub">向量庫快取／即時檢索</div></div>
-    <div class="node side" data-k="yida"><div class="ic">📋</div><div class="nm">宜搭表單</div><div class="sub">需人工報價時建單</div></div>
-  </div>
-
-  <h4 class="detail-h">冷熱資料判斷邏輯閘道</h4>
-  <div class="panel gate-panel">
-    <p class="gate-intro">每則訊息依序通過下面 4 道判斷閘門，<b>命中就立即分流、不再往下走</b>——真正決定的是「查<b>冷資料</b>本地索引」還是「查<b>熱資料</b>向量庫」。在上方送出聊天訊息後，這裡會同步亮起對應命中的分支。</p>
-    <div class="gate-tree" id="gateTree">
-      <div class="gate-in">📩 使用者訊息</div>
-      <div class="gate-row" data-row="code">
-        <div class="gate-q">Q1　含產品編號？<span class="gq-eg">例：GIFT-1001</span></div>
-        <div class="gate-arrow">是 →</div>
-        <div class="gate-leaf cold" data-leaf="code">❄️ 冷資料<small>本地編號索引精準命中，跳過向量搜尋</small></div>
-      </div>
-      <div class="gate-row" data-row="cat">
-        <div class="gate-q">Q2　含品類關鍵字？<span class="gq-eg">例：保溫杯、環保袋</span></div>
-        <div class="gate-arrow">是 →</div>
-        <div class="gate-leaf cold" data-leaf="cat">❄️ 冷資料<small>本地分類索引，回傳整類清單</small></div>
-      </div>
-      <div class="gate-row" data-row="fuzzy">
-        <div class="gate-q">Q3　需求模糊、無明確品項？<span class="gq-eg">例：送禮推薦、質感小禮</span></div>
-        <div class="gate-arrow">是 →</div>
-        <div class="gate-leaf hot" data-leaf="fuzzy">🔥 熱資料<small>向量語意檢索，即時算相似度</small></div>
-      </div>
-      <div class="gate-row" data-row="faq">
-        <div class="gate-q">Q4　命中 FAQ 關鍵字？<span class="gq-eg">例：運費、交期、發票</span></div>
-        <div class="gate-arrow">是 →</div>
-        <div class="gate-leaf cold" data-leaf="faq">❄️ 冷資料<small>FAQ 知識庫（批次同步）</small></div>
-      </div>
-      <div class="gate-row" data-row="fallback">
-        <div class="gate-q gate-fallback">以上皆未命中</div>
-        <div class="gate-arrow">→</div>
-        <div class="gate-leaf hot" data-leaf="fallback">🔥 熱資料<small>語意檢索 fallback，轉一般回答再由人工跟進</small></div>
-      </div>
-    </div>
-    <div class="coldhot-compare">
-      <div class="ch-card cold">
-        <h4>❄️ 冷資料</h4>
-        <p>變動少、可預先算好的資料：<b>商品編號／分類索引</b>與<b>FAQ 知識庫</b>。批次同步後建成記憶體快照，依檔案 <code>mtime</code>／<code>size</code> 判斷是否需要重建索引，查詢時直接讀記憶體，不需要即時運算。</p>
-      </div>
-      <div class="ch-card hot">
-        <h4>🔥 熱資料</h4>
-        <p>需要「即時理解語意」才回答得了的情境：<b>向量資料庫語意檢索</b>。只在編號／分類／FAQ 關鍵字都沒命中時才觸發，因為語意檢索的運算成本明顯高於本地索引查表，優先順序刻意放在最後。</p>
-      </div>
-    </div>
-  </div>
-    </div>
-  </details>
 
   <details class="acc acc-lg" open>
     <summary><span class="ic">✨</span> 設計重點<span class="cnt">5 項</span></summary>

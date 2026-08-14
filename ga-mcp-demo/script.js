@@ -1,4 +1,5 @@
-/* ga-mcp-demo — 前端模擬（無真實 API；所有數字為假資料，圖表以 Plotly.js 重建，結構仿真實 GA4/GSC/GTM 專案） */
+/* ga-mcp-demo — 前端模擬（無真實 API；所有數字為假資料，圖表以純手刻 inline SVG 繪製，
+   完全不依賴任何外部 JS 圖表庫或 CDN，離線亦可 100% 顯示。結構仿真實 GA4/GSC/GTM 專案） */
 (function () {
   "use strict";
 
@@ -8,26 +9,73 @@
     text: "#e6edf7", text2: "#9fb2cc", text3: "#6b809e",
     card: "#13213a", card2: "#0e1830", border: "#22324f", border2: "#2c4061"
   };
-  var PLY_CONFIG = { responsive: true, displayModeBar: false };
-  var PLY_BASE_LAYOUT = {
-    paper_bgcolor: "rgba(0,0,0,0)",
-    plot_bgcolor: "rgba(0,0,0,0)",
-    font: { family: "Inter, 'Noto Sans TC', sans-serif", color: COLORS.text2, size: 11 },
-    margin: { t: 30, r: 20, b: 36, l: 44 },
-    hoverlabel: { bgcolor: COLORS.card, bordercolor: COLORS.border2, font: { color: COLORS.text, size: 12 } },
-    legend: { orientation: "h", y: -0.2, font: { size: 10, color: COLORS.text2 } }
-  };
-  function mergeLayout(extra) {
-    var out = JSON.parse(JSON.stringify(PLY_BASE_LAYOUT));
-    for (var k in extra) out[k] = extra[k];
-    return out;
-  }
   function lerpColor(a, b, t) {
     var ah = parseInt(a.slice(1), 16), bh = parseInt(b.slice(1), 16);
     var ar = (ah >> 16) & 255, ag = (ah >> 8) & 255, ab = ah & 255;
     var br = (bh >> 16) & 255, bg = (bh >> 8) & 255, bb = bh & 255;
     var rr = Math.round(ar + (br - ar) * t), rg = Math.round(ag + (bg - ag) * t), rb = Math.round(ab + (bb - ab) * t);
     return "rgb(" + rr + "," + rg + "," + rb + ")";
+  }
+
+  /* ================= 共用 SVG 繪圖工具（純手刻，不依賴任何圖表庫） ================= */
+  var SVG_NS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS(SVG_NS, tag);
+    for (var k in attrs) if (attrs[k] !== undefined && attrs[k] !== null) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function svgRoot(w, h, extraClass) {
+    var svg = svgEl("svg", { viewBox: "0 0 " + w + " " + h, preserveAspectRatio: "none", class: "hchart" + (extraClass ? " " + extraClass : "") });
+    svg.style.width = "100%"; svg.style.height = "100%"; svg.style.display = "block";
+    return svg;
+  }
+  function scaleLinear(domain, range) {
+    var d0 = domain[0], d1 = domain[1], r0 = range[0], r1 = range[1];
+    var span = (d1 - d0) || 1;
+    return function (v) { return r0 + ((v - d0) / span) * (r1 - r0); };
+  }
+
+  /* 共用浮動 tooltip（取代 Plotly hoverlabel） */
+  var tipEl = document.createElement("div");
+  tipEl.className = "hchart-tip";
+  document.body.appendChild(tipEl);
+  function showTip(evt, html) {
+    tipEl.innerHTML = html;
+    tipEl.style.display = "block";
+    moveTip(evt);
+  }
+  function moveTip(evt) {
+    var pad = 14;
+    var x = evt.clientX + pad, y = evt.clientY + pad;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var rect = tipEl.getBoundingClientRect();
+    if (x + rect.width > vw - 8) x = evt.clientX - rect.width - pad;
+    if (y + rect.height > vh - 8) y = evt.clientY - rect.height - pad;
+    tipEl.style.left = x + "px"; tipEl.style.top = y + "px";
+  }
+  function hideTip() { tipEl.style.display = "none"; }
+  function bindTip(el, htmlFn) {
+    el.addEventListener("mousemove", function (evt) { showTip(evt, htmlFn()); });
+    el.addEventListener("mouseleave", hideTip);
+  }
+
+  function chartWrap(container, legendItems) {
+    container.innerHTML = "";
+    var host = document.createElement("div");
+    host.className = "hchart-host";
+    container.appendChild(host);
+    if (legendItems && legendItems.length > 1) {
+      var lg = document.createElement("div");
+      lg.className = "hchart-legend";
+      legendItems.forEach(function (it) {
+        var chip = document.createElement("span");
+        chip.className = "hchart-legend-chip";
+        chip.innerHTML = '<i style="background:' + it.color + '"></i>' + it.name;
+        lg.appendChild(chip);
+      });
+      container.appendChild(lg);
+    }
+    return host;
   }
 
   /* ---------- KPI 假數據 ---------- */
@@ -170,85 +218,134 @@
   /* 首次載入直接展示第一個情境 */
   setTimeout(function () { typeOut(AI_TEXT.overview); }, 900);
 
-  /* ================= 1. GSC 三軸組合趨勢圖 ================= */
+  /* ================= 1. GSC 三軸組合趨勢圖（SVG：面積 + 長條 + 折線，三個獨立比例尺） ================= */
   (function () {
     var DAYS = ["06/17", "06/18", "06/19", "06/20", "06/21", "06/22", "06/23", "06/24", "06/25", "06/26", "06/27", "06/28", "06/29", "06/30"];
     var IMP = [14200, 14800, 13950, 15100, 16200, 15800, 14650, 15950, 16700, 17200, 16850, 17950, 18400, 19200];
     var CLICKS = [680, 712, 655, 742, 806, 774, 690, 760, 812, 845, 820, 875, 905, 948];
     var POS = [12.8, 12.6, 12.9, 12.4, 12.1, 12.3, 12.5, 12.0, 11.7, 11.6, 11.9, 11.4, 11.1, 10.8];
 
-    var traceImp = {
-      type: "scatter", mode: "lines", name: "曝光 Impressions",
-      x: DAYS, y: IMP, yaxis: "y",
-      fill: "tozeroy", fillcolor: "rgba(34,211,238,.16)",
-      line: { color: COLORS.accent2, width: 2 },
-      hovertemplate: "曝光 %{y:,}<extra></extra>"
-    };
-    var traceClicks = {
-      type: "bar", name: "點擊 Clicks", x: DAYS, y: CLICKS, yaxis: "y2",
-      marker: { color: "rgba(59,130,246,.75)" },
-      hovertemplate: "點擊 %{y:,}<extra></extra>"
-    };
-    var tracePos = {
-      type: "scatter", mode: "lines+markers", name: "平均排名（Y 軸反轉）",
-      x: DAYS, y: POS, yaxis: "y3",
-      line: { color: COLORS.gold, width: 2 }, marker: { size: 5, color: COLORS.gold },
-      hovertemplate: "平均排名 %{y}<extra></extra>"
-    };
+    var container = document.getElementById("gscTrendChart");
+    var host = chartWrap(container, [
+      { name: "曝光 Impressions", color: COLORS.accent2 },
+      { name: "點擊 Clicks", color: COLORS.accent },
+      { name: "平均排名（軸反轉，越靠上越好）", color: COLORS.gold }
+    ]);
+    var W = 900, H = 340, padL = 46, padR = 46, padT = 18, padB = 40;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var n = DAYS.length;
+    var x = scaleLinear([0, n - 1], [padL, padL + plotW]);
+    var yImp = scaleLinear([0, Math.max.apply(null, IMP) * 1.1], [padT + plotH, padT]);
+    var maxClicks = Math.max.apply(null, CLICKS) * 1.35;
+    var yClicks = scaleLinear([0, maxClicks], [padT + plotH, padT]);
+    var yPos = scaleLinear([Math.max.apply(null, POS) + 1, Math.min.apply(null, POS) - 1], [padT + plotH, padT]); /* 反轉 */
 
-    var layout = mergeLayout({
-      margin: { t: 46, r: 66, b: 40, l: 50 },
-      xaxis: { domain: [0, 0.86], tickfont: { size: 10, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.05)" },
-      yaxis: { title: { text: "曝光", font: { size: 10, color: COLORS.text3 } }, gridcolor: "rgba(255,255,255,.06)", tickfont: { size: 10, color: COLORS.text3 }, zeroline: false },
-      yaxis2: { title: { text: "點擊", font: { size: 10, color: COLORS.text3 } }, overlaying: "y", side: "right", showgrid: false, tickfont: { size: 10, color: COLORS.text3 } },
-      yaxis3: { title: { text: "平均排名", font: { size: 9, color: COLORS.gold } }, overlaying: "y", side: "right", anchor: "free", position: 1, autorange: "reversed", showgrid: false, tickfont: { size: 10, color: COLORS.gold } },
-      annotations: [{ xref: "paper", yref: "paper", x: 0, y: 1.18, showarrow: false, align: "left", text: "排名軸已反轉：線越靠上代表名次越好", font: { size: 10, color: COLORS.text3 } }]
+    var svg = svgRoot(W, H);
+    /* 格線 */
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + (plotH / 4) * g;
+      svg.appendChild(svgEl("line", { x1: padL, x2: padL + plotW, y1: gy, y2: gy, stroke: "rgba(255,255,255,.06)", "stroke-width": 1 }));
+    }
+    /* 長條：點擊 */
+    var barW = plotW / n * 0.42;
+    CLICKS.forEach(function (v, i) {
+      var bx = x(i) - barW / 2, by = yClicks(v);
+      var rect = svgEl("rect", { x: bx, y: by, width: barW, height: (padT + plotH) - by, rx: 3, fill: "rgba(59,130,246,.75)" });
+      bindTip(rect, function () { return "<b>" + DAYS[i] + "</b><br>點擊 " + v.toLocaleString(); });
+      svg.appendChild(rect);
     });
-    Plotly.newPlot("gscTrendChart", [traceImp, traceClicks, tracePos], layout, PLY_CONFIG);
+    /* 面積：曝光 */
+    var areaPts = IMP.map(function (v, i) { return x(i) + "," + yImp(v); }).join(" L ");
+    var areaPath = "M " + x(0) + "," + (padT + plotH) + " L " + areaPts + " L " + x(n - 1) + "," + (padT + plotH) + " Z";
+    svg.appendChild(svgEl("path", { d: areaPath, fill: "rgba(34,211,238,.16)", stroke: "none" }));
+    var impLine = "M " + IMP.map(function (v, i) { return x(i) + "," + yImp(v); }).join(" L ");
+    svg.appendChild(svgEl("path", { d: impLine, fill: "none", stroke: COLORS.accent2, "stroke-width": 2 }));
+    IMP.forEach(function (v, i) {
+      var c = svgEl("circle", { cx: x(i), cy: yImp(v), r: 7, fill: "transparent", stroke: "none" });
+      bindTip(c, function () { return "<b>" + DAYS[i] + "</b><br>曝光 " + v.toLocaleString(); });
+      svg.appendChild(c);
+    });
+    /* 折線：平均排名 */
+    var posLine = "M " + POS.map(function (v, i) { return x(i) + "," + yPos(v); }).join(" L ");
+    svg.appendChild(svgEl("path", { d: posLine, fill: "none", stroke: COLORS.gold, "stroke-width": 2 }));
+    POS.forEach(function (v, i) {
+      var c = svgEl("circle", { cx: x(i), cy: yPos(v), r: 4, fill: COLORS.gold });
+      bindTip(c, function () { return "<b>" + DAYS[i] + "</b><br>平均排名 " + v; });
+      svg.appendChild(c);
+    });
+    /* X 軸標籤（每 2 天） */
+    DAYS.forEach(function (d, i) {
+      if (i % 2 !== 0) return;
+      svg.appendChild(svgEl("text", { x: x(i), y: H - 12, "text-anchor": "middle", class: "hchart-axis" })).textContent = d;
+    });
+    /* Y 軸標題 */
+    svg.appendChild(svgEl("text", { x: 6, y: padT - 4, class: "hchart-axis", fill: COLORS.text3 })).textContent = "曝光/點擊";
+    svg.appendChild(svgEl("text", { x: W - 6, y: padT - 4, "text-anchor": "end", class: "hchart-axis", fill: COLORS.gold })).textContent = "平均排名";
+    host.appendChild(svg);
   })();
 
-  /* ================= 流量來源結構（橫向長條） ================= */
+  /* ================= 流量來源結構（水平長條） ================= */
   (function () {
     var SRC = [{ n: "自然搜尋", v: 42 }, { n: "直接", v: 27 }, { n: "社群", v: 18 }, { n: "推薦", v: 13 }];
-    var trace = {
-      type: "bar", orientation: "h",
-      x: SRC.map(function (d) { return d.v; }),
-      y: SRC.map(function (d) { return d.n; }),
-      marker: { color: COLORS.accent2 },
-      text: SRC.map(function (d) { return d.v + "%"; }),
-      textposition: "outside", textfont: { color: COLORS.text2, size: 11 },
-      hovertemplate: "%{y}：%{x}%<extra></extra>"
-    };
-    var layout = mergeLayout({
-      margin: { t: 10, r: 30, b: 30, l: 70 },
-      xaxis: { visible: false },
-      yaxis: { autorange: "reversed", tickfont: { size: 11, color: COLORS.text2 } },
-      showlegend: false
+    var container = document.getElementById("srcChart");
+    var host = chartWrap(container);
+    var W = 420, rowH = 46, padL = 84, padR = 46, padT = 8;
+    var H = padT + rowH * SRC.length + 8;
+    var maxV = Math.max.apply(null, SRC.map(function (d) { return d.v; }));
+    var xw = scaleLinear([0, maxV], [0, W - padL - padR]);
+    var svg = svgRoot(W, H);
+    SRC.forEach(function (d, i) {
+      var y = padT + i * rowH;
+      var barH = rowH * 0.5;
+      svg.appendChild(svgEl("text", { x: padL - 10, y: y + barH / 2 + 4, "text-anchor": "end", class: "hchart-axis" })).textContent = d.n;
+      var rect = svgEl("rect", { x: padL, y: y, width: xw(d.v), height: barH, rx: 4, fill: COLORS.accent2 });
+      bindTip(rect, function () { return "<b>" + d.n + "</b>：" + d.v + "%"; });
+      svg.appendChild(rect);
+      svg.appendChild(svgEl("text", { x: padL + xw(d.v) + 8, y: y + barH / 2 + 4, class: "hchart-val" })).textContent = d.v + "%";
     });
-    Plotly.newPlot("srcChart", [trace], layout, PLY_CONFIG);
+    host.appendChild(svg);
   })();
 
-  /* ================= 6. 裝置圓餅圖 ================= */
+  /* ================= 6. 裝置圓餅圖（donut，stroke-dasharray） ================= */
   (function () {
     var DEV = [
-      { n: "行動", v: 64, clicks: 6200, imp: 132000 },
-      { n: "桌機", v: 31, clicks: 3300, imp: 66300 },
-      { n: "平板", v: 5, clicks: 340, imp: 6900 }
+      { n: "行動", v: 64, clicks: 6200, imp: 132000, color: COLORS.accent2 },
+      { n: "桌機", v: 31, clicks: 3300, imp: 66300, color: COLORS.accent },
+      { n: "平板", v: 5, clicks: 340, imp: 6900, color: COLORS.text3 }
     ];
-    var trace = {
-      type: "pie", hole: 0.5,
-      labels: DEV.map(function (d) { return d.n; }),
-      values: DEV.map(function (d) { return d.v; }),
-      marker: { colors: [COLORS.accent2, COLORS.accent, COLORS.text3], line: { color: COLORS.card, width: 2 } },
-      customdata: DEV.map(function (d) { return [d.clicks, d.imp, (d.clicks / d.imp * 100).toFixed(1)]; }),
-      hovertemplate: "<b>%{label}</b><br>佔比 %{percent}<br>點擊 %{customdata[0]:,}<br>曝光 %{customdata[1]:,}<br>CTR %{customdata[2]}%<extra></extra>",
-      textinfo: "label+percent", textfont: { size: 11, color: COLORS.text }
-    };
-    var layout = mergeLayout({ margin: { t: 10, r: 10, b: 10, l: 10 }, showlegend: false });
-    Plotly.newPlot("deviceChart", [trace], layout, PLY_CONFIG);
+    var container = document.getElementById("deviceChart");
+    var host = chartWrap(container, DEV.map(function (d) { return { name: d.n, color: d.color }; }));
+    var size = 220, cx = size / 2, cy = size / 2, r = 78, strokeW = 34;
+    var circumference = 2 * Math.PI * r;
+    var svg = svgRoot(size, size);
+    var offset = 0;
+    var total = DEV.reduce(function (a, d) { return a + d.v; }, 0);
+    DEV.forEach(function (d) {
+      var frac = d.v / total;
+      var len = circumference * frac;
+      var circle = svgEl("circle", {
+        cx: cx, cy: cy, r: r, fill: "none", stroke: d.color, "stroke-width": strokeW,
+        "stroke-dasharray": len + " " + (circumference - len),
+        "stroke-dashoffset": -offset, transform: "rotate(-90 " + cx + " " + cy + ")"
+      });
+      var ctr = d.clicks / d.imp * 100;
+      bindTip(circle, function () {
+        return "<b>" + d.n + "</b><br>佔比 " + d.v + "%<br>點擊 " + d.clicks.toLocaleString() +
+          "<br>曝光 " + d.imp.toLocaleString() + "<br>CTR " + ctr.toFixed(1) + "%";
+      });
+      svg.appendChild(circle);
+      offset += len;
+    });
+    var labelC = svgEl("text", { x: cx, y: cy - 4, "text-anchor": "middle", class: "hchart-donut-big" });
+    labelC.textContent = DEV[0].v + "%";
+    svg.appendChild(labelC);
+    var labelC2 = svgEl("text", { x: cx, y: cy + 16, "text-anchor": "middle", class: "hchart-axis" });
+    labelC2.textContent = DEV[0].n + "為主";
+    svg.appendChild(labelC2);
+    host.appendChild(svg);
   })();
 
-  /* ================= 3. Day × Hour Sessions Heatmap ================= */
+  /* ================= 3. Day × Hour Sessions Heatmap（矩形網格 + 顏色映照） ================= */
   (function () {
     var DAYS = ["週一", "週二", "週三", "週四", "週五", "週六", "週日"];
     var HOURS = []; for (var h = 0; h < 24; h++) HOURS.push(h);
@@ -266,22 +363,49 @@
         return Math.max(2, Math.round(base + bump1 + bump2 + wobble));
       });
     });
-    var trace = {
-      type: "heatmap", x: HOURS, y: DAYS, z: z,
-      colorscale: [[0, COLORS.card2], [0.5, "#1c3a5e"], [1, COLORS.accent2]],
-      hovertemplate: "%{y} %{x}:00｜%{z} sessions<extra></extra>",
-      showscale: true,
-      colorbar: { thickness: 10, len: 0.8, tickfont: { size: 9, color: COLORS.text3 } }
-    };
-    var layout = mergeLayout({
-      margin: { t: 10, r: 10, b: 34, l: 44 },
-      xaxis: { dtick: 2, tickfont: { size: 9, color: COLORS.text3 }, title: { text: "時段", font: { size: 10, color: COLORS.text3 } } },
-      yaxis: { tickfont: { size: 10, color: COLORS.text3 }, autorange: "reversed" }
+    var flat = z.reduce(function (a, row) { return a.concat(row); }, []);
+    var zMin = Math.min.apply(null, flat), zMax = Math.max.apply(null, flat);
+    function colorFor(v) {
+      var t = (v - zMin) / (zMax - zMin || 1);
+      if (t < 0.5) return lerpColor(COLORS.card2, "#1c3a5e", t / 0.5);
+      return lerpColor("#1c3a5e", COLORS.accent2, (t - 0.5) / 0.5);
+    }
+    var container = document.getElementById("heatmapChart");
+    var host = chartWrap(container);
+    var W = 900, padL = 50, padR = 60, padT = 8, padB = 30;
+    var cellW = (W - padL - padR) / HOURS.length;
+    var cellH = 26;
+    var H = padT + cellH * DAYS.length + padB;
+    var svg = svgRoot(W, H);
+    DAYS.forEach(function (dname, r) {
+      svg.appendChild(svgEl("text", { x: padL - 8, y: padT + r * cellH + cellH / 2 + 4, "text-anchor": "end", class: "hchart-axis" })).textContent = dname;
+      HOURS.forEach(function (hh, c) {
+        var v = z[r][c];
+        var rect = svgEl("rect", {
+          x: padL + c * cellW, y: padT + r * cellH, width: cellW - 1.5, height: cellH - 1.5,
+          rx: 2, fill: colorFor(v)
+        });
+        bindTip(rect, function () { return "<b>" + dname + " " + hh + ":00</b><br>" + v + " sessions"; });
+        svg.appendChild(rect);
+      });
     });
-    Plotly.newPlot("heatmapChart", [trace], layout, PLY_CONFIG);
+    for (var hh2 = 0; hh2 < 24; hh2 += 2) {
+      svg.appendChild(svgEl("text", { x: padL + hh2 * cellW + cellW / 2, y: padT + cellH * DAYS.length + 16, "text-anchor": "middle", class: "hchart-axis" })).textContent = hh2;
+    }
+    /* 顏色圖例（色階條） */
+    var legW = 140, legX = W - padR + 4, legY = padT;
+    var grad = svgEl("linearGradient", { id: "heatGrad", x1: "0", x2: "1", y1: "0", y2: "0" });
+    grad.appendChild(svgEl("stop", { offset: "0%", "stop-color": COLORS.card2 }));
+    grad.appendChild(svgEl("stop", { offset: "50%", "stop-color": "#1c3a5e" }));
+    grad.appendChild(svgEl("stop", { offset: "100%", "stop-color": COLORS.accent2 }));
+    var defs = svgEl("defs", {}); defs.appendChild(grad); svg.appendChild(defs);
+    svg.appendChild(svgEl("rect", { x: legX, y: legY, width: legW, height: 8, fill: "url(#heatGrad)", rx: 3 }));
+    svg.appendChild(svgEl("text", { x: legX, y: legY + 20, class: "hchart-axis" })).textContent = zMin;
+    svg.appendChild(svgEl("text", { x: legX + legW, y: legY + 20, "text-anchor": "end", class: "hchart-axis" })).textContent = zMax;
+    host.appendChild(svg);
   })();
 
-  /* ================= 4. 頁面類型多線趨勢 + 下拉選單 ================= */
+  /* ================= 4. 頁面類型多線趨勢 + 下拉選單（原生 select，重繪 SVG） ================= */
   (function () {
     var PT_DAYS = ["06/17", "06/18", "06/19", "06/20", "06/21", "06/22", "06/23", "06/24", "06/25", "06/26", "06/27", "06/28", "06/29", "06/30"];
     var PT_NAMES = ["商品頁 /products/*", "分類頁 /collections/*", "內容頁 /pages/*", "部落格 /blog/*"];
@@ -294,10 +418,10 @@
     ];
     /* Users/Pageviews 不是單純等比例縮放 Sessions：每個頁面類型有不同的「新舊訪客比」與「每工作階段瀏覽頁數」，
        且比例會隨時間微幅漂移（貼近真實 GA 數據），這樣切換指標時線形會真的不一樣，不會只是縮放同一條線。 */
-    var PT_USER_RATIO_BASE = [0.82, 0.88, 0.90, 0.70]; // 商品頁回訪多／部落格多新訪客
-    var PT_USER_RATIO_DRIFT = [-0.04, 0.02, -0.01, 0.10]; // 14 天內比例的總漂移量
-    var PT_PV_RATIO_BASE = [1.35, 1.15, 1.20, 2.60]; // 部落格單次工作階段常連續看多篇
-    var PT_PV_RATIO_DRIFT = [0.10, -0.05, 0.05, 0.90]; // 部落格瀏覽深度隨內容量成長明顯上升
+    var PT_USER_RATIO_BASE = [0.82, 0.88, 0.90, 0.70];
+    var PT_USER_RATIO_DRIFT = [-0.04, 0.02, -0.01, 0.10];
+    var PT_PV_RATIO_BASE = [1.35, 1.15, 1.20, 2.60];
+    var PT_PV_RATIO_DRIFT = [0.10, -0.05, 0.05, 0.90];
 
     var PT_USERS = PT_SESSIONS.map(function (arr, i) {
       return arr.map(function (v, d) {
@@ -313,34 +437,78 @@
         return Math.round(v * ratio);
       });
     });
+    var METRICS = { "Sessions": PT_SESSIONS, "Users": PT_USERS, "Pageviews": PT_PAGEVIEWS };
 
-    var traces = PT_NAMES.map(function (nm, i) {
-      return {
-        type: "scatter", mode: "lines+markers", name: nm,
-        x: PT_DAYS, y: PT_SESSIONS[i],
-        line: { color: PT_COLORS[i], width: 2 }, marker: { size: 4, color: PT_COLORS[i] },
-        hovertemplate: nm + "：%{y:,}<extra></extra>"
-      };
+    var container = document.getElementById("pageTypeChart");
+    container.innerHTML = "";
+    var ctrlRow = document.createElement("div");
+    ctrlRow.className = "hchart-controls";
+    var sel = document.createElement("select");
+    sel.className = "hchart-select";
+    ["Sessions", "Users", "Pageviews"].forEach(function (m) {
+      var opt = document.createElement("option"); opt.value = m; opt.textContent = "指標：" + m; sel.appendChild(opt);
     });
+    ctrlRow.appendChild(sel);
+    container.appendChild(ctrlRow);
+    var host = chartWrap2(container, PT_NAMES.map(function (nm, i) { return { name: nm, color: PT_COLORS[i] }; }));
 
-    var layout = mergeLayout({
-      margin: { t: 56, r: 20, b: 40, l: 48 },
-      xaxis: { tickfont: { size: 10, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.05)" },
-      yaxis: { title: { text: "Sessions", font: { size: 10, color: COLORS.text3 } }, gridcolor: "rgba(255,255,255,.06)", tickfont: { size: 10, color: COLORS.text3 } },
-      updatemenus: [{
-        type: "dropdown", direction: "down", x: 1, xanchor: "right", y: 1.28, yanchor: "top",
-        bgcolor: COLORS.card2, bordercolor: COLORS.border2, font: { size: 11, color: COLORS.text2 },
-        buttons: [
-          { label: "指標：Sessions", method: "update", args: [{ y: PT_SESSIONS }, { "yaxis.title.text": "Sessions", "yaxis.autorange": true }, [0, 1, 2, 3]] },
-          { label: "指標：Users", method: "update", args: [{ y: PT_USERS }, { "yaxis.title.text": "Users", "yaxis.autorange": true }, [0, 1, 2, 3]] },
-          { label: "指標：Pageviews", method: "update", args: [{ y: PT_PAGEVIEWS }, { "yaxis.title.text": "Pageviews", "yaxis.autorange": true }, [0, 1, 2, 3]] }
-        ]
-      }]
-    });
-    Plotly.newPlot("pageTypeChart", traces, layout, PLY_CONFIG);
+    function chartWrap2(cont, legendItems) {
+      var h = document.createElement("div");
+      h.className = "hchart-host";
+      cont.appendChild(h);
+      if (legendItems && legendItems.length > 1) {
+        var lg = document.createElement("div");
+        lg.className = "hchart-legend";
+        legendItems.forEach(function (it) {
+          var chip = document.createElement("span");
+          chip.className = "hchart-legend-chip";
+          chip.innerHTML = '<i style="background:' + it.color + '"></i>' + it.name;
+          lg.appendChild(chip);
+        });
+        cont.appendChild(lg);
+      }
+      return h;
+    }
+
+    function render(metricName) {
+      host.innerHTML = "";
+      var series = METRICS[metricName];
+      var W = 900, H = 340, padL = 54, padR = 20, padT = 18, padB = 40;
+      var plotW = W - padL - padR, plotH = H - padT - padB;
+      var n = PT_DAYS.length;
+      var allVals = series.reduce(function (a, s) { return a.concat(s); }, []);
+      var maxV = Math.max.apply(null, allVals) * 1.08;
+      var x = scaleLinear([0, n - 1], [padL, padL + plotW]);
+      var y = scaleLinear([0, maxV], [padT + plotH, padT]);
+      var svg = svgRoot(W, H);
+      for (var g = 0; g <= 4; g++) {
+        var gy = padT + (plotH / 4) * g;
+        svg.appendChild(svgEl("line", { x1: padL, x2: padL + plotW, y1: gy, y2: gy, stroke: "rgba(255,255,255,.06)", "stroke-width": 1 }));
+        var val = Math.round(maxV * (1 - g / 4));
+        svg.appendChild(svgEl("text", { x: padL - 8, y: gy + 3, "text-anchor": "end", class: "hchart-axis" })).textContent = val.toLocaleString();
+      }
+      series.forEach(function (arr, i) {
+        var d = "M " + arr.map(function (v, di) { return x(di) + "," + y(v); }).join(" L ");
+        svg.appendChild(svgEl("path", { d: d, fill: "none", stroke: PT_COLORS[i], "stroke-width": 2 }));
+        arr.forEach(function (v, di) {
+          var c = svgEl("circle", { cx: x(di), cy: y(v), r: 6, fill: "transparent" });
+          bindTip(c, function () { return "<b>" + PT_NAMES[i] + "</b><br>" + PT_DAYS[di] + "：" + v.toLocaleString(); });
+          svg.appendChild(c);
+          var dot = svgEl("circle", { cx: x(di), cy: y(v), r: 3, fill: PT_COLORS[i] });
+          svg.appendChild(dot);
+        });
+      });
+      PT_DAYS.forEach(function (dd, i) {
+        if (i % 2 !== 0) return;
+        svg.appendChild(svgEl("text", { x: x(i), y: H - 12, "text-anchor": "middle", class: "hchart-axis" })).textContent = dd;
+      });
+      host.appendChild(svg);
+    }
+    sel.addEventListener("change", function () { render(sel.value); });
+    render("Sessions");
   })();
 
-  /* ================= 5. Session Duration Histogram（全站 + 頁面大類拆解）================= */
+  /* ================= 5. Session Duration Histogram（全站 + 頁面大類拆解，SVG 長條直方圖） ================= */
   (function () {
     function mulberry32(seed) {
       return function () {
@@ -370,32 +538,42 @@
     var allDurations = CATS.reduce(function (acc, c) { return acc.concat(c.durations); }, []);
 
     function avg(arr) { return Math.round(arr.reduce(function (a, b) { return a + b; }, 0) / arr.length); }
-    function miniLayout(maxX) {
-      return mergeLayout({
-        margin: { t: 6, r: 10, b: 26, l: 30 }, showlegend: false,
-        xaxis: { range: [0, maxX], tickfont: { size: 9, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.05)" },
-        yaxis: { tickfont: { size: 9, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.06)" }
+
+    function renderHistogram(containerId, data, opts) {
+      opts = opts || {};
+      var start = opts.start || 0, end = opts.end, binSize = opts.binSize;
+      var binCount = Math.ceil((end - start) / binSize);
+      var bins = new Array(binCount).fill(0);
+      data.forEach(function (v) {
+        var idx = Math.min(binCount - 1, Math.floor((v - start) / binSize));
+        if (idx >= 0) bins[idx]++;
       });
+      var maxCount = Math.max.apply(null, bins) || 1;
+      var container = document.getElementById(containerId);
+      container.innerHTML = "";
+      var host = document.createElement("div"); host.className = "hchart-host"; container.appendChild(host);
+      var W = 400, H = 170, padL = 34, padR = 8, padT = 8, padB = 22;
+      var plotW = W - padL - padR, plotH = H - padT - padB;
+      var barW = plotW / binCount;
+      var svg = svgRoot(W, H);
+      bins.forEach(function (cnt, i) {
+        var bh = (cnt / maxCount) * plotH;
+        var rect = svgEl("rect", {
+          x: padL + i * barW, y: padT + plotH - bh, width: Math.max(0.6, barW - 1), height: bh,
+          fill: opts.color || "rgba(34,211,238,.55)"
+        });
+        var binStart = start + i * binSize;
+        bindTip(rect, function () { return (binStart) + "–" + (binStart + binSize) + " 秒<br>" + cnt + " 筆"; });
+        svg.appendChild(rect);
+      });
+      svg.appendChild(svgEl("text", { x: padL, y: H - 6, class: "hchart-axis" })).textContent = start + "s";
+      svg.appendChild(svgEl("text", { x: padL + plotW, y: H - 6, "text-anchor": "end", class: "hchart-axis" })).textContent = end + "s";
+      host.appendChild(svg);
     }
 
-    Plotly.newPlot("sessionDurChart", [{
-      type: "histogram", x: allDurations,
-      marker: { color: "rgba(34,211,238,.55)", line: { color: COLORS.accent2, width: 1 } },
-      xbins: { start: 0, end: 1800, size: 50 },
-      hovertemplate: "時長區間 %{x} 秒<br>工作階段數 %{y}<extra></extra>"
-    }], mergeLayout({
-      margin: { t: 6, r: 16, b: 30, l: 40 }, showlegend: false,
-      xaxis: { title: { text: "秒", font: { size: 9, color: COLORS.text3 } }, tickfont: { size: 9, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.05)" },
-      yaxis: { tickfont: { size: 9, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.06)" }
-    }), PLY_CONFIG);
-
+    renderHistogram("sessionDurChart", allDurations, { start: 0, end: 1800, binSize: 50, color: "rgba(34,211,238,.55)" });
     CATS.forEach(function (c) {
-      Plotly.newPlot(c.id, [{
-        type: "histogram", x: c.durations,
-        marker: { color: c.color, opacity: .55, line: { color: c.color, width: 1 } },
-        xbins: { start: 0, end: c.cap, size: Math.round(c.cap / 24) },
-        hovertemplate: c.name + " %{x} 秒<br>%{y} 筆<extra></extra>"
-      }], miniLayout(c.cap), PLY_CONFIG);
+      renderHistogram(c.id, c.durations, { start: 0, end: c.cap, binSize: Math.round(c.cap / 24), color: c.color });
     });
 
     var legend = document.getElementById("durcatLegend");
@@ -450,29 +628,51 @@
     ]);
   })();
 
-  /* ================= 2. 雙轉換漏斗 ================= */
+  /* ================= 2. 雙轉換漏斗（SVG 梯形 polygon，寬度依比例遞減） ================= */
   (function () {
+    function renderFunnel(containerId, steps, vals, colorFn) {
+      var container = document.getElementById(containerId);
+      container.innerHTML = "";
+      var host = document.createElement("div"); host.className = "hchart-host hchart-funnel-host"; container.appendChild(host);
+      var W = 420, rowH = 62, padT = 6;
+      var H = padT + rowH * steps.length + 6;
+      var maxV = vals[0];
+      var maxW = W * 0.86;
+      var svg = svgRoot(W, H);
+      var initial = vals[0];
+      steps.forEach(function (label, i) {
+        var v = vals[i];
+        var wTop = i === 0 ? maxW : maxW * (vals[i - 1] / maxV);
+        var wBot = maxW * (v / maxV);
+        var y0 = padT + i * rowH, y1 = y0 + rowH - 6;
+        var cx = W / 2;
+        var xTL = cx - wTop / 2, xTR = cx + wTop / 2;
+        var xBL = cx - wBot / 2, xBR = cx + wBot / 2;
+        var poly = svgEl("polygon", {
+          points: [xTL + "," + y0, xTR + "," + y0, xBR + "," + y1, xBL + "," + y1].join(" "),
+          fill: colorFn(i), stroke: COLORS.border2, "stroke-width": 1
+        });
+        var pct = ((v / initial) * 100).toFixed(1);
+        bindTip(poly, function () { return "<b>" + label + "</b><br>" + v.toLocaleString() + "（" + pct + "%）"; });
+        svg.appendChild(poly);
+        var labelY = (y0 + y1) / 2;
+        svg.appendChild(svgEl("text", { x: cx, y: labelY - 5, "text-anchor": "middle", class: "hchart-funnel-label" })).textContent = label;
+        svg.appendChild(svgEl("text", { x: cx, y: labelY + 13, "text-anchor": "middle", class: "hchart-funnel-val" })).textContent = v.toLocaleString() + "（" + pct + "%）";
+      });
+      host.appendChild(svg);
+    }
+
     var formSteps = ["Session 開始", "瀏覽商品", "開始填寫表單", "送出詢價表單"];
     var formVals = [48200, 34700, 2150, 312];
-    var formColors = formVals.map(function (_, i) { return lerpColor(COLORS.accent2, COLORS.accent, i / (formVals.length - 1)); });
-    var traceForm = {
-      type: "funnel", y: formSteps, x: formVals,
-      textinfo: "value+percent initial",
-      marker: { color: formColors },
-      connector: { line: { color: COLORS.border2, width: 1 } }
-    };
-    Plotly.newPlot("funnelForm", [traceForm], mergeLayout({ margin: { t: 10, r: 10, b: 10, l: 110 }, showlegend: false }), PLY_CONFIG);
+    renderFunnel("funnelForm", formSteps, formVals, function (i) {
+      return lerpColor(COLORS.accent2, COLORS.accent, i / (formVals.length - 1));
+    });
 
     var lineSteps = ["Session 開始", "瀏覽商品", "LINE 點擊轉換"];
     var lineVals = [48200, 34700, 1860];
-    var lineColors = lineVals.map(function (_, i) { return lerpColor("#bdf5d4", COLORS.line, i / (lineVals.length - 1)); });
-    var traceLine = {
-      type: "funnel", y: lineSteps, x: lineVals,
-      textinfo: "value+percent initial",
-      marker: { color: lineColors },
-      connector: { line: { color: COLORS.border2, width: 1 } }
-    };
-    Plotly.newPlot("funnelLine", [traceLine], mergeLayout({ margin: { t: 10, r: 10, b: 10, l: 110 }, showlegend: false }), PLY_CONFIG);
+    renderFunnel("funnelLine", lineSteps, lineVals, function (i) {
+      return lerpColor("#bdf5d4", COLORS.line, i / (lineVals.length - 1));
+    });
   })();
 
   /* ---------- GTM 版本控制 diff ---------- */
@@ -505,7 +705,7 @@
     });
   })();
 
-  /* ================= 7. 熱門進站頁（橫向長條，含疑似機器人流量標色） ================= */
+  /* ================= 7. 熱門進站頁（水平長條，含疑似機器人流量標色） ================= */
   (function () {
     var LANDING = [
       { nm: "/products", sessions: 8200, eng: 96, bounce: 38, bot: false },
@@ -521,24 +721,27 @@
     var colors = LANDING.map(function (d, i) {
       return d.bot ? COLORS.gold : lerpColor(COLORS.accent2, COLORS.accent, i / (n - 1));
     });
-    var customdata = LANDING.map(function (d) {
-      return [d.eng, d.bounce, d.bot ? "⚠ 互動時間異常偏低、疑似機器人流量" : ""];
+    var container = document.getElementById("landingPagesChart");
+    var host = chartWrap(container);
+    var W = 760, rowH = 40, padL = 128, padR = 40, padT = 6;
+    var H = padT + rowH * n + 6;
+    var maxV = Math.max.apply(null, LANDING.map(function (d) { return d.sessions; }));
+    var xw = scaleLinear([0, maxV], [0, W - padL - padR]);
+    var svg = svgRoot(W, H);
+    LANDING.forEach(function (d, i) {
+      var y = padT + i * rowH;
+      var barH = rowH * 0.55;
+      svg.appendChild(svgEl("text", { x: padL - 10, y: y + barH / 2 + 4, "text-anchor": "end", class: "hchart-axis" })).textContent = d.nm;
+      var rect = svgEl("rect", { x: padL, y: y, width: xw(d.sessions), height: barH, rx: 4, fill: colors[i] });
+      bindTip(rect, function () {
+        return "<b>" + d.nm + "</b><br>Sessions " + d.sessions.toLocaleString() +
+          "<br>平均互動時間 " + d.eng + "s ・跳出率 " + d.bounce + "%" +
+          (d.bot ? "<br>⚠ 互動時間異常偏低、疑似機器人流量" : "");
+      });
+      svg.appendChild(rect);
+      svg.appendChild(svgEl("text", { x: padL + xw(d.sessions) + 8, y: y + barH / 2 + 4, class: "hchart-val" })).textContent = d.sessions.toLocaleString() + (d.bot ? " ⚠" : "");
     });
-    var trace = {
-      type: "bar", orientation: "h",
-      x: LANDING.map(function (d) { return d.sessions; }),
-      y: LANDING.map(function (d) { return d.nm; }),
-      marker: { color: colors },
-      customdata: customdata,
-      hovertemplate: "<b>%{y}</b><br>Sessions %{x:,}<br>平均互動時間 %{customdata[0]}s ・跳出率 %{customdata[1]}%<br>%{customdata[2]}<extra></extra>"
-    };
-    var layout = mergeLayout({
-      margin: { t: 10, r: 30, b: 30, l: 130 },
-      xaxis: { title: { text: "Sessions", font: { size: 10, color: COLORS.text3 } }, tickfont: { size: 10, color: COLORS.text3 }, gridcolor: "rgba(255,255,255,.06)" },
-      yaxis: { autorange: "reversed", tickfont: { size: 11, color: COLORS.text2 } },
-      showlegend: false
-    });
-    Plotly.newPlot("landingPagesChart", [trace], layout, PLY_CONFIG);
+    host.appendChild(svg);
   })();
 
   /* ---------- 載入自動播一次資料流程動畫 ---------- */

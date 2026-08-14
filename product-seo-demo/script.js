@@ -145,8 +145,12 @@
   });
 
   var busy = false;
+  var genBtnLabel = genBtn.innerHTML;
   function runGen() {
     if (busy) return; busy = true; genBtn.disabled = true; postBtn.disabled = true;
+    genBtn.classList.add("busy");
+    genBtn.innerHTML = '<span class="btn-spin"></span>生成中…';
+    document.querySelector(".ba").scrollIntoView({ behavior: "smooth", block: "center" });
     var p = cur;
     ppUrl.textContent = "example-shop.com/products/" + p.handleBefore;
     ppBody.innerHTML = '<div class="pp-empty">生成中，AI 正在為這個商品建立完整頁面…</div>';
@@ -172,6 +176,11 @@
           setTimeout(function () {
             var sc = document.createElement("span"); sc.className = "ptg sync"; sc.textContent = "✓ 已同步宜搭(Yida)狀態"; aMeta.appendChild(sc);
             busy = false; genBtn.disabled = false; postBtn.disabled = false; processed = true;
+            genBtn.classList.remove("busy"); genBtn.innerHTML = "✓ 已生成 " + genBtnLabel;
+            var afterCard = document.querySelector(".pcard.after");
+            afterCard.classList.add("flash");
+            setTimeout(function () { afterCard.classList.remove("flash"); }, 1600);
+            setTimeout(function () { genBtn.innerHTML = genBtnLabel; }, 1800);
             renderProductPage(p);
           }, 220);
         }, 120 * p.tags.length + 200);
@@ -472,16 +481,24 @@
     else if (len >= 55 && len <= 90) ruleLenItem.classList.add("warn");
     else ruleLenItem.classList.add("bad");
   }
+  var topicLabels = {};
+  topicChips.forEach(function (b) { topicLabels[b.dataset.topic] = b.innerHTML; });
   topicChips.forEach(function (btn) {
     btn.addEventListener("click", function () {
       if (blogBusy) return; blogBusy = true;
       topicChips.forEach(function (b) { b.classList.remove("sel"); b.disabled = true; });
       btn.classList.add("sel");
+      btn.innerHTML = '<span class="btn-spin"></span>生成中…';
+      blogTitle.textContent = "生成中…";
+      blogMeta.textContent = "—";
+      document.querySelector(".blog-out").scrollIntoView({ behavior: "smooth", block: "center" });
       var topic = BLOG_TOPICS[btn.dataset.topic];
       typeInto(blogTitle, topic.title, function () {
         typeIntoProgress(blogMeta, topic.meta, function (slice) { updateLenIndicator(slice); }, function () {
           blogBusy = false;
           topicChips.forEach(function (b) { b.disabled = false; });
+          btn.innerHTML = "✓ 已生成";
+          setTimeout(function () { btn.innerHTML = topicLabels[btn.dataset.topic]; }, 1800);
         });
       });
     });

@@ -65,34 +65,44 @@
   <h2 class="sec">本月概況 KPI</h2>
   <div class="kpi-grid" id="kpiGrid"></div>
 
-  <!-- ===== 1. GSC 三軸組合趨勢圖 ===== -->
-  <h2 class="sec">GSC 成效趨勢（近 14 天）</h2>
-  <div class="panel">
-    <div id="gscTrendChart" class="pchart pchart-lg"></div>
-    <div class="chart-note">曝光（面積）／點擊（長條）／平均排名（線，Y 軸已反轉，線越靠上代表名次越好）</div>
+  <!-- ===== 群組一：搜尋成效與趨勢（GSC 趨勢圖 + 熱門關鍵字溫度圖 並排） ===== -->
+  <h2 class="sec">搜尋成效與趨勢</h2>
+  <div class="analysis-area analysis-area-wide">
+    <div class="panel">
+      <h3>GSC 成效趨勢（近 14 天）</h3>
+      <div id="gscTrendChart" class="pchart pchart-lg"></div>
+      <div class="chart-note">曝光（面積）／點擊（長條）／平均排名（線，Y 軸已反轉，線越靠上代表名次越好）</div>
+    </div>
+    <div class="panel" style="overflow-x:auto">
+      <h3>GSC 熱門關鍵字（欄位溫度圖）</h3>
+      <table class="kwt" id="kwTable"><thead><tr><th>關鍵字</th><th>點擊</th><th>曝光</th><th>CTR</th><th>平均排名</th></tr></thead><tbody id="kwBody"></tbody></table>
+      <div class="chart-note">每欄依該欄數值的 min–max 各自上色（非整表統一色階），顏色越亮代表該欄位表現越好。</div>
+    </div>
   </div>
 
-  <!-- ===== 流量來源 + 裝置分佈 ===== -->
-  <div class="analysis-area" style="margin-top:16px">
+  <!-- ===== 群組二：流量品質與來源（來源結構 + 裝置分佈 並排） ===== -->
+  <h2 class="sec">流量品質與來源</h2>
+  <div class="analysis-area">
     <div class="panel"><h3>流量來源結構</h3><div id="srcChart" class="pchart pchart-sm"></div></div>
     <div class="panel"><h3>裝置分佈</h3><div id="deviceChart" class="pchart pchart-sm"></div></div>
   </div>
 
-  <!-- ===== 3. Day × Hour Heatmap ===== -->
-  <h2 class="sec">流量熱力圖（星期 × 時段）</h2>
-  <div class="panel">
-    <div id="heatmapChart" class="pchart pchart-lg"></div>
-    <div class="chart-note">z 值為 sessions；平日白天與晚間、假日午後至深夜各有一段高峰，貼近真實電商流量的作息模式。</div>
+  <!-- ===== 群組三：裝置與使用行為（時段熱力圖 + 頁面類型趨勢 並排） ===== -->
+  <h2 class="sec">裝置與使用行為</h2>
+  <div class="analysis-area analysis-area-wide">
+    <div class="panel">
+      <h3>流量熱力圖（星期 × 時段）</h3>
+      <div id="heatmapChart" class="pchart pchart-md"></div>
+      <div class="chart-note">z 值為 sessions；平日白天與晚間、假日午後至深夜各有一段高峰。</div>
+    </div>
+    <div class="panel">
+      <h3>頁面類型流量趨勢</h3>
+      <div id="pageTypeChart" class="pchart pchart-md"></div>
+      <div class="chart-note">右上角下拉選單可切換 Sessions / Users / Pageviews，純 JS 重新產生 SVG 資料序列。</div>
+    </div>
   </div>
 
-  <!-- ===== 4. 頁面類型多線趨勢 + 下拉選單 ===== -->
-  <h2 class="sec">頁面類型流量趨勢</h2>
-  <div class="panel">
-    <div id="pageTypeChart" class="pchart pchart-lg"></div>
-    <div class="chart-note">右上角下拉選單可切換 Sessions / Users / Pageviews，切換時以純 JS 重新產生 SVG 資料序列，不依賴任何圖表庫。</div>
-  </div>
-
-  <!-- ===== 5. Session Duration Histogram ===== -->
+  <!-- ===== Session Duration Histogram：內容較細（全站 + 5 種頁面類型），維持全寬 ===== -->
   <h2 class="sec">工作階段時長分佈</h2>
   <div class="panel">
     <div class="durcat-overview">
@@ -108,13 +118,6 @@
     </div>
     <div class="durcat-legend" id="durcatLegend"></div>
     <div class="chart-note">全站多數工作階段落在數十秒到數分鐘之間，右側長尾為深度瀏覽 / 高互動使用者；拆解到頁面大類可看出部落格／商品頁停留明顯較長，首頁則多為快速跳轉。</div>
-  </div>
-
-  <!-- ===== 8. 關鍵字溫度圖 ===== -->
-  <h2 class="sec">GSC 熱門關鍵字（欄位溫度圖）</h2>
-  <div class="panel" style="overflow-x:auto">
-    <table class="kwt" id="kwTable"><thead><tr><th>關鍵字</th><th>點擊</th><th>曝光</th><th>CTR</th><th>平均排名</th></tr></thead><tbody id="kwBody"></tbody></table>
-    <div class="chart-note">每欄依該欄數值的 min–max 各自上色（非整表統一色階），顏色越亮代表該欄位表現越好；與上方 day×hour 熱力圖是不同的視覺化手法。</div>
   </div>
 
   <!-- ===== 2. 雙轉換漏斗 ===== -->

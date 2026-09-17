@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="insights.css">
 </head>
 <body>
 <a href="../index.html" title="返回作品集首頁" class="float-home">← 作品集首頁</a>
@@ -38,79 +39,82 @@
     </div>
   </div>
 
-  <!-- ===== 互動體驗：聊天 + 即時亮燈動畫並排 ===== -->
-  <h2 class="sec">互動體驗（送出訊息後，旁邊會即時亮燈）</h2>
-  <div class="chat-area">
-    <div class="phone">
-      <div class="phone-top"><span class="av">🤖</span>
-        <div class="pt-info"><div class="pt-name">AI 客服 · 禮品小幫手</div>
-        <div class="pt-st">● 線上 · 自動回覆中</div></div>
-      </div>
-      <div class="msgs" id="msgs"></div>
-      <div class="mobile-trace" id="mobileTrace" hidden>
-        <button class="mobile-trace-summary" id="mobileTraceOpen" type="button" aria-expanded="false">
-          <span class="mt-dot" aria-hidden="true"></span>
-          <span class="mt-copy"><b id="mobileTraceState">AI 正在處理</b><small id="mobileTraceDetail">正在準備檢索</small></span>
-          <span class="mt-progress" id="mobileTraceProgress">0 / 6</span>
-          <span class="mt-more">查看流程 ›</span>
-        </button>
-      </div>
-      <div class="compose">
-        <input id="inp" placeholder="輸入問題，或點下方範例開始體驗…" autocomplete="off">
-        <button id="send">送出</button>
+  <!-- ===== 互動體驗：緊湊卡片 Grid，聊天／範例問題／處理流程同屏可見 ===== -->
+  <div class="sec-row">
+    <h2 class="sec">互動體驗（送出訊息後，右側卡片即時亮燈）</h2>
+    <!-- 狀態提示降級為細長橫向列，只作輔助，不與核心互動元件（對話框／範例問題）爭奪視覺權重 -->
+    <div class="trace-strip" id="traceSummary" aria-live="polite">
+      <span class="trace-status">目前狀態：等待提問</span>
+      <span class="trace-detail">送出問題後將顯示資料檢索與回覆時間</span>
+    </div>
+  </div>
+  <div class="demo-grid">
+
+    <!-- 對話框：內容較長，跨 2 欄／與其對應的處理流程並排 -->
+    <div class="dg-card dg-span2 dg-phone-card">
+      <div class="phone">
+        <div class="phone-top"><span class="av">🤖</span>
+          <div class="pt-info"><div class="pt-name">AI 客服 · 禮品小幫手</div>
+          <div class="pt-st">● 線上 · 自動回覆中</div></div>
+        </div>
+        <div class="msgs" id="msgs"></div>
+        <div class="mobile-trace" id="mobileTrace" hidden>
+          <button class="mobile-trace-summary" id="mobileTraceOpen" type="button" aria-expanded="false">
+            <span class="mt-dot" aria-hidden="true"></span>
+            <span class="mt-copy"><b id="mobileTraceState">AI 正在處理</b><small id="mobileTraceDetail">正在準備檢索</small></span>
+            <span class="mt-progress" id="mobileTraceProgress">0 / 6</span>
+            <span class="mt-more">查看流程 ›</span>
+          </button>
+        </div>
+        <div class="compose">
+          <input id="inp" placeholder="輸入問題，或點右側範例開始體驗…" autocomplete="off">
+          <button id="send">送出</button>
+        </div>
       </div>
     </div>
 
-    <!-- 聊天輔助：範例問題緊接聊天窗（點了會直接送進輸入框，邏輯上屬於互動的一部分） -->
-    <div class="side-panel">
-      <div class="panel">
-        <h3>試試這些問題（依技術分類）</h3>
-        <div id="chips"></div>
+    <!-- 與對話框並排：處理流程總覽，送出訊息後同步亮燈/更新 -->
+    <div class="dg-card dg-trace-card">
+      <h3>處理流程</h3>
+      <div class="cpipe" id="cpipe">
+        <div class="cnode node line" data-k="line"><span class="cstep">1</span><span class="cic">💬</span><span class="cnm">LINE</span></div>
+        <div class="cnode node" data-k="n8n"><span class="cstep">2</span><span class="cic">🔀</span><span class="cnm">n8n</span></div>
+        <div class="cnode node" data-k="route"><span class="cstep">3</span><span class="cic">🧭</span><span class="cnm">路由</span></div>
+        <div class="cnode node" data-k="rag"><span class="cstep">4</span><span class="cic">🗂️</span><span class="cnm">RAG</span></div>
+        <div class="cnode node" data-k="ai"><span class="cstep">5</span><span class="cic">🤖</span><span class="cnm">AI</span></div>
+        <div class="cnode node line" data-k="reply"><span class="cstep">6</span><span class="cic">📤</span><span class="cnm">回覆</span></div>
+      </div>
+      <div class="tl" id="timeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
+    </div>
+
+    <!-- 試試這些問題：精簡掃讀卡片 -->
+    <div class="dg-card">
+      <h3>試試這些問題（依技術分類）</h3>
+      <div id="chips"></div>
+    </div>
+
+    <!-- 冷熱判斷閘道：精簡卡片，一排可放 3 個小卡之一 -->
+    <div class="dg-card dg-compact">
+      <h3>冷熱判斷閘道</h3>
+      <div class="cgate" id="cgateTree">
+        <div class="cgate-row gate-row" data-row="code"><span class="cgq">Q1 編號？</span><span class="cgleaf cold">❄️冷</span></div>
+        <div class="cgate-row gate-row" data-row="cat"><span class="cgq">Q2 品類？</span><span class="cgleaf cold">❄️冷</span></div>
+        <div class="cgate-row gate-row" data-row="fuzzy"><span class="cgq">Q3 模糊？</span><span class="cgleaf hot">🔥熱</span></div>
+        <div class="cgate-row gate-row" data-row="faq"><span class="cgq">Q4 FAQ？</span><span class="cgleaf cold">❄️冷</span></div>
+        <div class="cgate-row gate-row" data-row="fallback"><span class="cgq">皆未命中</span><span class="cgleaf hot">🔥熱</span></div>
       </div>
     </div>
 
-    <!-- 即時處理狀態：精簡動畫 + 本次流程紀錄，同一群組，送出訊息後同步亮燈/更新 -->
-    <div class="compact-anim">
-      <div class="trace-summary" id="traceSummary" aria-live="polite">
-        <span class="trace-status">等待提問</span>
-        <span class="trace-detail">送出問題後，這裡會顯示本次資料路徑與回覆時間。</span>
-      </div>
-      <div class="ca-grid3">
-        <div class="ca-block">
-          <h3>處理流程</h3>
-          <div class="cpipe" id="cpipe">
-            <div class="cnode node line" data-k="line"><span class="cstep">1</span><span class="cic">💬</span><span class="cnm">LINE</span></div>
-            <div class="cnode node" data-k="n8n"><span class="cstep">2</span><span class="cic">🔀</span><span class="cnm">n8n</span></div>
-            <div class="cnode node" data-k="route"><span class="cstep">3</span><span class="cic">🧭</span><span class="cnm">路由</span></div>
-            <div class="cnode node" data-k="rag"><span class="cstep">4</span><span class="cic">🗂️</span><span class="cnm">RAG</span></div>
-            <div class="cnode node" data-k="ai"><span class="cstep">5</span><span class="cic">🤖</span><span class="cnm">AI</span></div>
-            <div class="cnode node line" data-k="reply"><span class="cstep">6</span><span class="cic">📤</span><span class="cnm">回覆</span></div>
-          </div>
-        </div>
-        <div class="ca-block">
-          <h3>冷熱判斷閘道</h3>
-          <div class="cgate" id="cgateTree">
-            <div class="cgate-row gate-row" data-row="code"><span class="cgq">Q1 編號？</span><span class="cgleaf cold">❄️冷</span></div>
-            <div class="cgate-row gate-row" data-row="cat"><span class="cgq">Q2 品類？</span><span class="cgleaf cold">❄️冷</span></div>
-            <div class="cgate-row gate-row" data-row="fuzzy"><span class="cgq">Q3 模糊？</span><span class="cgleaf hot">🔥熱</span></div>
-            <div class="cgate-row gate-row" data-row="faq"><span class="cgq">Q4 FAQ？</span><span class="cgleaf cold">❄️冷</span></div>
-            <div class="cgate-row gate-row" data-row="fallback"><span class="cgq">皆未命中</span><span class="cgleaf hot">🔥熱</span></div>
-          </div>
-        </div>
-        <div class="ca-block">
-          <h3>接點說明</h3>
-          <div class="caux">
-            <span class="cnode node side" data-k="sheet">❄️ 冷資料源</span>
-            <span class="cnode node side" data-k="vec">🔥 熱資料</span>
-            <span class="cnode node side" data-k="yida">📋 宜搭表單</span>
-          </div>
-        </div>
-      </div>
-      <div class="panel ca-timeline">
-        <h3>本次處理流程</h3>
-        <div class="tl" id="timeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
+    <!-- 接點說明：精簡卡片，一排可放 3 個小卡之一 -->
+    <div class="dg-card dg-compact">
+      <h3>接點說明</h3>
+      <div class="caux">
+        <span class="cnode node side" data-k="sheet">❄️ 冷資料源</span>
+        <span class="cnode node side" data-k="vec">🔥 熱資料</span>
+        <span class="cnode node side" data-k="yida">📋 宜搭表單</span>
       </div>
     </div>
+
   </div>
 
   <section class="mobile-trace-sheet" id="mobileTraceSheet" aria-hidden="true" aria-label="本次 AI 處理流程">
@@ -119,6 +123,181 @@
       <div class="tl" id="mobileTimeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
     </div>
   </section>
+
+  <!-- ===== 後台設定與數據（Tab 切換，避免版面一路往下延伸） ===== -->
+  <div class="sec-row">
+    <h2 class="sec">後台設定與對話數據</h2>
+  </div>
+
+  <div class="tabs">
+    <div class="tab-bar" role="tablist" aria-label="後台設定與對話數據">
+      <button type="button" class="tab-btn on" role="tab" id="tb-scn"
+              aria-selected="true" aria-controls="tp-scn" data-tab="scn">
+        <span class="tb-ic">🧩</span>腳本情境設定
+      </button>
+      <button type="button" class="tab-btn" role="tab" id="tb-ins"
+              aria-selected="false" aria-controls="tp-ins" data-tab="ins">
+        <span class="tb-ic">📊</span>對話數據分析
+      </button>
+      <button type="button" class="tab-btn" role="tab" id="tb-qa"
+              aria-selected="false" aria-controls="tp-qa" data-tab="qa">
+        <span class="tb-ic">🔍</span>品質與自我修正
+      </button>
+    </div>
+
+    <!-- Tab 1：腳本情境設定 -->
+    <div class="tab-panel" role="tabpanel" id="tp-scn" aria-labelledby="tb-scn" data-panel="scn">
+      <p class="tab-intro">
+        AI 的回答行為不寫死在程式裡，而是由<b>四段式情境設定</b>驅動：
+        <b>觸發條件 → 資訊收集 → API 工具 → 回覆規則</b>。
+        每個情境可獨立設定優先度、必填欄位與可用資料源，新增情境不需改程式碼。
+        <b>點左側情境，右側流程即時切換。</b>
+      </p>
+      <div class="sb-wrap">
+        <div class="sb-side">
+          <h3>對話情境（4）</h3>
+          <div class="sb-scn" id="sbScn"></div>
+          <div class="sb-side-note">
+            優先度高者可中斷低者；「規則流程」走固定選項回覆，「AI 對話」交由語意判斷。
+          </div>
+        </div>
+        <div class="sb-flow" id="sbFlow"></div>
+      </div>
+    </div>
+
+    <!-- Tab 2：對話數據分析 -->
+    <div class="tab-panel" role="tabpanel" id="tp-ins" aria-labelledby="tb-ins" data-panel="ins" hidden>
+      <p class="tab-intro">
+        每通對話結束後，AI 依 B2B 客製禮品的業務邏輯<b>自動貼標</b>：
+        客戶單位別、產業、詢價金額帶、數量級距、交期急迫度與問題類型。
+        這些標籤讓「客服對話」變成可分析的<b>市場與 TA 數據</b>，而不只是聊天紀錄。
+      </p>
+
+  <div class="ins-kpi">
+    <div class="ik"><div class="n">2,847<small>則</small></div><div class="l">近 90 天對話總數</div></div>
+    <div class="ik good"><div class="n">77.0<small>%</small></div><div class="l">AI 自動完成率</div></div>
+    <div class="ik warn"><div class="n">654<small>則</small></div><div class="l">轉人工（23.0%）</div></div>
+    <div class="ik"><div class="n">6.8<small>則</small></div><div class="l">平均對話輪數</div></div>
+    <div class="ik"><div class="n">1.9<small>秒</small></div><div class="l">AI 平均回覆時間</div></div>
+  </div>
+
+  <div class="ins-split">
+    <h3>處理結果分佈</h3>
+    <div class="spl-bar">
+      <div class="spl-a" style="width:77%">AI 完成 77.0%</div>
+      <div class="spl-b" style="width:23%">轉人工 23.0%</div>
+    </div>
+    <div class="spl-lg">
+      <span><i style="background:var(--accent)"></i>AI 完成 2,193 則</span>
+      <span><i style="background:var(--card2);border:1px solid var(--border2)"></i>轉人工 654 則</span>
+      <span>＊客製品項需業務確認規格與報價，轉人工比例本就高於一般電商客服</span>
+    </div>
+  </div>
+
+  <div class="ins-grid">
+
+    <div class="idim">
+      <h3>🏢 客戶單位別</h3>
+      <div class="dsub">用於區分採購決策流程與付款條件</div>
+      <div class="bar-row"><span class="bar-nm">一般企業</span><span class="bar-tk"><span class="bar-fl" data-w="41"></span></span><span class="bar-pc">41%</span></div>
+      <div class="bar-row"><span class="bar-nm">中小企業</span><span class="bar-tk"><span class="bar-fl" data-w="24"></span></span><span class="bar-pc">24%</span></div>
+      <div class="bar-row"><span class="bar-nm">政府機構</span><span class="bar-tk"><span class="bar-fl" data-w="15"></span></span><span class="bar-pc">15%</span></div>
+      <div class="bar-row"><span class="bar-nm">學校單位</span><span class="bar-tk"><span class="bar-fl" data-w="12"></span></span><span class="bar-pc">12%</span></div>
+      <div class="bar-row"><span class="bar-nm">上市櫃公司</span><span class="bar-tk"><span class="bar-fl" data-w="8"></span></span><span class="bar-pc">8%</span></div>
+    </div>
+
+    <div class="idim alt">
+      <h3>💵 詢價金額帶</h3>
+      <div class="dsub">辨識高價值詢問，優先轉專人跟進</div>
+      <div class="bar-row"><span class="bar-nm">1 萬以下</span><span class="bar-tk"><span class="bar-fl" data-w="28"></span></span><span class="bar-pc">28%</span></div>
+      <div class="bar-row"><span class="bar-nm">1–5 萬</span><span class="bar-tk"><span class="bar-fl" data-w="34"></span></span><span class="bar-pc">34%</span></div>
+      <div class="bar-row"><span class="bar-nm">5–15 萬</span><span class="bar-tk"><span class="bar-fl" data-w="21"></span></span><span class="bar-pc">21%</span></div>
+      <div class="bar-row"><span class="bar-nm">15–50 萬</span><span class="bar-tk"><span class="bar-fl" data-w="12"></span></span><span class="bar-pc">12%</span></div>
+      <div class="bar-row"><span class="bar-nm">50 萬以上</span><span class="bar-tk"><span class="bar-fl" data-w="5"></span></span><span class="bar-pc">5%</span></div>
+    </div>
+
+    <div class="idim alt2">
+      <h3>🏭 產業分類</h3>
+      <div class="dsub">對應不同的產品偏好與預算結構</div>
+      <div class="bar-row"><span class="bar-nm">資訊科技</span><span class="bar-tk"><span class="bar-fl" data-w="26"></span></span><span class="bar-pc">26%</span></div>
+      <div class="bar-row"><span class="bar-nm">學校單位</span><span class="bar-tk"><span class="bar-fl" data-w="19"></span></span><span class="bar-pc">19%</span></div>
+      <div class="bar-row"><span class="bar-nm">政府機構</span><span class="bar-tk"><span class="bar-fl" data-w="17"></span></span><span class="bar-pc">17%</span></div>
+      <div class="bar-row"><span class="bar-nm">製造業</span><span class="bar-tk"><span class="bar-fl" data-w="14"></span></span><span class="bar-pc">14%</span></div>
+      <div class="bar-row"><span class="bar-nm">金融保險</span><span class="bar-tk"><span class="bar-fl" data-w="11"></span></span><span class="bar-pc">11%</span></div>
+      <div class="bar-row"><span class="bar-nm">其他</span><span class="bar-tk"><span class="bar-fl" data-w="13"></span></span><span class="bar-pc">13%</span></div>
+    </div>
+
+    <div class="idim">
+      <h3>📦 數量級距</h3>
+      <div class="dsub">決定適用牌價級距與生產排程</div>
+      <div class="bar-row"><span class="bar-nm">100 以下</span><span class="bar-tk"><span class="bar-fl" data-w="22"></span></span><span class="bar-pc">22%</span></div>
+      <div class="bar-row"><span class="bar-nm">100–500</span><span class="bar-tk"><span class="bar-fl" data-w="38"></span></span><span class="bar-pc">38%</span></div>
+      <div class="bar-row"><span class="bar-nm">500–2,000</span><span class="bar-tk"><span class="bar-fl" data-w="27"></span></span><span class="bar-pc">27%</span></div>
+      <div class="bar-row"><span class="bar-nm">2,000 以上</span><span class="bar-tk"><span class="bar-fl" data-w="13"></span></span><span class="bar-pc">13%</span></div>
+    </div>
+
+    <div class="idim alt">
+      <h3>⏱️ 交期急迫度</h3>
+      <div class="dsub">急件自動標記並推播負責窗口</div>
+      <div class="bar-row"><span class="bar-nm">標準（14 天以上）</span><span class="bar-tk"><span class="bar-fl" data-w="58"></span></span><span class="bar-pc">58%</span></div>
+      <div class="bar-row"><span class="bar-nm">急件（7–14 天）</span><span class="bar-tk"><span class="bar-fl" data-w="29"></span></span><span class="bar-pc">29%</span></div>
+      <div class="bar-row"><span class="bar-nm">特急（7 天內）</span><span class="bar-tk"><span class="bar-fl" data-w="13"></span></span><span class="bar-pc">13%</span></div>
+    </div>
+
+    <div class="idim alt2">
+      <h3>❓ 問題類型</h3>
+      <div class="dsub">對應到不同的腳本情境與資料源</div>
+      <div class="bar-row"><span class="bar-nm">報價詢問</span><span class="bar-tk"><span class="bar-fl" data-w="36"></span></span><span class="bar-pc">36%</span></div>
+      <div class="bar-row"><span class="bar-nm">規格確認</span><span class="bar-tk"><span class="bar-fl" data-w="24"></span></span><span class="bar-pc">24%</span></div>
+      <div class="bar-row"><span class="bar-nm">交期查詢</span><span class="bar-tk"><span class="bar-fl" data-w="16"></span></span><span class="bar-pc">16%</span></div>
+      <div class="bar-row"><span class="bar-nm">打樣需求</span><span class="bar-tk"><span class="bar-fl" data-w="13"></span></span><span class="bar-pc">13%</span></div>
+      <div class="bar-row"><span class="bar-nm">售後 / 其他</span><span class="bar-tk"><span class="bar-fl" data-w="11"></span></span><span class="bar-pc">11%</span></div>
+    </div>
+
+      </div>
+    </div>
+
+    <!-- Tab 3：品質與自我修正 -->
+    <div class="tab-panel" role="tabpanel" id="tp-qa" aria-labelledby="tb-qa" data-panel="qa" hidden>
+      <p class="tab-intro">
+        RAG 會答錯，所以除了「答得出來」，更重要的是<b>答錯時系統知不知道</b>。
+        以下三層機制在客訴發生前先攔下問題，並把低分案例回饋成優化建議。
+      </p>
+
+  <div class="qa-wrap">
+    <div class="qa-card">
+      <h3>🔍 回查機制</h3>
+      <p>AI 回覆送出後另跑一次<b>獨立回查</b>：比對回覆內容與引用的資料來源是否一致，
+         發現引用不到來源或數字對不上，立即標記並通知內部確認。</p>
+      <div class="qa-list">
+        <div class="qa-item"><span class="qt">回查命中率</span>2,793 / 2,847 則通過（98.1%）</div>
+        <div class="qa-item low"><span class="qt">標記待確認</span>54 則 — 多為牌價級距邊界與客製品項</div>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <h3>📝 自動審核評分</h3>
+      <p>每則回覆依<b>正確性、完整度、語氣、是否越權承諾</b>四項自動評分，
+         低於門檻自動進入複審佇列，不等客訴才發現問題。</p>
+      <div class="qa-score"><span class="v">4.42</span><span class="m">/ 5.00 平均分（近 90 天）</span></div>
+      <div class="qa-list">
+        <div class="qa-item low"><span class="qt">低分樣本</span>「這個一定來得及」— 越權承諾交期，扣分並列入修正</div>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <h3>♻️ 自我修正建議</h3>
+      <p>累積低分與轉人工案例後，系統彙整出<b>優化建議</b>：
+         哪些問題常答不好、哪份資料需要補、哪個情境該調整回覆規則。</p>
+      <div class="qa-list">
+        <div class="qa-item fix"><span class="qt">建議 · 補資料</span>「環保材質」相關詢問命中率偏低 → 建議補 FAQ 條目</div>
+        <div class="qa-item fix"><span class="qt">建議 · 調規則</span>急件詢問常直接轉人工 → 建議新增急件前置判斷</div>
+      </div>
+    </div>
+      </div>
+    </div>
+
+  </div>
 
   <!-- ===== 技術與設計說明 ===== -->
   <h2 class="sec">技術與設計說明</h2>
@@ -185,5 +364,6 @@
 </div>
 
 <script src="script.js"></script>
+<script src="insights.js"></script>
 </body>
 </html>

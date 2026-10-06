@@ -303,15 +303,30 @@
   <h2 class="sec">技術與設計說明</h2>
 
   <details class="acc acc-lg" open>
-    <summary><span class="ic">✨</span> 設計重點<span class="cnt">5 項</span></summary>
+    <summary><span class="ic">✨</span> 設計重點<span class="cnt">6 項</span></summary>
     <div class="abody">
   <ul class="dlist">
-    <li><span class="ic">🎯</span><div class="tx"><h4>分層檢索（先精準、後語意）</h4><p>先用編號／關鍵字做精準比對，命中就直接回覆；找不到才動用 AI 語意搜尋，同時顧到準確度與運算成本。</p></div></li>
+    <li><span class="ic">🎯</span><div class="tx"><h4>分層檢索（先精準、後語意）</h4><p>先用編號／分類代碼／關鍵字做精準比對，命中就直接回覆；找不到才動用向量語意搜尋，同時顧到準確度與運算成本。</p></div></li>
+    <li><span class="ic">🔀</span><div class="tx"><h4>規則式分流，不靠 AI 判斷</h4><p>進線第一步用關鍵字規則判斷「問產品 / 問規則 / 兩者都問」，不耗費一次 LLM 呼叫就能決定走哪條路；誤判時會在下游的檢索階段被修正，不影響最終答案正確性。</p></div></li>
     <li><span class="ic">❄️🔥</span><div class="tx"><h4>冷熱資料分流</h4><p>變動少的 FAQ／產品／牌價以批次方式同步為「冷資料」，查詢時走「熱資料」快取與向量索引，明顯降低回應延遲。</p></div></li>
-    <li><span class="ic">🛡️</span><div class="tx"><h4>報價保守、不亂估</h4><p>沒有對應牌價時不臆測價格，改提示「需人工確認」並自動建立宜搭詢價單，避免報錯價造成商業風險。</p></div></li>
+    <li><span class="ic">🛡️</span><div class="tx"><h4>報價保守、不亂估</h4><p>只有「商品編號」與牌價表完全比對一致才自動報價；對不到就不臆測，改提示「需人工確認」並自動建立宜搭詢價單，避免報錯價造成商業風險。</p></div></li>
     <li><span class="ic">🔔</span><div class="tx"><h4>即時通知、不漏單</h4><p>客戶詢問同步通知內部群組，重要詢價與需人工處理的案件不漏接。</p></div></li>
     <li><span class="ic">⚡</span><div class="tx"><h4>本地快照索引與快取重建</h4><p>把上萬筆產品建成記憶體索引（編號／分類／關鍵詞），並用檔案 mtime／size 判斷是否重建，避免每次查詢重讀整份資料、大幅降低延遲。</p></div></li>
   </ul>
+    </div>
+  </details>
+
+  <details class="acc acc-lg" open>
+    <summary><span class="ic">📊</span> 牌價覆蓋率與報價策略<span class="cnt">示意數字</span></summary>
+    <div class="abody">
+      <p class="lead" style="margin:0 0 4px">產品庫規模遠大於牌價表規模，是這類 B2B 客製商品常見的現實——
+      多數商品需人工報價。系統的任務是<b>把能自動的部分做到準，剩下的部分可靠地轉人工</b>，而不是硬湊一個看起來會回答的價格。</p>
+      <div class="statrow">
+        <div class="stat"><div class="num">16k+</div><div class="lb">產品庫筆數（示意量級）</div></div>
+        <div class="stat"><div class="num">~2.4%</div><div class="lb">編號可自動對到牌價</div></div>
+        <div class="stat"><div class="num">~97.6%</div><div class="lb">轉人工報價</div></div>
+      </div>
+      <p class="foot" style="margin:0">＊ 以上比例為實際專案量級的示意數字，用於說明「為什麼保守報價策略是必要設計」，非即時營運數據，亦不含實際品名／客戶資訊。</p>
     </div>
   </details>
 
@@ -339,8 +354,8 @@
       </li>
       <li>
         <div class="h"><span class="ic">🛡️</span>商業風險控管</div>
-        <p class="d">針對報價情境採<b>保守策略</b>，無對應牌價即轉人工並自動建單，
-        把「AI 答錯造成的營運風險」納入系統設計，而不只是追求看起來會回答。</p>
+        <p class="d">針對報價情境採<b>保守策略</b>：唯一認定依據是「商品編號」與牌價表精準比對，
+        對不到即轉人工並自動建單，把「AI 答錯造成的營運風險」納入系統設計，而不只是追求看起來會回答。</p>
       </li>
       <li>
         <div class="h"><span class="ic">🏗️</span>生產化與工程紀律</div>

@@ -3968,6 +3968,9 @@ function show(i){document.querySelectorAll('.tb').forEach(b=>b.classList.toggle(
 document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.i==i));
 (PANEL[i]||[]).forEach(id=>{const c=CHARTS[id],el=document.getElementById(id);
  if(!el)return; if(done[id]){Plotly.Plots.resize(el);return;}
- Plotly.newPlot(el,c.data,Object.assign({autosize:true},c.layout),{displaylogo:false,responsive:true});done[id]=1;});}
+ const L=Object.assign({autosize:true},c.layout,{dragmode:false});
+ Object.keys(L).forEach(k=>{if(/^(x|y)axis\d*$/.test(k))L[k]=Object.assign({},L[k],{fixedrange:true});});
+ ['xaxis','yaxis'].forEach(k=>{if(!L[k])L[k]={fixedrange:true};});
+ Plotly.newPlot(el,c.data,L,{displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false,responsive:true});done[id]=1;});}
 document.querySelectorAll('.tb').forEach(b=>b.onclick=()=>show(b.dataset.i));show(0);
 </script></body></html>

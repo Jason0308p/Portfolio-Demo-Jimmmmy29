@@ -3,8 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Jason｜AI × 數據 × 自動化 作品集</title>
-<meta name="description" content="Jason 的作品集：LINE RAG 客服機器人、GA4 官方 MCP 數據分析、AI 自動化求職 pipeline、宜搭自建 MCP 商品上架 SEO、台股輿情（自建 TWSE MCP）。技術涵蓋 LINE / n8n / RAG / Qdrant / Gemini / MCP / GA4 / GSC / GTM / 爬蟲 / Notion API / 宜搭 API。">
+<title>Jason｜Technical Solutions · AI × 數據 × 自動化</title>
+<meta name="description" content="Jason 的技術解決方案作品集：Schooling 互動式 SQL 課程平台（真實上線，純靜態 + WASM SQLite + Cloudflare Workers）、LINE RAG 客服、GA4 官方 MCP 數據分析、GA4/GSC 行銷儀表板、AI 自動化求職 pipeline、Shopify 上架 SEO 自動化、自建 TWSE MCP 台股輿情日報。從需求定義、資料模型、流程設計、實作到維運獨立完成。">
+<meta property="og:title" content="Jason｜Technical Solutions · AI × 數據 × 自動化">
+<meta property="og:description" content="把商業問題端到端做成可運作的系統：1 個真實上線產品、7 個架構展示、2 份案例研究。">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -27,6 +30,7 @@ a{text-decoration:none;color:inherit}
 .nav-links{display:flex;list-style:none;gap:1.8rem}
 .nav-links a{font-size:.9rem;font-weight:500;color:var(--text2);transition:var(--t)}
 .nav-links a:hover{color:var(--accent)}
+.nav-links a.alt{color:var(--gold);font-weight:700}
 .nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;background:none;border:1px solid var(--border2);border-radius:8px;cursor:pointer;padding:0}
 .nav-toggle span{display:block;width:20px;height:2px;margin:0 auto;background:var(--text);border-radius:2px;transition:var(--t)}
 .nav-toggle.active span:nth-child(1){transform:translateY(7px) rotate(45deg)}
@@ -55,7 +59,7 @@ a{text-decoration:none;color:inherit}
 .greeting{color:var(--accent);font-family:var(--mono),monospace;font-size:1rem;margin-bottom:1rem;letter-spacing:1px}
 .hero h1{font-size:clamp(2.6rem,8vw,5rem);font-weight:900;line-height:1.05;color:#fff;letter-spacing:1px}
 .hero h2{font-size:clamp(1.4rem,5vw,2.8rem);color:var(--text2);margin:.4rem 0 1.4rem;font-weight:800}
-.hero .desc{max-width:600px;color:var(--text2);margin-bottom:2.4rem;font-size:1.05rem}
+.hero .desc{max-width:640px;color:var(--text2);margin-bottom:2.4rem;font-size:1.05rem}
 .hero .desc b{color:var(--text)}
 .cta{display:flex;gap:1rem;flex-wrap:wrap}
 .btn{display:inline-block;padding:.85rem 1.8rem;border-radius:6px;font-weight:700;transition:var(--t);font-size:.95rem}
@@ -77,18 +81,48 @@ section{padding:5.5rem 8%}
 .sec-title .num{font-family:var(--mono),monospace;font-size:1rem;color:var(--accent);font-weight:500}
 .sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
 
+/* 專案分組 */
+.grp{margin:0 0 1.1rem}
+.grp h3{font-size:1.12rem;color:#fff;font-weight:800;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.grp .note{font-size:.82rem;color:var(--text3);margin-top:.45rem;max-width:880px}
+.grp-wrap{margin-bottom:3.4rem}
+.pill{font-size:.68rem;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:20px}
+.pill.live{color:#052e16;background:#4ade80}
+.pill.mock{color:var(--text2);background:var(--card2);border:1px solid var(--border2)}
+.pill.doc{color:var(--gold);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35)}
+
 /* works grid */
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.3rem}
 .card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;transition:var(--t);position:relative;overflow:hidden}
 .card::before{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
 .card:hover{border-color:var(--accent);transform:translateY(-6px);box-shadow:0 14px 34px rgba(0,0,0,.4)}
 .card .ic{font-size:1.7rem}
-.card h3{margin:.7rem 0 .5rem;font-size:1.15rem;color:#fff;font-weight:800}
+.card h3{margin:.7rem 0 .4rem;font-size:1.15rem;color:#fff;font-weight:800}
+.prob{color:var(--accent2);font-weight:600;font-size:.88rem;margin-bottom:.55rem}
 .card .d{font-size:.9rem;color:var(--text2);flex:1}
 .card .tags{display:flex;flex-wrap:wrap;gap:6px;margin:.9rem 0 1rem}
 .card .t{font-size:.7rem;color:var(--text3);background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:2px 8px}
-.card .go{font-size:.85rem;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px}
-.card:hover .go{gap:11px}
+.links{display:flex;flex-wrap:wrap;gap:.5rem 1.3rem;margin-top:auto}
+.links a{font-size:.85rem;font-weight:700;color:var(--accent);display:inline-flex;align-items:center;gap:6px;transition:var(--t)}
+.links a:hover{gap:11px;color:var(--accent2)}
+.links a.doc{color:var(--gold)}
+.links a.doc:hover{color:#fbbf24}
+
+/* 真實上線產品（視覺區別） */
+.flagship{background:linear-gradient(140deg,#13243d 0%,#111c30 62%);border:1px solid #2f5f7a;box-shadow:0 0 0 1px rgba(34,211,238,.12),0 18px 44px rgba(0,0,0,.45)}
+.flagship::before{height:4px;background:linear-gradient(90deg,#4ade80,var(--accent2))}
+.flagship:hover{border-color:#4ade80}
+.flagship h3{font-size:1.4rem}
+.flagship .d{font-size:.95rem}
+.metrics{display:flex;flex-wrap:wrap;gap:1.4rem;margin:1.1rem 0 .3rem}
+.metrics .m .n{font-size:1.5rem;font-weight:800;color:#4ade80;font-family:var(--mono),monospace;line-height:1.15}
+.metrics .m .l{font-size:.75rem;color:var(--text3)}
+
+/* 案例研究簡卡 */
+.card.lite{background:var(--card2);padding:1.3rem 1.4rem}
+.card.lite::before{background:linear-gradient(90deg,var(--gold),transparent)}
+.card.lite:hover{border-color:var(--gold)}
+.card.lite h3{font-size:1.05rem}
 
 /* skills */
 .skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.3rem}
@@ -112,7 +146,7 @@ section{padding:5.5rem 8%}
 .contact p{color:var(--text2);font-size:1.1rem;margin-bottom:1.6rem}
 .email{font-size:clamp(1.3rem,4vw,2rem);color:var(--accent);font-weight:800;display:inline-block;margin-bottom:2rem;transition:var(--t)}
 .email:hover{transform:scale(1.04)}
-.socials{display:flex;justify-content:center;gap:1.6rem}
+.socials{display:flex;justify-content:center;gap:1.6rem;flex-wrap:wrap}
 .socials a{color:var(--text2);transition:var(--t)}
 .socials a:hover{color:var(--accent)}
 
@@ -136,6 +170,7 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
     <li><a href="#skills">技能</a></li>
     <li><a href="#about">關於</a></li>
     <li><a href="#contact">聯絡</a></li>
+    <li><a class="alt" href="index-pm.html">PM 版 ↗</a></li>
   </ul>
   <div class="nav-overlay" id="navOverlay"></div>
 </nav>
@@ -144,9 +179,9 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
 <header class="hero">
   <span class="greeting">你好，我是</span>
   <h1>Jason</h1>
-  <h2>AI × 數據 × 自動化 工程師</h2>
-  <p class="desc">把 <b>AI、資料與多平台串接</b>，做成能解決實際問題的系統——
-     從 LINE 客服機器人、GA/輿情數據分析，到爬蟲與電商上架自動化。以下每個專案都有可互動的展示版。</p>
+  <h2>把商業問題端到端做成可運作的系統</h2>
+  <p class="desc">我的工作方式是<b>從需求定義、資料模型、流程設計、實作到維運獨立完成</b>——不用等別人補齊規格，也不用交接才能動工。
+     特別擅長<b>把高風險流程設計成可驗證機制</b>：報價不能錯、法規下架不能漏、追蹤設定不能被誤改，所以我把檢查點寫進系統，而不是寫進 SOP 文件。</p>
   <div class="cta">
     <a href="#work" class="btn primary">看作品 →</a>
     <a href="#contact" class="btn secondary">聯絡我</a>
@@ -158,66 +193,159 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
 <section id="work">
   <div class="container">
     <h2 class="sec-title reveal"><span class="num">01.</span> 專案作品</h2>
-    <div class="grid">
 
-      <a class="card reveal" href="line-rag-demo/index.html">
-        <div class="ic">💬</div>
-        <h3>LINE 智能客服機器人</h3>
-        <div class="d">串接 LINE + n8n + RAG 向量資料庫 + AI 的 B2B 客服：自動分流產品/FAQ、分層檢索、冷熱資料分流、報價保守防錯、宜搭建單與群組通知。</div>
-        <div class="tags"><span class="t">LINE API</span><span class="t">n8n</span><span class="t">RAG · Qdrant</span><span class="t">Gemini</span><span class="t">宜搭 API</span></div>
-        <div class="go">進入展示 →</div>
-      </a>
-
-      <a class="card reveal" href="ga-mcp-demo/index.html">
-        <div class="ic">📊</div>
-        <h3>GA4 + MCP 數據分析</h3>
-        <div class="d">以 Google <b>官方 GA MCP</b> 取 GA4 數據，整合 GSC / GTM API 餵給 AI 自動分析，產出 KPI、趨勢、SEO 與轉換洞察。</div>
-        <div class="tags"><span class="t">官方 GA MCP</span><span class="t">GSC · GTM API</span><span class="t">AI 分析</span><span class="t">資料視覺化</span></div>
-        <div class="go">進入展示 →</div>
-      </a>
-
-      <a class="card reveal" href="ga-dashboard-demo/index.html">
-        <div class="ic">🧭</div>
-        <h3>GA4 / GSC 行銷分析儀表板</h3>
-        <div class="d">整合 GA4 與 Google Search Console 的 7 分頁決策儀表板：流量來源、詢價與 LINE 漏斗、搜尋字熱力圖，以及依「量體 × 意圖」自動分層的<b>關鍵字廣告投放建議</b>（小池子／大池子／否定字／季節字）。每個圖表都標註資料更新日。</div>
-        <div class="tags"><span class="t">GA4 · GSC</span><span class="t">廣告關鍵字分層</span><span class="t">漏斗與熱力圖</span><span class="t">Plotly</span></div>
-        <div class="go">進入展示 →</div>
-      </a>
-
-      <a class="card reveal" href="job-automation-demo/index.html">
-        <div class="ic">🤖</div>
-        <h3>AI 自動化求職 Pipeline</h3>
-        <div class="d">多平台職缺爬蟲 → 資料清洗正規化 → 規則/AI 評分 → 抓 JD → AI 生成 CV/面試 QA → 寫入 Notion 的一條龍自動化。</div>
-        <div class="tags"><span class="t">爬蟲</span><span class="t">AI 評分</span><span class="t">資料正規化</span><span class="t">Notion API</span></div>
-        <div class="go">進入展示 →</div>
-      </a>
-
-      <a class="card reveal" href="job-research-dashboard-demo/index.html">
-        <div class="ic">🗂️</div>
-        <h3>職缺研究 Dashboard</h3>
-        <div class="d">將職缺攻略、公司研究與 AI 產出素材集中成可搜尋的表格介面；可用 A / B / KA / KB 等批次切換，快速開啟對應分析與來源資料。</div>
-        <div class="tags"><span class="t">Dashboard UX</span><span class="t">資料索引</span><span class="t">AI 求職攻略</span><span class="t">靜態前端</span></div>
-        <div class="go">進入展示 →</div>
-      </a>
-
-      <a class="card reveal" href="product-seo-demo/index.html">
-        <div class="ic">🛍️</div>
-        <h3>Shopify 商品上架 SEO/GEO 自動化</h3>
-        <div class="d">以 <b>Shopify CLI + Admin API</b> 為核心的電商自動化：商品/集合批次管理、AI 生成 SEO/GEO 內容、頁面產生器與安全發布、搜尋詞彙分類與加權再排序，宜搭(Yida) 為下架流程的下游同步。</div>
-        <div class="tags"><span class="t">Shopify CLI</span><span class="t">Shopify Admin API</span><span class="t">AI SEO/GEO</span><span class="t">搜尋加權再排序</span></div>
-        <div class="go">進入展示 →</div>
-      </a>
-
-      <a class="card reveal" href="輿情_demo/index.html">
-        <div class="ic">📈</div>
-        <h3>台股輿情日報</h3>
-        <div class="d"><b>自建 MCP（基於台灣官方 TWSE API）</b> + 多來源爬蟲的單日完整輿情日報：族群燈號、討論度攀升、多因子選股與智能選股快選、法人籌碼動向，以 ECharts 呈現全市場熱議榜與國際輪動雷達。</div>
-        <div class="tags"><span class="t">自建 TWSE MCP</span><span class="t">多因子選股</span><span class="t">法人籌碼</span><span class="t">ECharts</span></div>
-        <div class="go">進入展示 →</div>
-      </a>
-
+    <!-- 第一組：真實上線產品 -->
+    <div class="grp-wrap">
+      <div class="grp reveal">
+        <h3>真實上線產品 <span class="pill live">✅ 真實上線・可直接操作・非模擬資料</span></h3>
+        <p class="note">自行設計、開發並部署上線的產品，任何人都可以直接開啟使用。</p>
+      </div>
+      <div class="grid">
+        <div class="card flagship reveal">
+          <div class="ic">🎓</div>
+          <h3>Schooling｜互動式 SQL 課程平台</h3>
+          <div class="prob">讓想學 SQL 的人在瀏覽器裡直接練，不用裝資料庫、不用註冊、不用後端</div>
+          <div class="d">完整的 SQL 學習路徑，每一課都附可執行的查詢環境，學習者在頁面裡直接寫 SQL、直接看到結果。
+             架構上<b>刻意不做後端</b>——以 WASM SQLite（sql.js）把資料庫跑在瀏覽器裡，因此<b>零維運成本、使用者資料不離開瀏覽器</b>；
+             自動批改採<b>比對查詢結果而非 SQL 字串</b>，同一題允許多種正確寫法，避免把「寫法不同」誤判成「答錯」。</div>
+          <div class="metrics">
+            <div class="m"><div class="n">13</div><div class="l">門課</div></div>
+            <div class="m"><div class="n">113</div><div class="l">課</div></div>
+            <div class="m"><div class="n">296</div><div class="l">題</div></div>
+            <div class="m"><div class="n">204</div><div class="l">個課文範例</div></div>
+          </div>
+          <div class="tags"><span class="t">純靜態網頁</span><span class="t">WASM SQLite · sql.js</span><span class="t">Cloudflare Workers</span><span class="t">結果比對式自動批改</span></div>
+          <div class="links">
+            <a href="https://schooling.jason0308p.workers.dev" target="_blank" rel="noopener">開啟線上平台 ↗</a>
+          </div>
+        </div>
+      </div>
     </div>
-    <p class="demo-note reveal">＊ 以上皆為公開展示用的純前端靜態頁；真實程式碼、架構與 know-how 可於面談時說明。</p>
+
+    <!-- 第二組：架構展示 -->
+    <div class="grp-wrap">
+      <div class="grp reveal">
+        <h3>架構展示 <span class="pill mock">模擬資料</span></h3>
+        <p class="note">公司內部系統不可外展，此區為純前端架構示意，資料為虛構脫敏範例，AI 與後端行為為模擬。</p>
+      </div>
+      <div class="grid">
+
+        <div class="card reveal">
+          <div class="ic">💬</div>
+          <h3>LINE 智能客服機器人</h3>
+          <div class="prob">讓客服不會因為報錯價格造成商業損失——回得快不是第一優先</div>
+          <div class="d">串接 LINE + n8n + RAG 向量資料庫 + AI 的 B2B 客服：自動分流產品／FAQ、分層檢索、冷熱資料分流、報價保守防錯、宜搭建單與群組通知。</div>
+          <div class="tags"><span class="t">LINE API</span><span class="t">n8n</span><span class="t">RAG · Qdrant</span><span class="t">Gemini</span><span class="t">宜搭 API</span></div>
+          <div class="links">
+            <a href="line-rag-demo/index.html">進入展示 →</a>
+            <a class="doc" href="case-studies/06-line-rag.md" target="_blank" rel="noopener">看完整案例 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">📊</div>
+          <h3>GA4 + MCP 數據分析</h3>
+          <div class="prob">讓 AI 能安全存取追蹤設定，但沒有發布權</div>
+          <div class="d">以 Google <b>官方 GA MCP</b> 取 GA4 數據，整合 GSC / GTM API 餵給 AI 自動分析，產出 KPI、趨勢、SEO 與轉換洞察。權限設計停在讀取與草稿層，發布動作保留給人。</div>
+          <div class="tags"><span class="t">官方 GA MCP</span><span class="t">GSC · GTM API</span><span class="t">AI 分析</span><span class="t">權限邊界設計</span></div>
+          <div class="links">
+            <a href="ga-mcp-demo/index.html">進入展示 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">🧭</div>
+          <h3>GA4 / GSC 行銷分析儀表板</h3>
+          <div class="prob">讓主管看得懂詢價從哪來，讓行銷與工程能安全改追蹤設定</div>
+          <div class="d">整合 GA4 與 Google Search Console 的 7 分頁決策儀表板：流量來源、詢價與 LINE 漏斗、搜尋字熱力圖，以及依「量體 × 意圖」自動分層的<b>關鍵字廣告投放建議</b>（小池子／大池子／否定字／季節字）。每個圖表都標註資料更新日。</div>
+          <div class="tags"><span class="t">GA4 · GSC</span><span class="t">廣告關鍵字分層</span><span class="t">漏斗與熱力圖</span><span class="t">Plotly</span></div>
+          <div class="links">
+            <a href="ga-dashboard-demo/index.html">進入展示 →</a>
+            <a class="doc" href="case-studies/04-ga4-dashboard.md" target="_blank" rel="noopener">看完整案例 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">🤖</div>
+          <h3>AI 自動化求職 Pipeline</h3>
+          <div class="prob">讓六千多筆職缺被語意判讀，而不是被職稱關鍵字誤判</div>
+          <div class="d">多平台職缺爬蟲 → 資料清洗正規化 → 規則／AI 評分 → 抓 JD → AI 生成 CV／面試 QA → 寫入 Notion 的一條龍自動化。</div>
+          <div class="tags"><span class="t">爬蟲</span><span class="t">AI 評分</span><span class="t">資料正規化</span><span class="t">Notion API</span></div>
+          <div class="links">
+            <a href="job-automation-demo/index.html">進入展示 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">🗂️</div>
+          <h3>職缺研究 Dashboard</h3>
+          <div class="prob">讓分散的職缺研究與 AI 產出集中成可搜尋的決策介面</div>
+          <div class="d">將職缺攻略、公司研究與 AI 產出素材集中成可搜尋的表格介面；可用 A / B / KA / KB 等批次切換，快速開啟對應分析與來源資料。</div>
+          <div class="tags"><span class="t">Dashboard UX</span><span class="t">資料索引</span><span class="t">AI 求職攻略</span><span class="t">靜態前端</span></div>
+          <div class="links">
+            <a href="job-research-dashboard-demo/index.html">進入展示 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">🛍️</div>
+          <h3>Shopify 商品上架 SEO/GEO 自動化</h3>
+          <div class="prob">讓一萬四千件商品的法規下架能在幾分鐘內零錯誤完成</div>
+          <div class="d">以 <b>Shopify CLI + Admin API</b> 為核心的電商自動化：商品／集合批次管理、AI 生成 SEO/GEO 內容、頁面產生器與安全發布、搜尋詞彙分類與加權再排序，宜搭(Yida) 為下架流程的下游同步。</div>
+          <div class="tags"><span class="t">Shopify CLI</span><span class="t">Shopify Admin API</span><span class="t">AI SEO/GEO</span><span class="t">搜尋加權再排序</span></div>
+          <div class="links">
+            <a href="product-seo-demo/index.html">進入展示 →</a>
+            <a class="doc" href="case-studies/03-shopify-ops.md" target="_blank" rel="noopener">看完整案例 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">📈</div>
+          <h3>台股輿情日報</h3>
+          <div class="prob">讓一個人能每天掌握六十多支股票的市場情緒，而且 AI 成本可控</div>
+          <div class="d"><b>自建 MCP（基於台灣官方 TWSE API）</b> + 多來源爬蟲的單日完整輿情日報：族群燈號、討論度攀升、多因子選股與智能選股快選、法人籌碼動向，以 ECharts 呈現全市場熱議榜與國際輪動雷達。</div>
+          <div class="tags"><span class="t">自建 TWSE MCP</span><span class="t">多因子選股</span><span class="t">法人籌碼</span><span class="t">ECharts</span></div>
+          <div class="links">
+            <a href="輿情_demo/index.html">進入展示 →</a>
+            <a class="doc" href="case-studies/05-stock-sentiment.md" target="_blank" rel="noopener">看完整案例 →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 第三組：案例研究 -->
+    <div class="grp-wrap">
+      <div class="grp reveal">
+        <h3>案例研究 <span class="pill doc">無互動 demo</span></h3>
+        <p class="note">這兩個專案為公司內部系統，無法做成可外展的展示頁，但有完整的案例文件可閱讀。</p>
+      </div>
+      <div class="grid">
+
+        <div class="card lite reveal">
+          <div class="ic">✍️</div>
+          <h3>J1 商品文案自動化</h3>
+          <div class="prob">讓文案批次生成，但錯寫不會進到正式商品資料</div>
+          <div class="d">商品文案的批次生成流程，核心設計在「生成」與「寫入正式資料」之間的審核閘門：AI 產出先落在暫存層，通過比對與抽驗後才同步到商品資料。</div>
+          <div class="links">
+            <a class="doc" href="case-studies/01-j1-product-copy.md" target="_blank" rel="noopener">看案例 →</a>
+          </div>
+        </div>
+
+        <div class="card lite reveal">
+          <div class="ic">🚚</div>
+          <h3>營運流程自動化（社群／貨運／財務）</h3>
+          <div class="prob">讓業務能即時回答客戶「貨在哪」，而不是打電話問倉庫</div>
+          <div class="d">把社群、貨運與財務三條各自獨立的流程，串成同一份可查詢的狀態，讓前線不必靠人際轉述才能取得資訊。</div>
+          <div class="links">
+            <a class="doc" href="case-studies/02-ops-automation.md" target="_blank" rel="noopener">看案例 →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="demo-note reveal">＊ 除 Schooling 為真實上線產品外，其餘展示頁皆為公開展示用的純前端靜態頁；真實程式碼、架構與 know-how 可於面談時說明。</p>
   </div>
 </section>
 
@@ -230,8 +358,9 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
       <div class="skill reveal"><div class="ic">🔌</div><h3>MCP / 串接整合</h3><div class="row"><span class="k">自建宜搭 (Yida) MCP</span><span class="k">自建 TWSE MCP</span><span class="k">官方 GA MCP</span><span class="k">LINE Messaging API</span><span class="k">Notion API</span></div></div>
       <div class="skill reveal"><div class="ic">⚙️</div><h3>自動化 / 資料處理</h3><div class="row"><span class="k">n8n</span><span class="k">Web Scraping</span><span class="k">資料正規化 / 清洗</span><span class="k">Webhook 簽章驗證</span><span class="k">訊息去抖動 (debounce)</span></div></div>
       <div class="skill reveal"><div class="ic">📊</div><h3>數據 / 視覺化</h3><div class="row"><span class="k">GA4 Data API</span><span class="k">GSC API</span><span class="k">GTM API</span><span class="k">資料視覺化</span><span class="k">ECharts</span><span class="k">SEO / GEO</span></div></div>
-      <div class="skill reveal"><div class="ic">💻</div><h3>開發語言 / 介面</h3><div class="row"><span class="k">Python</span><span class="k">JavaScript</span><span class="k">REST API</span><span class="k">HTML / CSS</span><span class="k">RWD</span></div></div>
-      <div class="skill reveal"><div class="ic">🛡️</div><h3>工程實務</h3><div class="row"><span class="k">API 配額管理與節流</span><span class="k">增量同步</span><span class="k">自動化測試</span><span class="k">跨資料模型對齊</span><span class="k">OAuth / Service Account</span></div></div>
+      <div class="skill reveal"><div class="ic">💻</div><h3>開發語言 / 介面</h3><div class="row"><span class="k">Python</span><span class="k">JavaScript</span><span class="k">SQL</span><span class="k">REST API</span><span class="k">HTML / CSS</span><span class="k">RWD</span></div></div>
+      <div class="skill reveal"><div class="ic">☁️</div><h3>部署 / 架構</h3><div class="row"><span class="k">Cloudflare Workers</span><span class="k">Cloudflare Pages</span><span class="k">WASM SQLite (sql.js)</span><span class="k">靜態優先架構</span><span class="k">零後端設計</span></div></div>
+      <div class="skill reveal"><div class="ic">🛡️</div><h3>工程實務</h3><div class="row"><span class="k">API 配額管理與節流</span><span class="k">增量同步</span><span class="k">自動化測試</span><span class="k">跨資料模型對齊</span><span class="k">OAuth / Service Account</span><span class="k">權限邊界設計</span></div></div>
     </div>
   </div>
 </section>
@@ -241,12 +370,13 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
   <div class="container">
     <h2 class="sec-title reveal"><span class="num">03.</span> 關於我</h2>
     <div class="about reveal">
-      <p>我專注於把 <b>AI、資料與多平台串接</b> 落地成能真正解決問題的系統。習慣從<b>系統設計、外部服務整合到生產化維運</b>一手包辦——例如自建 MCP server 讓 AI 直接、可靠地取用資料，並兼顧成本、準確度與商業風險。</p>
-      <p>擅長把重複的營運流程（客服、上架、數據分析、求職）<b>自動化</b>，並用清楚的視覺化把數據變成可行動的決策。</p>
+      <p>我專注於把 <b>AI、資料與多平台串接</b> 落地成能真正解決問題的系統。習慣從<b>需求定義、資料模型、流程設計、實作到生產化維運一手包辦</b>——例如自建 MCP server 讓 AI 直接、可靠地取用資料，同時兼顧成本、準確度與商業風險。</p>
+      <p>面對高風險流程時，我的做法是<b>把驗證寫進系統</b>：報價走保守防錯、AI 只有讀取與草稿權限、法規下架先比對再執行、自動批改比對結果而不是比對字串。錯誤不該靠人記得檢查。</p>
+      <p>學術背景是<b>數學系（高雄大學）</b>與<b>經濟研究所（台北大學）</b>。研究所期間擔任助教，負責出考題；大學時參與<b>教育部偏鄉計畫</b>擔任帶班老師。這段經歷讓我習慣先把「什麼叫做做到了」定義清楚，再開始動手。</p>
       <div class="stats">
-        <div class="stat"><div class="n">6</div><div class="l">互動作品展示</div></div>
-        <div class="stat"><div class="n">3</div><div class="l">自建 / 官方 MCP 整合</div></div>
-        <div class="stat"><div class="n">5+</div><div class="l">平台 API 串接</div></div>
+        <div class="stat"><div class="n">1</div><div class="l">真實上線產品</div></div>
+        <div class="stat"><div class="n">7</div><div class="l">架構展示</div></div>
+        <div class="stat"><div class="n">3</div><div class="l">自建／官方 MCP 整合</div></div>
       </div>
     </div>
   </div>
@@ -262,12 +392,13 @@ footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-
       <div class="socials">
         <a href="https://github.com/Jason0308p" target="_blank" rel="noopener">GitHub ↗</a>
         <a href="mailto:jason0308p@gmail.com">Email ↗</a>
+        <a href="index-pm.html">PM 版作品集 ↗</a>
       </div>
     </div>
   </div>
 </section>
 
-<footer>© 2026 Jason ｜ AI × 數據 × 自動化 作品集 ｜ 展示資料為虛構脫敏範例，AI 與後端行為為前端模擬</footer>
+<footer>© 2026 Jason ｜ Technical Solutions · AI × 數據 × 自動化 ｜ 架構展示區資料為虛構脫敏範例，AI 與後端行為為前端模擬；Schooling 為真實上線產品</footer>
 
 <script>
 // nav 陰影
@@ -300,5 +431,3 @@ document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
 </script>
 </body>
 </html>
-
-<!-- CI/CD 驗證 2026-07-24 -->

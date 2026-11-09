@@ -39,9 +39,9 @@
     </div>
   </div>
 
-  <!-- ===== 互動體驗：緊湊卡片 Grid，聊天／範例問題／處理流程同屏可見 ===== -->
+  <!-- ===== 主要互動區：對話框與範例問題為視覺主角，說明性區塊移至下方 ===== -->
   <div class="sec-row">
-    <h2 class="sec">互動體驗（送出訊息後，右側卡片即時亮燈）</h2>
+    <h2 class="sec">互動體驗：實際對話結果</h2>
     <!-- 狀態提示降級為細長橫向列，只作輔助，不與核心互動元件（對話框／範例問題）爭奪視覺權重 -->
     <div class="trace-strip" id="traceSummary" aria-live="polite">
       <span class="trace-status">目前狀態：等待提問</span>
@@ -50,8 +50,8 @@
   </div>
   <div class="demo-grid">
 
-    <!-- 對話框：內容較長，跨 2 欄／與其對應的處理流程並排 -->
-    <div class="dg-card dg-span2 dg-phone-card">
+    <!-- 對話框：本頁主角，跨 3 欄並加高，讓 AI 回覆內容成為最先被看到的結果 -->
+    <div class="dg-card dg-span3 dg-phone-card">
       <div class="phone">
         <div class="phone-top"><span class="av">🤖</span>
           <div class="pt-info"><div class="pt-name">AI 客服 · 禮品小幫手</div>
@@ -73,7 +73,22 @@
       </div>
     </div>
 
-    <!-- 與對話框並排：處理流程總覽，送出訊息後同步亮燈/更新 -->
+    <!-- 試試這些問題：互動的入口，與對話框同排同高 -->
+    <div class="dg-card">
+      <h3>試試這些問題（依技術分類）</h3>
+      <div id="chips"></div>
+    </div>
+
+  </div>
+
+  <!-- ===== 說明區：流程與判斷邏輯，仍會隨提問亮燈，但視覺權重低於上方互動區 ===== -->
+  <div class="sec-row explain-head">
+    <h2 class="sec">背後怎麼運作（說明）</h2>
+    <span class="explain-note">以下為架構說明，會跟著上方提問同步亮燈；實際展示重點在上方對話結果。</span>
+  </div>
+  <div class="explain-grid">
+
+    <!-- 處理流程總覽，送出訊息後同步亮燈/更新 -->
     <div class="dg-card dg-trace-card">
       <h3>處理流程</h3>
       <div class="cpipe" id="cpipe">
@@ -87,13 +102,7 @@
       <div class="tl" id="timeline"><div class="row skip"><span>尚未送出</span><span>—</span></div></div>
     </div>
 
-    <!-- 試試這些問題：精簡掃讀卡片 -->
-    <div class="dg-card">
-      <h3>試試這些問題（依技術分類）</h3>
-      <div id="chips"></div>
-    </div>
-
-    <!-- 冷熱判斷閘道：精簡卡片，一排可放 3 個小卡之一 -->
+    <!-- 冷熱判斷閘道：精簡卡片 -->
     <div class="dg-card dg-compact">
       <h3>冷熱判斷閘道</h3>
       <div class="cgate" id="cgateTree">
@@ -105,7 +114,7 @@
       </div>
     </div>
 
-    <!-- 接點說明：精簡卡片，一排可放 3 個小卡之一 -->
+    <!-- 接點說明：精簡卡片 -->
     <div class="dg-card dg-compact">
       <h3>接點說明</h3>
       <div class="caux">

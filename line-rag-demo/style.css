@@ -405,10 +405,10 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 }
 
 
-/* ===== 響應式卡片 Grid：高資訊密度，首屏內同時看到對話、流程與範例問題 ===== */
+/* ===== 版面層級：上方「互動區」是主角，下方「說明區」為輔助 ===== */
 /* 桌機（≥1000px）：4 欄基準格。
-   - 對話框（.dg-span2）跨 2 欄，與其對應的「處理流程」卡並排，同高、彼此可對照。
-   - 「試試這些問題」「冷熱判斷」「接點說明」等精簡卡各佔 1 欄，自動換行形成一排 2～3 個。 */
+   - 互動區：對話框跨 3 欄並加高，範例問題佔 1 欄同高，兩者都是訪客實際操作的元件。
+   - 說明區：處理流程／冷熱判斷／接點說明移出互動區，改用低彩度卡片，仍會隨提問亮燈。 */
 .demo-grid{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
@@ -420,14 +420,15 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
   display:flex;flex-direction:column;min-width:0;
 }
 .dg-span2{grid-column:span 2}
+.dg-span3{grid-column:span 3}
 
 .dg-phone-card{padding:0;overflow:hidden;grid-row:1}
-.dg-phone-card .phone{height:440px}
+.dg-phone-card .phone{height:520px}
 
-.dg-trace-card{grid-column:span 2;grid-row:1;gap:8px}
-.dg-trace-card .tl{max-height:150px;overflow-y:auto;padding-right:4px}
+.dg-trace-card{gap:8px}
+.dg-trace-card .tl{max-height:118px;overflow-y:auto;padding-right:4px}
 
-/* 冷熱判斷／接點說明：精簡指標卡，桌機一排放 2～3 個 */
+/* 冷熱判斷／接點說明：說明區的精簡指標卡 */
 .dg-compact{grid-column:span 1}
 
 .cnode.node{padding:6px 8px;gap:7px}
@@ -436,8 +437,8 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 .caux .cnode.node.side{width:100%;text-align:left;font-size:10.5px;white-space:nowrap;padding:6px 8px}
 .tl .row{padding:4px 0}
 
-/* 「試試這些問題」：跟冷熱判斷／接點說明同排的精簡卡，內容可捲動避免撐高整排 */
-.dg-card:has(#chips){grid-column:span 2;max-height:300px}
+/* 「試試這些問題」：互動入口，與對話框同排同高 */
+.demo-grid .dg-card:has(#chips){grid-column:span 1;max-height:520px}
 #chips{display:flex;flex-direction:column;gap:6px;overflow-y:auto}
 #chips .acc{margin:0}
 #chips .acc>summary{min-height:38px;padding:7px 9px;font-size:11.5px;line-height:1.3}
@@ -446,21 +447,41 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 #chips .chips{gap:5px}
 #chips .chip{padding:6px 8px;font-size:11.5px}
 
-/* 1180px 以下：4 欄縮成 2 欄，對話框與流程各自全寬（仍並排較窄兩欄），精簡卡兩排各 2 個 */
+/* ===== 說明區：與互動區明確分隔，視覺權重刻意降低 ===== */
+.explain-head{margin-top:26px;padding-top:16px;border-top:1px dashed var(--border2)}
+.explain-note{font-size:10.5px;color:var(--text3);line-height:1.4}
+.explain-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  align-items:start;
+}
+.explain-grid .dg-card{background:rgba(17,28,48,.5);border-color:#1b2941}
+.explain-grid .dg-trace-card{grid-column:span 2}
+/* 處理流程在說明區改橫排，佔用高度大幅降低 */
+.explain-grid .cpipe{flex-direction:row;flex-wrap:wrap;gap:4px}
+.explain-grid .cpipe .cnode.node{flex:1 1 auto;padding:5px 6px;gap:5px}
+.explain-grid .cpipe .cnode .cnm{font-size:10px}
+.explain-grid .cpipe .cnode .cic{font-size:11px}
+
+/* 1180px 以下：4 欄縮成 2 欄 */
 @media (max-width:1180px) and (min-width:1001px){
-  .demo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .dg-span2,.dg-trace-card,.dg-card:has(#chips){grid-column:span 2}
+  .demo-grid,.explain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dg-span2,.dg-span3{grid-column:span 2}
+  .demo-grid .dg-card:has(#chips){grid-column:span 2;max-height:300px}
+  .explain-grid .dg-trace-card{grid-column:span 2}
   .dg-compact{grid-column:span 1}
 }
 
-/* 1000px 以下：單欄堆疊，順序＝對話 → 範例問題（互動的延伸）→ 處理流程 → 冷熱判斷／接點說明 */
+/* 1000px 以下：單欄堆疊，順序＝對話 → 範例問題 → 說明區 */
 @media (max-width:1000px){
-  .demo-grid{grid-template-columns:1fr;gap:10px}
-  .dg-span2,.dg-trace-card,.dg-compact,.dg-card:has(#chips){grid-column:1}
+  .demo-grid,.explain-grid{grid-template-columns:1fr;gap:10px}
+  .dg-span2,.dg-span3,.dg-compact,.demo-grid .dg-card:has(#chips){grid-column:1}
+  .explain-grid .dg-trace-card{grid-column:1}
   .dg-phone-card{order:1}
-  .dg-card:has(#chips){order:2;max-height:none}
-  .dg-trace-card{order:3}
+  .demo-grid .dg-card:has(#chips){order:2;max-height:none}
   .dg-phone-card .phone{height:480px}
+  .explain-head{margin-top:20px}
 }
 
 /* 手機：卡片維持可點擊、可閱讀的尺寸，避免壓成微型卡片 */

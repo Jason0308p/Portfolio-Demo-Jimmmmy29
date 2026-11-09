@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jason｜技術型產品經理 · AI · MarTech · 電商營運</title>
+<meta name="description" content="Jason 的產品經理作品集：把模糊的營運痛點變成可衡量的產品問題。Schooling 互動式 SQL 課程平台（真實上線）、LINE 客服風險治理、GA4／GSC 行銷決策儀表板、電商上架與法規下架流程、台股輿情日報。擅長問題定義、優先排序、build-vs-buy 取捨、跨部門採用與風險治理。">
+<meta property="og:title" content="Jason｜技術型產品經理 · AI · MarTech · 電商營運">
+<meta property="og:description" content="把模糊的營運痛點變成可衡量的產品問題：1 個真實上線產品、7 個架構展示、2 份案例研究。">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1220; --card:#111c30; --card2:#0e1830; --border:#1e2c44; --border2:#2c4061;
+  --text:#e6edf7; --text2:#9fb2cc; --text3:#6b809e; --accent:#3b82f6; --accent2:#22d3ee; --gold:#f59e0b;
+  --nav-bg:rgba(11,18,32,.82); --t:all .3s ease;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+/* nav */
+.navbar{position:fixed;top:0;width:100%;padding:1.1rem 6%;display:flex;justify-content:space-between;align-items:center;background:var(--nav-bg);backdrop-filter:blur(10px);z-index:1000;border-bottom:1px solid transparent;transition:var(--t)}
+.navbar.scrolled{border-bottom-color:var(--border)}
+.logo{font-size:1.4rem;font-weight:900;color:var(--accent);letter-spacing:1px}
+.logo span{color:var(--text)}
+.nav-links{display:flex;list-style:none;gap:1.8rem}
+.nav-links a{font-size:.9rem;font-weight:500;color:var(--text2);transition:var(--t)}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.alt{color:var(--gold);font-weight:700}
+.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;background:none;border:1px solid var(--border2);border-radius:8px;cursor:pointer;padding:0}
+.nav-toggle span{display:block;width:20px;height:2px;margin:0 auto;background:var(--text);border-radius:2px;transition:var(--t)}
+.nav-toggle.active span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle.active span:nth-child(2){opacity:0}
+.nav-toggle.active span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998}
+@media(max-width:680px){
+  .nav-toggle{display:flex}
+  .nav-links{
+    position:fixed;top:0;right:0;height:100vh;width:min(74vw,300px);
+    background:var(--card);border-left:1px solid var(--border);
+    flex-direction:column;align-items:flex-start;gap:0;
+    padding:5.5rem 1.8rem 2rem;
+    transform:translateX(100%);transition:transform .3s ease;
+    z-index:999;box-shadow:-8px 0 30px rgba(0,0,0,.4);
+  }
+  .nav-links.open{transform:translateX(0)}
+  .nav-links li{width:100%}
+  .nav-links a{display:block;width:100%;padding:1rem 0;font-size:1rem;border-bottom:1px solid var(--border)}
+  .nav-overlay.open{display:block}
+}
+
+/* hero */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 8%;position:relative;
+  background:radial-gradient(900px 500px at 80% -10%,#12233f 0%,transparent 60%)}
+.greeting{color:var(--accent);font-family:var(--mono),monospace;font-size:1rem;margin-bottom:1rem;letter-spacing:1px}
+.hero h1{font-size:clamp(2.6rem,8vw,5rem);font-weight:900;line-height:1.05;color:#fff;letter-spacing:1px}
+.hero h2{font-size:clamp(1.4rem,5vw,2.8rem);color:var(--text2);margin:.4rem 0 1.4rem;font-weight:800}
+.hero .desc{max-width:640px;color:var(--text2);margin-bottom:2.4rem;font-size:1.05rem}
+.hero .desc b{color:var(--text)}
+.cta{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{display:inline-block;padding:.85rem 1.8rem;border-radius:6px;font-weight:700;transition:var(--t);font-size:.95rem}
+.btn.primary{border:1px solid var(--accent);color:var(--accent)}
+.btn.primary:hover{background:rgba(59,130,246,.1);transform:translateY(-2px)}
+.btn.secondary{color:var(--text2);border:1px solid var(--border2)}
+.btn.secondary:hover{color:var(--text);border-color:var(--text2)}
+.scroll-cue{position:absolute;bottom:1.6rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;opacity:.6;animation:bounce 2s infinite}
+.mouse{width:22px;height:36px;border:2px solid var(--text2);border-radius:12px;position:relative}
+.mouse::before{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:var(--text2);border-radius:50%;animation:sc 1.5s infinite}
+.scroll-cue span{font-size:.7rem;color:var(--text3);letter-spacing:1px}
+@keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0) translateX(-50%)}40%{transform:translateY(-8px) translateX(-50%)}60%{transform:translateY(-4px) translateX(-50%)}}
+@keyframes sc{0%{opacity:1;top:6px}100%{opacity:0;top:18px}}
+
+/* sections */
+section{padding:5.5rem 8%}
+.container{max-width:1160px;margin:0 auto}
+.sec-title{display:flex;align-items:center;gap:16px;font-size:1.6rem;font-weight:800;color:#fff;margin-bottom:2.4rem;white-space:nowrap}
+.sec-title .num{font-family:var(--mono),monospace;font-size:1rem;color:var(--accent);font-weight:500}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* 專案分組 */
+.grp{margin:0 0 1.1rem}
+.grp h3{font-size:1.12rem;color:#fff;font-weight:800;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.grp .note{font-size:.82rem;color:var(--text3);margin-top:.45rem;max-width:880px}
+.grp-wrap{margin-bottom:3.4rem}
+.pill{font-size:.68rem;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:20px}
+.pill.live{color:#052e16;background:#4ade80}
+.pill.mock{color:var(--text2);background:var(--card2);border:1px solid var(--border2)}
+.pill.doc{color:var(--gold);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35)}
+
+/* works grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.3rem}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;transition:var(--t);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.card:hover{border-color:var(--accent);transform:translateY(-6px);box-shadow:0 14px 34px rgba(0,0,0,.4)}
+.card .ic{font-size:1.7rem}
+.card h3{margin:.7rem 0 .4rem;font-size:1.15rem;color:#fff;font-weight:800}
+.prob{color:var(--accent2);font-weight:600;font-size:.88rem;margin-bottom:.55rem}
+.card .d{font-size:.9rem;color:var(--text2);flex:1}
+.card .tags{display:flex;flex-wrap:wrap;gap:6px;margin:.9rem 0 1rem}
+.card .t{font-size:.7rem;color:var(--text3);background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:2px 8px}
+.links{display:flex;flex-wrap:wrap;gap:.5rem 1.3rem;margin-top:auto}
+.links a{font-size:.85rem;font-weight:700;color:var(--accent);display:inline-flex;align-items:center;gap:6px;transition:var(--t)}
+.links a:hover{gap:11px;color:var(--accent2)}
+.links a.doc{color:var(--gold)}
+.links a.doc:hover{color:#fbbf24}
+
+/* 真實上線產品（視覺區別） */
+.flagship{background:linear-gradient(140deg,#13243d 0%,#111c30 62%);border:1px solid #2f5f7a;box-shadow:0 0 0 1px rgba(34,211,238,.12),0 18px 44px rgba(0,0,0,.45)}
+.flagship::before{height:4px;background:linear-gradient(90deg,#4ade80,var(--accent2))}
+.flagship:hover{border-color:#4ade80}
+.flagship h3{font-size:1.4rem}
+.flagship .d{font-size:.95rem}
+.metrics{display:flex;flex-wrap:wrap;gap:1.4rem;margin:1.1rem 0 .3rem}
+.metrics .m .n{font-size:1.5rem;font-weight:800;color:#4ade80;font-family:var(--mono),monospace;line-height:1.15}
+.metrics .m .l{font-size:.75rem;color:var(--text3)}
+
+/* 案例研究簡卡 */
+.card.lite{background:var(--card2);padding:1.3rem 1.4rem}
+.card.lite::before{background:linear-gradient(90deg,var(--gold),transparent)}
+.card.lite:hover{border-color:var(--gold)}
+.card.lite h3{font-size:1.05rem}
+
+/* skills */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.3rem}
+.skill{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:var(--t)}
+.skill:hover{transform:translateY(-5px);border-color:var(--accent2)}
+.skill.lead{border-color:var(--accent2);background:linear-gradient(140deg,#13243d 0%,#111c30 62%)}
+.skill .ic{font-size:1.6rem;margin-bottom:.7rem}
+.skill h3{color:#fff;font-size:1.05rem;margin-bottom:.7rem}
+.skill .row{display:flex;flex-wrap:wrap;gap:6px}
+.skill .k{font-size:.75rem;color:var(--text2);background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:3px 10px}
+
+/* about */
+.about{color:var(--text2);max-width:820px;font-size:1.02rem}
+.about p{margin-bottom:1rem}
+.about b{color:var(--text)}
+.stats{display:flex;gap:2.5rem;margin-top:2rem;flex-wrap:wrap}
+.stat .n{font-size:2.2rem;font-weight:800;color:var(--accent);font-family:var(--mono),monospace}
+.stat .l{font-size:.85rem;color:var(--text3)}
+
+/* contact */
+.contact{text-align:center;max-width:600px;margin:0 auto}
+.contact p{color:var(--text2);font-size:1.1rem;margin-bottom:1.6rem}
+.email{font-size:clamp(1.3rem,4vw,2rem);color:var(--accent);font-weight:800;display:inline-block;margin-bottom:2rem;transition:var(--t)}
+.email:hover{transform:scale(1.04)}
+.socials{display:flex;justify-content:center;gap:1.6rem;flex-wrap:wrap}
+.socials a{color:var(--text2);transition:var(--t)}
+.socials a:hover{color:var(--accent)}
+
+footer{text-align:center;padding:2rem;color:var(--text3);font-size:.8rem;border-top:1px solid var(--border)}
+.demo-note{font-size:.8rem;color:var(--text3);margin-top:1.5rem}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:all .7s ease}
+.reveal.on{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<nav class="navbar" id="nav">
+  <div class="logo">Jason<span>.</span></div>
+  <button class="nav-toggle" id="navToggle" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="navLinks">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#work">作品</a></li>
+    <li><a href="#skills">能力</a></li>
+    <li><a href="#about">關於</a></li>
+    <li><a href="#contact">聯絡</a></li>
+    <li><a class="alt" href="index.html">Technical 版 ↗</a></li>
+  </ul>
+  <div class="nav-overlay" id="navOverlay"></div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <span class="greeting">你好，我是</span>
+  <h1>Jason</h1>
+  <h2>把模糊的營運痛點變成可衡量的產品問題</h2>
+  <p class="desc">我的起點通常不是「要做什麼功能」，而是<b>誰在什麼情況下被卡住、卡住的成本是多少</b>。
+     把痛點收斂成可衡量的問題之後，才做<b>優先排序與 build-vs-buy 取捨</b>——能用現成服務解決的不自己蓋，蓋了之後也要有人真的用。
+     交付不只是上線：還包括<b>跨部門採用、風險治理與驗收標準的設計</b>。</p>
+  <div class="cta">
+    <a href="#work" class="btn primary">看作品 →</a>
+    <a href="#contact" class="btn secondary">聯絡我</a>
+  </div>
+  <div class="scroll-cue"><div class="mouse"></div><span>SCROLL</span></div>
+</header>
+
+<!-- WORK -->
+<section id="work">
+  <div class="container">
+    <h2 class="sec-title reveal"><span class="num">01.</span> 專案作品</h2>
+
+    <!-- 第一組：真實上線產品 -->
+    <div class="grp-wrap">
+      <div class="grp reveal">
+        <h3>真實上線產品 <span class="pill live">✅ 真實上線・可直接操作・非模擬資料</span></h3>
+        <p class="note">自行定義問題、設計範圍並上線的產品，任何人都可以直接開啟使用。</p>
+      </div>
+      <div class="grid">
+        <div class="card flagship reveal">
+          <div class="ic">🎓</div>
+          <h3>Schooling｜互動式 SQL 課程平台</h3>
+          <div class="prob">讓想學 SQL 的人在瀏覽器裡直接練，不用裝資料庫、不用註冊、不用後端</div>
+          <div class="d">產品決策的核心是<b>把註冊與環境安裝這兩道放棄點直接拿掉</b>：打開網頁就能寫 SQL。
+             因此架構上<b>刻意不做後端</b>（WASM SQLite 跑在瀏覽器裡）——換來<b>零維運成本</b>與<b>使用者資料不離開瀏覽器</b>的隱私優勢，代價是放棄跨裝置同步與學習數據收集，這是明知取捨後的選擇。
+             驗收標準上，自動批改<b>比對查詢結果而非 SQL 字串</b>：同一題允許多種正確寫法，避免把「寫法不同」誤判成「答錯」而打擊學習者。</div>
+          <div class="metrics">
+            <div class="m"><div class="n">13</div><div class="l">門課</div></div>
+            <div class="m"><div class="n">113</div><div class="l">課</div></div>
+            <div class="m"><div class="n">296</div><div class="l">題</div></div>
+            <div class="m"><div class="n">204</div><div class="l">個課文範例</div></div>
+          </div>
+          <div class="tags"><span class="t">零後端取捨</span><span class="t">WASM SQLite</span><span class="t">結果比對式批改</span></div>
+          <div class="links">
+            <a href="https://schooling.jason0308p.workers.dev" target="_blank" rel="noopener">開啟線上平台 ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第二組：架構展示 -->
+    <div class="grp-wrap">
+      <div class="grp reveal">
+        <h3>架構展示 <span class="pill mock">模擬資料</span></h3>
+        <p class="note">公司內部系統不可外展，此區為純前端架構示意，資料為虛構脫敏範例，AI 與後端行為為模擬。</p>
+      </div>
+      <div class="grid">
+
+        <div class="card reveal">
+          <div class="ic">💬</div>
+          <h3>LINE 智能客服機器人</h3>
+          <div class="prob">讓客服不會因為報錯價格造成商業損失——回得快不是第一優先</div>
+          <div class="d">B2B 客服導入 AI 的關鍵決策，是<b>先定義「答錯的代價」再定義「答得多快」</b>：報價類問題一律走保守回覆並轉人工，FAQ 類才全自動。
+             同時設計建單與群組通知，讓業務知道哪些對話需要接手，而不是全部重看一遍。</div>
+          <div class="tags"><span class="t">風險分級回覆</span><span class="t">RAG</span><span class="t">LINE</span></div>
+          <div class="links">
+            <a href="line-rag-demo/index.html">進入展示 →</a>
+            <a class="doc" href="case-studies/06-line-rag.md" target="_blank" rel="noopener">看完整案例 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">📊</div>
+          <h3>GA4 + MCP 數據分析</h3>
+          <div class="prob">讓 AI 能安全存取追蹤設定，但沒有發布權</div>
+          <div class="d">在「讓 AI 幫忙分析」與「不要讓 AI 搞壞追蹤設定」之間劃權限邊界：AI 只有讀取與草稿權，<b>發布動作保留給人</b>。
+             這是 build-vs-buy 的實例——分析層採用官方 MCP 不自建，省下的時間花在治理設計上。</div>
+          <div class="tags"><span class="t">權限邊界設計</span><span class="t">官方 MCP（buy）</span></div>
+          <div class="links">
+            <a href="ga-mcp-demo/index.html">進入展示 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">🧭</div>
+          <h3>GA4 / GSC 行銷分析儀表板</h3>
+          <div class="prob">讓主管看得懂詢價從哪來，讓行銷與工程能安全改追蹤設定</div>
+          <div class="d">把「流量很多但不知道哪來的詢價」收斂成一組可決策的畫面：來源歸因、詢價與 LINE 漏斗，以及依「量體 × 意圖」自動分層的<b>關鍵字投放建議</b>（小池子／大池子／否定字／季節字），讓行銷能直接拿去調預算。
+             每張圖都標資料更新日——沒有更新日的數字不會被信任，也不該被用來做決策。</div>
+          <div class="tags"><span class="t">決策介面設計</span><span class="t">關鍵字分層</span><span class="t">GA4 · GSC</span></div>
+          <div class="links">
+            <a href="ga-dashboard-demo/index.html">進入展示 →</a>
+            <a class="doc" href="case-studies/04-ga4-dashboard.md" target="_blank" rel="noopener">看完整案例 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">🤖</div>
+          <h3>AI 自動化求職 Pipeline</h3>
+          <div class="prob">讓六千多筆職缺被語意判讀，而不是被職稱關鍵字誤判</div>
+          <div class="d">關鍵字過濾在大量資料下的失誤率太高，所以改用語意評分：先用規則做粗篩降低 AI 成本，再讓 AI 處理需要判斷的部分。
+             這是<b>成本與準確度的分層取捨</b>，不是一律丟給 AI。</div>
+          <div class="tags"><span class="t">分層篩選取捨</span><span class="t">AI 成本控制</span></div>
+          <div class="links">
+            <a href="job-automation-demo/index.html">進入展示 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">🗂️</div>
+          <h3>職缺研究 Dashboard</h3>
+          <div class="prob">讓分散的職缺研究與 AI 產出集中成可搜尋的決策介面</div>
+          <div class="d">資料散落在各處時，問題不是「資料不夠」而是「找不到」。把研究素材收進單一可搜尋介面，讓決策時間從「翻半小時」降到「查一次」。</div>
+          <div class="tags"><span class="t">資訊架構</span><span class="t">決策介面</span></div>
+          <div class="links">
+            <a href="job-research-dashboard-demo/index.html">進入展示 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">🛍️</div>
+          <h3>Shopify 商品上架 SEO/GEO 自動化</h3>
+          <div class="prob">讓一萬四千件商品的法規下架能在幾分鐘內零錯誤完成</div>
+          <div class="d">法規下架是<b>錯一件就有法律風險</b>的流程，人工處理一萬四千件商品既慢又不可驗證。
+             設計重點在批次執行前的比對與執行後的可稽核紀錄，並把下架結果同步到下游系統，避免各部門看到不同版本的真相。</div>
+          <div class="tags"><span class="t">法規風險治理</span><span class="t">批次流程設計</span><span class="t">Shopify</span></div>
+          <div class="links">
+            <a href="product-seo-demo/index.html">進入展示 →</a>
+            <a class="doc" href="case-studies/03-shopify-ops.md" target="_blank" rel="noopener">看完整案例 →</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <div class="ic">📈</div>
+          <h3>台股輿情日報</h3>
+          <div class="prob">讓一個人能每天掌握六十多支股票的市場情緒，而且 AI 成本可控</div>
+          <div class="d">範圍設定成「每天一份可讀完的日報」而不是即時監控系統——後者成本高、也不符合實際使用節奏。
+             資料來源優先選官方 API 以降低爬蟲維護風險，AI 只用在需要語意判斷的環節以控制成本。</div>
+          <div class="tags"><span class="t">範圍收斂</span><span class="t">AI 成本控制</span><span class="t">官方資料源優先</span></div>
+          <div class="links">
+            <a href="輿情_demo/index.html">進入展示 →</a>
+            <a class="doc" href="case-studies/05-stock-sentiment.md" target="_blank" rel="noopener">看完整案例 →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 第三組：案例研究 -->
+    <div class="grp-wrap">
+      <div class="grp reveal">
+        <h3>案例研究 <span class="pill doc">無互動 demo</span></h3>
+        <p class="note">這兩個專案為公司內部系統，無法做成可外展的展示頁，但有完整的案例文件可閱讀。</p>
+      </div>
+      <div class="grid">
+
+        <div class="card lite reveal">
+          <div class="ic">✍️</div>
+          <h3>J1 商品文案自動化</h3>
+          <div class="prob">讓文案批次生成，但錯寫不會進到正式商品資料</div>
+          <div class="d">導入 AI 生成的前提是先設好退路：產出先進暫存層，通過比對與抽驗才寫入正式商品資料。願意接受「多一道關卡」換取「錯誤不會外流到客戶眼前」。</div>
+          <div class="links">
+            <a class="doc" href="case-studies/01-j1-product-copy.md" target="_blank" rel="noopener">看案例 →</a>
+          </div>
+        </div>
+
+        <div class="card lite reveal">
+          <div class="ic">🚚</div>
+          <h3>營運流程自動化（社群／貨運／財務）</h3>
+          <div class="prob">讓業務能即時回答客戶「貨在哪」，而不是打電話問倉庫</div>
+          <div class="d">真正的痛點不在倉庫，而在資訊只存在於某個人的腦袋裡。把三條獨立流程收斂成同一份可查詢狀態，前線不必靠人情轉述就能回覆客戶——跨部門採用是這個案子最難的部分。</div>
+          <div class="links">
+            <a class="doc" href="case-studies/02-ops-automation.md" target="_blank" rel="noopener">看案例 →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="demo-note reveal">＊ 除 Schooling 為真實上線產品外，其餘展示頁皆為公開展示用的純前端靜態頁；真實程式碼、架構與 know-how 可於面談時說明。</p>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <h2 class="sec-title reveal"><span class="num">02.</span> 能力與工具</h2>
+    <div class="skills-grid">
+      <div class="skill lead reveal"><div class="ic">🎯</div><h3>產品與決策</h3><div class="row"><span class="k">問題定義</span><span class="k">優先排序</span><span class="k">build vs buy</span><span class="k">風險治理</span><span class="k">跨部門採用</span><span class="k">評量標準設計</span></div></div>
+      <div class="skill reveal"><div class="ic">🧠</div><h3>AI 應用與邊界</h3><div class="row"><span class="k">RAG 應用設計</span><span class="k">AI grounding / 防幻覺</span><span class="k">AI 成本控制</span><span class="k">人機分工設計</span><span class="k">MCP</span></div></div>
+      <div class="skill reveal"><div class="ic">📊</div><h3>數據與成效衡量</h3><div class="row"><span class="k">GA4</span><span class="k">GSC</span><span class="k">GTM</span><span class="k">轉換漏斗</span><span class="k">來源歸因</span><span class="k">SQL</span><span class="k">決策儀表板</span></div></div>
+      <div class="skill reveal"><div class="ic">🛒</div><h3>電商與 MarTech 營運</h3><div class="row"><span class="k">Shopify</span><span class="k">商品與集合管理</span><span class="k">SEO / GEO</span><span class="k">法規下架流程</span><span class="k">LINE 官方帳號</span></div></div>
+      <div class="skill reveal"><div class="ic">⚙️</div><h3>流程與自動化</h3><div class="row"><span class="k">n8n</span><span class="k">流程重新設計</span><span class="k">資料正規化</span><span class="k">批次作業治理</span><span class="k">宜搭 (Yida)</span></div></div>
+      <div class="skill reveal"><div class="ic">💻</div><h3>技術落地（能自己做）</h3><div class="row"><span class="k">Python</span><span class="k">JavaScript</span><span class="k">REST API</span><span class="k">Cloudflare Workers</span><span class="k">靜態優先架構</span><span class="k">RWD</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <h2 class="sec-title reveal"><span class="num">03.</span> 關於我</h2>
+    <div class="about reveal">
+      <p>我做產品的方式是<b>先問「誰被卡住、卡住的成本是多少」</b>，再決定要不要做、做到什麼程度。
+         因為自己寫得出來，所以在 <b>build-vs-buy</b> 的討論裡我能給出有根據的估算，而不是只能等工程回報；也因為自己維運過，所以會把維護成本算進決策。</p>
+      <p>導入 AI 與自動化時，我的立場是<b>先定義錯誤的代價，再決定自動化的程度</b>：報價錯一次的損失、法規下架漏一件的風險、追蹤設定被誤改的後果——這些決定了哪裡該全自動、哪裡該留人工關卡。</p>
+      <p>學術背景是<b>數學系（高雄大學）</b>與<b>經濟研究所（台北大學）</b>。研究所期間擔任助教，<b>負責出考題</b>；大學時參與<b>教育部偏鄉計畫</b>擔任帶班老師。
+         出考題其實就是定義「什麼叫做學會了」——<b>跟定義驗收標準是同一種能力</b>：你得先講清楚什麼算及格，別人才有辦法做到。偏鄉帶班則讓我習慣對著完全不同背景的人把事情講懂，這在跨部門推動採用時每天都在用。</p>
+      <div class="stats">
+        <div class="stat"><div class="n">1</div><div class="l">真實上線產品</div></div>
+        <div class="stat"><div class="n">7</div><div class="l">架構展示</div></div>
+        <div class="stat"><div class="n">3</div><div class="l">自建／官方 MCP 整合</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <h2 class="sec-title reveal"><span class="num">04.</span> 聯絡我</h2>
+    <div class="contact reveal">
+      <p>對合作、職缺或這些專案有興趣，歡迎來信聊聊。</p>
+      <a class="email" href="mailto:jason0308p@gmail.com">jason0308p@gmail.com</a>
+      <div class="socials">
+        <a href="https://github.com/Jason0308p" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="mailto:jason0308p@gmail.com">Email ↗</a>
+        <a href="index.html">Technical 版作品集 ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Jason ｜ 技術型產品經理 · AI · MarTech · 電商營運 ｜ 架構展示區資料為虛構脫敏範例，AI 與後端行為為前端模擬；Schooling 為真實上線產品</footer>
+
+<script>
+// nav 陰影
+var nav = document.getElementById("nav");
+addEventListener("scroll", function () { nav.classList.toggle("scrolled", scrollY > 20); });
+// 手機版漢堡選單
+var navToggle = document.getElementById("navToggle");
+var navLinks = document.getElementById("navLinks");
+var navOverlay = document.getElementById("navOverlay");
+function closeNav() {
+  navLinks.classList.remove("open");
+  navOverlay.classList.remove("open");
+  navToggle.classList.remove("active");
+  navToggle.setAttribute("aria-expanded", "false");
+}
+function toggleNav() {
+  var isOpen = navLinks.classList.toggle("open");
+  navOverlay.classList.toggle("open", isOpen);
+  navToggle.classList.toggle("active", isOpen);
+  navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+}
+navToggle.addEventListener("click", toggleNav);
+navOverlay.addEventListener("click", closeNav);
+navLinks.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeNav); });
+// reveal on scroll
+var io = new IntersectionObserver(function (es) {
+  es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } });
+}, { threshold: .12 });
+document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+</script>
+</body>
+</html>

@@ -419,7 +419,6 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
   background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;
   display:flex;flex-direction:column;min-width:0;
 }
-.dg-span2{grid-column:span 2}
 .dg-span3{grid-column:span 3}
 
 .dg-phone-card{padding:0;overflow:hidden;grid-row:1}
@@ -467,7 +466,7 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 /* 1180px 以下：4 欄縮成 2 欄 */
 @media (max-width:1180px) and (min-width:1001px){
   .demo-grid,.explain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .dg-span2,.dg-span3{grid-column:span 2}
+  .dg-span3{grid-column:span 2}
   .demo-grid .dg-card:has(#chips){grid-column:span 2;max-height:300px}
   .explain-grid .dg-trace-card{grid-column:span 2}
   .dg-compact{grid-column:span 1}
@@ -476,7 +475,7 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);
 /* 1000px 以下：單欄堆疊，順序＝對話 → 範例問題 → 說明區 */
 @media (max-width:1000px){
   .demo-grid,.explain-grid{grid-template-columns:1fr;gap:10px}
-  .dg-span2,.dg-span3,.dg-compact,.demo-grid .dg-card:has(#chips){grid-column:1}
+  .dg-span3,.dg-compact,.demo-grid .dg-card:has(#chips){grid-column:1}
   .explain-grid .dg-trace-card{grid-column:1}
   .dg-phone-card{order:1}
   .demo-grid .dg-card:has(#chips){order:2;max-height:none}

@@ -161,15 +161,10 @@
 
   /* ---------- 流程動畫 ---------- */
   var STEPS = [["gtm"], ["ga", "gsc"], ["mcp"], ["ai"]];
-  var SIDE_AT = {};
   var runBtn = document.getElementById("runBtn");
   function setNode(k, st) {
     var n = document.querySelector('.node[data-k="' + k + '"]');
     if (!n) return; n.classList.remove("active", "done"); if (st) n.classList.add(st);
-  }
-  function pingSide(k) {
-    var n = document.querySelector('.node.side[data-k="' + k + '"]');
-    if (n) { n.classList.add("ping"); setTimeout(function () { n.classList.remove("ping"); }, 1300); }
   }
   function playFlow() {
     if (runBtn.disabled) return;
@@ -180,7 +175,6 @@
       if (i > 0) STEPS[i - 1].forEach(function (k) { setNode(k, "done"); });
       if (i < STEPS.length) {
         STEPS[i].forEach(function (k) { setNode(k, "active"); });
-        if (SIDE_AT[i]) pingSide(SIDE_AT[i]);
         i++; setTimeout(tick, 520);
       } else { runBtn.disabled = false; }
     }
@@ -626,12 +620,15 @@
     });
 
     var legend = document.getElementById("durcatLegend");
-    var rows = [{ name: "全站平均", color: COLORS.accent2, val: avg(allDurations) }].concat(
-      CATS.map(function (c) { return { name: c.name, color: c.color, val: avg(c.durations) }; })
+    /* 圖上畫的是中位數虛線，因此圖例以中位數為主、平均為輔；
+       對數常態分佈的長尾會把平均拉高，兩者刻意並列以免誤讀。 */
+    var rows = [{ name: "全站", color: COLORS.accent2, med: median(allDurations), mean: avg(allDurations) }].concat(
+      CATS.map(function (c) { return { name: c.name, color: c.color, med: median(c.durations), mean: avg(c.durations) }; })
     );
     legend.innerHTML = rows.map(function (r) {
       return '<div class="durcat-chip"><span class="durcat-dot" style="background:' + r.color + '"></span>' +
-        r.name + ' 平均 <span class="durcat-val">' + r.val + ' 秒</span></div>';
+        r.name + ' 中位數 <span class="durcat-val">' + r.med + ' 秒</span>' +
+        '<span class="durcat-mean">平均 ' + r.mean + ' 秒</span></div>';
     }).join("");
   })();
 

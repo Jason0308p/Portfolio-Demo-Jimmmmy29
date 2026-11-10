@@ -27,35 +27,24 @@
     <p>把 Google Analytics 4、Search Console、Tag Manager 的數據，透過 <b>Google 官方 GA MCP</b> 與 GSC / GTM API 餵給 AI，
        自動產出洞察分析與可視化儀表板。</p>
     <div class="tags">
-      <span class="tag">GA4 Data API</span>
-      <span class="tag">Google Search Console (GSC) API</span>
-      <span class="tag">Google Tag Manager (GTM) API</span>
       <span class="tag cool">官方 GA MCP (Google)</span>
-      <span class="tag">GSC / GTM API 整合</span>
-      <span class="tag">GTM 版本控制 / 變更管理</span>
+      <span class="tag">GA4 Data API</span>
+      <span class="tag">GSC / GTM API</span>
+      <span class="tag">AI 跨來源分析</span>
       <span class="tag">OAuth / Service Account</span>
-      <span class="tag">純 SVG 視覺化（零依賴）</span>
-      <span class="tag">AI 分析</span>
-      <span class="tag">資料視覺化</span>
-      <span class="tag">Python</span>
     </div>
   </div>
 
-  <!-- ===== 資料流程順序 ===== -->
+  <!-- ===== 資料流程順序：GTM 埋點 → GA4／GSC 收數 → MCP 取數 → AI 分析 ===== -->
   <h2 class="sec">資料流程順序（頁面載入自動播放一次）</h2>
   <div class="pipe" id="pipe">
-    <div class="node src" data-k="ga"><span class="step">1</span><div class="ic">📊</div><div class="nm">GA4</div><div class="sub">流量 / 事件 / 轉換</div><div class="ms" data-ms="ga"></div></div>
-    <div class="node src" data-k="gsc"><span class="step">1</span><div class="ic">🔍</div><div class="nm">GSC</div><div class="sub">點擊 / 曝光 / 排名</div><div class="ms" data-ms="gsc"></div></div>
-    <div class="node src" data-k="gtm"><span class="step">1</span><div class="ic">🏷️</div><div class="nm">GTM</div><div class="sub">標籤 / 事件設定</div><div class="ms" data-ms="gtm"></div></div>
-    <div class="node" data-k="mcp"><span class="step">2</span><div class="ic">🔌</div><div class="nm">官方 GA MCP</div><div class="sub">＋GSC / GTM API 取數</div><div class="ms" data-ms="mcp"></div></div>
-    <div class="node" data-k="ai"><span class="step">3</span><div class="ic">🤖</div><div class="nm">AI 分析</div><div class="sub">跨來源解讀</div><div class="ms" data-ms="ai"></div></div>
-    <div class="node out" data-k="out"><span class="step">4</span><div class="ic">📈</div><div class="nm">儀表板 / 洞察</div><div class="sub">視覺化報告</div><div class="ms" data-ms="out"></div></div>
+    <div class="node src" data-k="gtm"><span class="step">1</span><div class="ic">🏷️</div><div class="nm">GTM 埋點</div><div class="sub">標籤 / 事件 / Consent</div><div class="ms" data-ms="gtm"></div></div>
+    <div class="node src" data-k="ga"><span class="step">2</span><div class="ic">📊</div><div class="nm">GA4 收集</div><div class="sub">流量 / 事件 / 轉換</div><div class="ms" data-ms="ga"></div></div>
+    <div class="node src" data-k="gsc"><span class="step">2</span><div class="ic">🔍</div><div class="nm">GSC 搜尋成效</div><div class="sub">點擊 / 曝光 / 排名</div><div class="ms" data-ms="gsc"></div></div>
+    <div class="node" data-k="mcp"><span class="step">3</span><div class="ic">🔌</div><div class="nm">官方 GA MCP</div><div class="sub">＋GSC / GTM API 取數</div><div class="ms" data-ms="mcp"></div></div>
+    <div class="node out" data-k="ai"><span class="step">4</span><div class="ic">🤖</div><div class="nm">AI 分析 → 儀表板</div><div class="sub">跨來源解讀與視覺化</div><div class="ms" data-ms="ai"></div></div>
   </div>
-  <div class="aux">
-    <div class="node side" data-k="gen"><div class="ic">🚦</div><div class="nm">API 配額 / 節流</div><div class="sub">分頁·退避重試·快取</div></div>
-    <div class="node side" data-k="viz"><div class="ic">🧩</div><div class="nm">跨資料模型對齊</div><div class="sub">GA4 / GSC / GTM 口徑統一</div></div>
-    <div class="node side" data-k="lang"><div class="ic">📉</div><div class="nm">GA4 抽樣處理</div><div class="sub">拆區間·偵測 sampling</div></div>
-  </div>
+  <p class="pipe-note">GTM 先決定「要收什麼」，GA4 才有事件可收；GSC 是 Google 端的搜尋數據，與 GA4 平行取得。配額節流、抽樣處理與跨來源口徑對齊的作法，見本頁最後的技術說明。</p>
   <div class="runbar">
     <button id="runBtn">▶ 重播資料流程</button>
     <span class="runhint">頁面載入會自動播一次；亦可手動重播</span>
@@ -117,7 +106,7 @@
       <div class="durcat-cell"><h5>部落格</h5><div id="durCatBlog" class="pchart pchart-xs"></div></div>
     </div>
     <div class="durcat-legend" id="durcatLegend"></div>
-    <div class="chart-note">全站多數工作階段落在數十秒到數分鐘之間，右側長尾為深度瀏覽 / 高互動使用者；拆解到頁面大類可看出部落格／商品頁停留明顯較長，首頁則多為快速跳轉。</div>
+    <div class="chart-note">五張圖共用 0–600 秒的 X 軸與 20 秒分箱，Y 軸為該類型的工作階段佔比，因此可直接互相比較；超過 600 秒的長尾收斂在最後一個分箱。虛線為中位數——首頁多為快速跳轉，部落格與商品頁明顯右移、停留較長。</div>
   </div>
 
   <!-- ===== 2. 雙轉換漏斗 ===== -->
@@ -136,24 +125,67 @@
     <div class="chart-note">兩條路徑共用同一批進站流量，分別追蹤「填表詢價」與「導流至 LINE 官方帳號」兩種轉換終點，以手刻 SVG 梯形（polygon）呈現漏斗收斂。</div>
   </div>
 
-  <!-- ===== GTM 版本控制 ===== -->
+  <!-- ===== GTM 版本控制：仿 Tag Manager 後台的工作區／版本／變更摘要介面 ===== -->
   <h2 class="sec">GTM 版本控制與變更管理</h2>
-  <div class="panel">
-    <p class="gtm-intro">變更一律先在<b>獨立 Workspace</b> 中開發、確認無誤後才由人工審核並手動發布——API 存取權杖刻意不給 publish scope，避免草稿直接影響正式追蹤設定。</p>
-    <div class="gtm-ver">
-      <div class="gv-cur">已發布版本 <b id="gvCur">—</b></div>
-      <div class="gv-arrow">⟵ 比對草稿 Workspace ⟶</div>
-      <div class="gv-prev">草稿 Workspace <b id="gvPrev">—</b></div>
-    </div>
-    <div class="gtm-meta" id="gtmMeta"></div>
+  <div class="panel gtm-panel">
+    <div class="gtmui">
+      <div class="gtmui-top">
+        <div class="gtmui-brand"><span class="gtmui-mark">▦</span> Tag Manager</div>
+        <div class="gtmui-crumb">帳戶：DEMO BRAND　›　容器：<b id="gtmContainerId">GTM-XXXXXXX</b></div>
+        <div class="gtmui-actions">
+          <button class="gtmui-btn ghost" type="button" disabled>預覽</button>
+          <button class="gtmui-btn" type="button" disabled title="API 權杖未授予 publish 權限">提交變更</button>
+        </div>
+      </div>
+      <div class="gtmui-tabs" role="tablist" aria-label="GTM 後台分頁">
+        <button class="gtmui-tab on" type="button" role="tab" aria-selected="true" data-gtab="changes">變更摘要</button>
+        <button class="gtmui-tab" type="button" role="tab" aria-selected="false" data-gtab="versions">版本</button>
+      </div>
 
-    <div class="gtm-scenario">
-      <h4>範例變更：新增 <code>?debug=1</code> 開發者除錯開關</h4>
-      <p>目的是讓開發者在網址加上查詢參數就能即時進 GA4 DebugView 驗證事件觸發是否正確，同時完全不影響一般使用者的正式資料。</p>
-    </div>
+      <div class="gtmui-body" id="gtabChanges">
+        <div class="gtmui-wsbar">
+          <div class="gtmui-ws">
+            <span class="gtmui-wsdot"></span>
+            <div>
+              <div class="gtmui-wslabel">目前工作區</div>
+              <div class="gtmui-wsname" id="gvPrev">—</div>
+            </div>
+          </div>
+          <div class="gtmui-vs">比對</div>
+          <div class="gtmui-ws">
+            <span class="gtmui-wsdot live"></span>
+            <div>
+              <div class="gtmui-wslabel">線上已發布版本</div>
+              <div class="gtmui-wsname" id="gvCur">—</div>
+            </div>
+          </div>
+          <div class="gtmui-count"><b id="gtmChangeCount">0</b> 項工作區變更</div>
+        </div>
+        <div class="gtm-meta" id="gtmMeta"></div>
 
-    <div class="gtm-diff" id="gtmDiff"></div>
-    <div class="chart-note">變更類型：<span style="color:var(--green)">＋新增</span>／<span style="color:var(--gold)">～修改</span>／<span style="color:var(--red)">－刪除</span></div>
+        <div class="gtmui-scenario">
+          <b>本次變更：</b>新增 <code>?debug=1</code> 開發者除錯開關——讓開發者在網址加上查詢參數就能進 GA4 DebugView 驗證事件，不影響一般使用者的正式資料。
+        </div>
+
+        <div class="gtmui-table">
+          <div class="gtmui-thead"><span>類型</span><span>名稱</span><span>變更</span><span>說明</span></div>
+          <div class="gtm-diff" id="gtmDiff"></div>
+        </div>
+
+        <div class="gtmui-foot">
+          <span class="gtmui-status">狀態：待人工審核，尚未發布</span>
+          <span class="gtmui-perm">🔒 API 權杖僅有 <code>tagmanager.edit.containers</code>，未給 <code>publish</code>——草稿無法直接上線</span>
+        </div>
+      </div>
+
+      <div class="gtmui-body" id="gtabVersions" hidden>
+        <div class="gtmui-table">
+          <div class="gtmui-thead vhead"><span>版本</span><span>名稱</span><span>發布時間</span><span>發布者</span></div>
+          <div id="gtmVersions"></div>
+        </div>
+        <div class="gtmui-foot"><span class="gtmui-status">版本可直接回復（rollback）到任一先前版本；此處為展示資料。</span></div>
+      </div>
+    </div>
 
     <div class="note gtm-api-note">
       <b>API 行為備註：</b>GTM API 的更新是「整包覆寫」而非局部 patch——每次修改都要先 <code>GET</code> 現有設定，在本地合併新參數後再把完整物件送出，漏掉既有欄位會直接被覆蓋清空。

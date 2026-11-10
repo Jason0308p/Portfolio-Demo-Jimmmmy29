@@ -160,8 +160,8 @@
   });
 
   /* ---------- 流程動畫 ---------- */
-  var STEPS = [["ga", "gsc", "gtm"], ["mcp"], ["ai"], ["out"]];
-  var SIDE_AT = { 1: "gen", 3: "viz" };
+  var STEPS = [["gtm"], ["ga", "gsc"], ["mcp"], ["ai"]];
+  var SIDE_AT = {};
   var runBtn = document.getElementById("runBtn");
   function setNode(k, st) {
     var n = document.querySelector('.node[data-k="' + k + '"]');
@@ -534,46 +534,95 @@
       { key: "page", id: "durCatPage", name: "內容頁", mu: 3.7, sigma: 0.48, cap: 1000, color: COLORS.gold },
       { key: "blog", id: "durCatBlog", name: "部落格", mu: 4.55, sigma: 0.6, cap: 1800, color: COLORS.purple }
     ];
-    CATS.forEach(function (c, i) { c.durations = genDurations(20260630 + i * 97, 220, c.mu, c.sigma, c.cap); });
+    CATS.forEach(function (c, i) { c.durations = genDurations(20260630 + i * 97, 2400, c.mu, c.sigma, c.cap); });
     var allDurations = CATS.reduce(function (acc, c) { return acc.concat(c.durations); }, []);
 
     function avg(arr) { return Math.round(arr.reduce(function (a, b) { return a + b; }, 0) / arr.length); }
+    function median(arr) {
+      var s = arr.slice().sort(function (a, b) { return a - b; });
+      return s[Math.floor(s.length / 2)];
+    }
+
+    /* 所有分佈圖共用同一組 X 區間與分箱寬度，五個頁面類型才能直接互相比較；
+       超過上限的長尾一律落在最後一個「600s+」分箱。Y 軸改為佔比，不同樣本數也能並排看。 */
+    var DUR_START = 0, DUR_END = 600, DUR_BIN = 20;
 
     function renderHistogram(containerId, data, opts) {
       opts = opts || {};
-      var start = opts.start || 0, end = opts.end, binSize = opts.binSize;
+      var start = DUR_START, end = DUR_END, binSize = DUR_BIN;
       var binCount = Math.ceil((end - start) / binSize);
       var bins = new Array(binCount).fill(0);
       data.forEach(function (v) {
         var idx = Math.min(binCount - 1, Math.floor((v - start) / binSize));
         if (idx >= 0) bins[idx]++;
       });
-      var maxCount = Math.max.apply(null, bins) || 1;
+      var total = data.length || 1;
+      var pct = bins.map(function (c) { return c / total * 100; });
+      var maxPct = Math.max.apply(null, pct) || 1;
+      var yTop = Math.ceil(maxPct / 5) * 5 || 5;
+
       var container = document.getElementById(containerId);
       container.innerHTML = "";
       var host = document.createElement("div"); host.className = "hchart-host"; container.appendChild(host);
-      var W = 400, H = 170, padL = 34, padR = 8, padT = 8, padB = 22;
+      var W = 400, H = 170, padL = 34, padR = 10, padT = 10, padB = 26;
       var plotW = W - padL - padR, plotH = H - padT - padB;
       var barW = plotW / binCount;
       var svg = svgRoot(W, H);
+
+      /* Y 軸：佔比格線與刻度 */
+      [0, 0.5, 1].forEach(function (f) {
+        var v = yTop * f, y = padT + plotH - f * plotH;
+        svg.appendChild(svgEl("line", {
+          x1: padL, x2: padL + plotW, y1: y, y2: y,
+          stroke: "rgba(148,170,200,.16)", "stroke-width": 1
+        }));
+        svg.appendChild(svgEl("text", {
+          x: padL - 6, y: y + 3, "text-anchor": "end", class: "hchart-axis"
+        })).textContent = v.toFixed(0) + "%";
+      });
+
       bins.forEach(function (cnt, i) {
-        var bh = (cnt / maxCount) * plotH;
+        var bh = (pct[i] / yTop) * plotH;
+        var isOverflow = i === binCount - 1;
         var rect = svgEl("rect", {
           x: padL + i * barW, y: padT + plotH - bh, width: Math.max(0.6, barW - 1), height: bh,
-          fill: opts.color || "rgba(34,211,238,.55)"
+          fill: opts.color || "rgba(34,211,238,.55)", opacity: isOverflow ? .75 : 1
         });
         var binStart = start + i * binSize;
-        bindTip(rect, function () { return (binStart) + "–" + (binStart + binSize) + " 秒<br>" + cnt + " 筆"; });
+        bindTip(rect, function () {
+          return (isOverflow ? (binStart + " 秒以上") : (binStart + "–" + (binStart + binSize) + " 秒")) +
+            "<br>" + cnt.toLocaleString() + " 筆（" + pct[i].toFixed(1) + "%）";
+        });
         svg.appendChild(rect);
       });
-      svg.appendChild(svgEl("text", { x: padL, y: H - 6, class: "hchart-axis" })).textContent = start + "s";
-      svg.appendChild(svgEl("text", { x: padL + plotW, y: H - 6, "text-anchor": "end", class: "hchart-axis" })).textContent = end + "s";
+
+      /* 中位數參考線，讓「集中在哪」一眼可讀 */
+      var med = Math.min(end, median(data));
+      var mx = padL + (med - start) / (end - start) * plotW;
+      svg.appendChild(svgEl("line", {
+        x1: mx, x2: mx, y1: padT, y2: padT + plotH,
+        stroke: COLORS.gold, "stroke-width": 1.2, "stroke-dasharray": "3 3", opacity: .85
+      }));
+      /* 小倍數圖不標中位數文字，避免與 Y 軸刻度重疊 */
+      if (opts.medianLabel) {
+        svg.appendChild(svgEl("text", {
+          x: Math.min(mx + 4, padL + plotW - 2), y: padT + 9, class: "hchart-axis", fill: COLORS.gold
+        })).textContent = "中位數 " + median(data) + "s";
+      }
+
+      /* X 軸刻度：0 / 2 / 5 / 10 分鐘 */
+      [0, 120, 300, 600].forEach(function (t) {
+        var x = padL + (t - start) / (end - start) * plotW;
+        svg.appendChild(svgEl("text", {
+          x: x, y: H - 8, "text-anchor": t === 0 ? "start" : (t === end ? "end" : "middle"), class: "hchart-axis"
+        })).textContent = t === end ? "600s+" : (t + "s");
+      });
       host.appendChild(svg);
     }
 
-    renderHistogram("sessionDurChart", allDurations, { start: 0, end: 1800, binSize: 50, color: "rgba(34,211,238,.55)" });
+    renderHistogram("sessionDurChart", allDurations, { color: "rgba(34,211,238,.55)", medianLabel: true });
     CATS.forEach(function (c) {
-      renderHistogram(c.id, c.durations, { start: 0, end: c.cap, binSize: Math.round(c.cap / 24), color: c.color });
+      renderHistogram(c.id, c.durations, { color: c.color });
     });
 
     var legend = document.getElementById("durcatLegend");
@@ -675,33 +724,60 @@
     });
   })();
 
-  /* ---------- GTM 版本控制 diff ---------- */
+  /* ---------- GTM 版本控制：仿 Tag Manager 後台的變更摘要與版本列表 ---------- */
   (function () {
     var G = {
-      cur: "v42（正式）", prev: "wsp-debug-mode（草稿）", by: "Jason",
+      cur: "版本 42", prev: "wsp-debug-mode", by: "Jason",
       at: "2026-06-30 15:20", container: "GTM-XXXXXXX",
-      groups: [
-        { name: "變數 Variables", rows: [
-          { op: "add", nm: "URL 變數 - debug_param", note: "讀取網址查詢字串 debug" },
-          { op: "add", nm: "查詢表變數 - debug_mode_lookup", note: '"1"→"true"，其餘輸入→undefined' }
-        ] },
-        { name: "標籤 Tags", rows: [
-          { op: "mod", nm: "Google 代碼設定標籤（Google tag）", note: "configSettings 新增 debug_mode，綁定 debug_mode_lookup" }
-        ] }
+      rows: [
+        { type: "變數", op: "add", nm: "URL 變數 - debug_param", note: "讀取網址查詢字串 debug" },
+        { type: "變數", op: "add", nm: "查詢表變數 - debug_mode_lookup", note: '"1" → "true"，其餘輸入 → undefined' },
+        { type: "標籤", op: "mod", nm: "Google 代碼設定標籤（Google tag）", note: "configSettings 新增 debug_mode，綁定 debug_mode_lookup" }
+      ],
+      versions: [
+        { v: "42", nm: "新增 debug_mode 查詢參數前的穩定版", at: "2026-06-28 11:05", by: "Jason", live: true },
+        { v: "41", nm: "表單送出事件改用 GA4 建議命名", at: "2026-06-19 16:42", by: "Jason", live: false },
+        { v: "40", nm: "Consent Mode v2 全標籤套用", at: "2026-06-05 09:30", by: "Jason", live: false },
+        { v: "39", nm: "LINE 點擊外連事件新增", at: "2026-05-22 14:18", by: "Jason", live: false }
       ]
     };
-    var SYM = { add: "＋", mod: "～", del: "－" };
+    var OPLABEL = { add: "新增", mod: "已修改", del: "已刪除" };
+    var TYPEICON = { "變數": "🧩", "標籤": "🏷️", "觸發條件": "⚡" };
+
     document.getElementById("gvCur").textContent = G.cur;
     document.getElementById("gvPrev").textContent = G.prev;
+    document.getElementById("gtmContainerId").textContent = G.container;
+    document.getElementById("gtmChangeCount").textContent = G.rows.length;
     document.getElementById("gtmMeta").innerHTML =
-      "容器：<b>" + G.container + "</b>　·　變更人：<b>" + G.by + "</b>　·　時間：<b>" + G.at + "</b>　·　狀態：<b>待人工審核，尚未發布</b>";
-    var diff = document.getElementById("gtmDiff");
-    G.groups.forEach(function (g) {
-      var wrap = document.createElement("div"); wrap.className = "gtm-group";
-      wrap.innerHTML = "<h4>" + g.name + "</h4>" + g.rows.map(function (r) {
-        return '<div class="diff-row ' + r.op + '"><span class="op">' + SYM[r.op] + '</span><span class="nm">' + r.nm + '</span><span class="note">' + r.note + '</span></div>';
-      }).join("");
-      diff.appendChild(wrap);
+      "容器：<b>" + G.container + "</b>　·　變更人：<b>" + G.by + "</b>　·　最後編輯：<b>" + G.at + "</b>";
+
+    document.getElementById("gtmDiff").innerHTML = G.rows.map(function (r) {
+      return '<div class="diff-row ' + r.op + '">' +
+        '<span class="ty">' + (TYPEICON[r.type] || "•") + " " + r.type + "</span>" +
+        '<span class="nm">' + r.nm + "</span>" +
+        '<span class="op">' + OPLABEL[r.op] + "</span>" +
+        '<span class="note">' + r.note + "</span></div>";
+    }).join("");
+
+    document.getElementById("gtmVersions").innerHTML = G.versions.map(function (v) {
+      return '<div class="ver-row">' +
+        '<span class="vv">' + v.v + (v.live ? ' <span class="vlive">線上</span>' : "") + "</span>" +
+        '<span class="vn">' + v.nm + "</span>" +
+        '<span class="vt">' + v.at + "</span>" +
+        '<span class="vb">' + v.by + "</span></div>";
+    }).join("");
+
+    var panes = { changes: document.getElementById("gtabChanges"), versions: document.getElementById("gtabVersions") };
+    document.querySelectorAll(".gtmui-tab").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var key = btn.getAttribute("data-gtab");
+        document.querySelectorAll(".gtmui-tab").forEach(function (b) {
+          var on = b === btn;
+          b.classList.toggle("on", on);
+          b.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        Object.keys(panes).forEach(function (k) { panes[k].hidden = k !== key; });
+      });
     });
   })();
 

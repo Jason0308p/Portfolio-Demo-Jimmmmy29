@@ -28,13 +28,13 @@
 
 | 專案 | 解決誰的什麼問題 | 案例文件 |
 |------|------------------|----------|
-| 💬 **LINE 智能客服機器人** | 讓客服不會因為報錯價格造成商業損失——回得快不是第一優先 | [06-line-rag.md](case-studies/06-line-rag.md) |
+| 💬 **LINE 智能客服機器人** | 讓客服不會因為報錯價格造成商業損失——回得快不是第一優先 | [06-line-rag.md](case-study.html?doc=06-line-rag) |
 | 📊 **GA4 + MCP 數據分析** | 讓 AI 能安全存取追蹤設定，但沒有發布權 | — |
-| 🧭 **GA4 / GSC 行銷分析儀表板** | 讓主管看得懂詢價從哪來，讓行銷與工程能安全改追蹤設定 | [04-ga4-dashboard.md](case-studies/04-ga4-dashboard.md) |
+| 🧭 **GA4 / GSC 行銷分析儀表板** | 讓主管看得懂詢價從哪來，讓行銷與工程能安全改追蹤設定 | [04-ga4-dashboard.md](case-study.html?doc=04-ga4-dashboard) |
 | 🤖 **AI 自動化求職 Pipeline** | 讓六千多筆職缺被語意判讀，而不是被職稱關鍵字誤判 | — |
 | 🗂️ **職缺研究 Dashboard** | 讓分散的職缺研究與 AI 產出集中成可搜尋的決策介面 | — |
-| 🛍️ **Shopify 商品上架 SEO/GEO 自動化** | 讓一萬四千件商品的法規下架能在幾分鐘內零錯誤完成 | [03-shopify-ops.md](case-studies/03-shopify-ops.md) |
-| 📈 **台股輿情日報** | 讓一個人能每天掌握六十多支股票的市場情緒，而且 AI 成本可控 | [05-stock-sentiment.md](case-studies/05-stock-sentiment.md) |
+| 🛍️ **Shopify 商品上架 SEO/GEO 自動化** | 讓一萬四千件商品的法規下架能在幾分鐘內零錯誤完成 | [03-shopify-ops.md](case-study.html?doc=03-shopify-ops) |
+| 📈 **台股輿情日報** | 讓一個人能每天掌握六十多支股票的市場情緒，而且 AI 成本可控 | [05-stock-sentiment.md](case-study.html?doc=05-stock-sentiment) |
 
 ### 2 個案例研究（無互動 demo）
 
@@ -42,8 +42,8 @@
 
 | 專案 | 解決誰的什麼問題 | 案例文件 |
 |------|------------------|----------|
-| ✍️ **J1 商品文案自動化** | 讓文案批次生成，但錯寫不會進到正式商品資料 | [01-j1-product-copy.md](case-studies/01-j1-product-copy.md) |
-| 🚚 **營運流程自動化（社群／貨運／財務）** | 讓業務能即時回答客戶「貨在哪」，而不是打電話問倉庫 | [02-ops-automation.md](case-studies/02-ops-automation.md) |
+| ✍️ **J1 商品文案自動化** | 讓文案批次生成，但錯寫不會進到正式商品資料 | [01-j1-product-copy.md](case-study.html?doc=01-j1-product-copy) |
+| 🚚 **營運流程自動化（社群／貨運／財務）** | 讓業務能即時回答客戶「貨在哪」，而不是打電話問倉庫 | [02-ops-automation.md](case-study.html?doc=02-ops-automation) |
 
 ---
 

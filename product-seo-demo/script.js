@@ -242,21 +242,21 @@
   }
   postBtn.onclick = runPost;
 
-  /* ================= 區塊2：上架與下架流程總覽 ================= */
+  /* ================= 區塊2：上架與下架流程總覽 =================
+     這一區只是流程說明，載入時自動播一次即可，不再提供重播按鈕。 */
   var STEPS = ["excel", "read", "ai", "write", "yida", "post"];
-  var runBtn = document.getElementById("runBtn");
+  var flowBusy = false;
   function setNode(k, st) { var n = document.querySelector('.node[data-k="' + k + '"]'); if (n) { n.classList.remove("active", "done"); if (st) n.classList.add(st); } }
   function playFlow() {
-    if (runBtn.disabled) return; runBtn.disabled = true;
+    if (flowBusy) return; flowBusy = true;
     document.querySelectorAll("#pipe .node").forEach(function (n) { n.classList.remove("active", "done"); });
     var i = 0;
     (function tick() {
       if (i > 0) setNode(STEPS[i - 1], "done");
       if (i < STEPS.length) { setNode(STEPS[i], "active"); i++; setTimeout(tick, 480); }
-      else { runBtn.disabled = false; }
+      else { flowBusy = false; }
     })();
   }
-  runBtn.addEventListener("click", playFlow);
 
   /* ================= 區塊4A：批次下架跨平台整合流程 ================= */
   var ARCHIVE_STEPS = ["a1", "a2", "a3", "a4", "a5"];
